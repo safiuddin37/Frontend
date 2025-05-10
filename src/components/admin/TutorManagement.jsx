@@ -80,7 +80,7 @@ const TutorManagement = () => {
         }
       });
       // POST to backend
-      const response = await fetch('/api/tutors', {
+      const response = await fetch('https://mtc-backend-jn5y.onrender.com/api/tutors', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`
@@ -177,7 +177,7 @@ const TutorManagement = () => {
       });
       
       // PUT to backend
-      const response = await fetch(`/api/tutors/${selectedTutor._id}`, {
+      const response = await fetch(`https://mtc-backend-jn5y.onrender.com/api/tutors/${selectedTutor._id}`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`
