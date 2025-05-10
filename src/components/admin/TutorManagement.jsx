@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import API from '../../config/axios.js';
 import AddTutorForm from './tutors/AddTutorForm';
 import UpdateTutorForm from './tutors/UpdateTutorForm';
 import TutorProfile from './tutors/TutorProfile';
@@ -79,29 +80,28 @@ const TutorManagement = () => {
           fd.append(key, value);
         }
       });
-      // POST to backend
-      const response = await fetch('https://mtc-backend-jn5y.onrender.com/api/tutors', {
-        method: 'POST',
+      // Define proper JSON data instead of FormData for API endpoints expecting JSON
+      const jsonData = {};
+      
+      // Convert FormData to JSON object
+      Object.entries(formData).forEach(([key, value]) => {
+        if (key === 'subjects' && Array.isArray(value)) {
+          jsonData[key] = value;
+        } else if (value !== undefined && value !== null) {
+          jsonData[key] = value;
+        }
+      });
+      
+      console.log('Sending JSON data to API:', jsonData);
+      
+      // POST to backend using axios instance
+      const response = await API.post('/tutors', jsonData, {
         headers: {
           Authorization: `Bearer ${token}`
-        },
-        body: fd
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        // Log full error response for debug
-        console.error('[AddTutor] Backend error:', data, JSON.stringify(data.errors, null, 2));
-        let errorMsg = 'Failed to add tutor';
-        if (data && Array.isArray(data.errors) && data.errors.length > 0) {
-          errorMsg = data.errors.map(e => e.msg || JSON.stringify(e)).join('\n');
-        } else if (data && data.message) {
-          errorMsg = data.message;
         }
-        setErrorMessage(errorMsg);
-        setShowErrorPopover(true);
-        setIsSubmitting(false);
-        return;
-      }
+      });
+      const data = response.data;
+      // With axios, successful responses come to this point - no need to check response.ok
       // Don't show an alert here - the AddTutorForm will show its own success popover
       // The form component will handle this with its own popover
       setIsSubmitting(false);
@@ -176,29 +176,29 @@ const TutorManagement = () => {
         }
       });
       
-      // PUT to backend
-      const response = await fetch(`https://mtc-backend-jn5y.onrender.com/api/tutors/${selectedTutor._id}`, {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        body: fd
+      // Define proper JSON data instead of FormData
+      const jsonData = {};
+      
+      // Convert FormData to JSON object
+      Object.entries(updatedData).forEach(([key, value]) => {
+        if (key === 'subjects' && Array.isArray(value)) {
+          jsonData[key] = value;
+        } else if (value !== undefined && value !== null) {
+          jsonData[key] = value;
+        }
       });
       
-      const data = await response.json();
-      if (!response.ok) {
-        console.error('[UpdateTutor] Backend error:', data);
-        let errorMsg = 'Failed to update tutor';
-        if (data && Array.isArray(data.errors) && data.errors.length > 0) {
-          errorMsg = data.errors.map(e => e.msg || JSON.stringify(e)).join('\n');
-        } else if (data && data.message) {
-          errorMsg = data.message;
+      console.log('Sending JSON data to API for update:', jsonData);
+      
+      // PUT to backend using axios instance
+      const response = await API.put(`/tutors/${selectedTutor._id}`, jsonData, {
+        headers: {
+          Authorization: `Bearer ${token}`
         }
-        setErrorMessage(errorMsg);
-        setShowErrorPopover(true);
-        setIsSubmitting(false);
-        return;
-      }
+      });
+      
+      const data = response.data;
+      // With axios, successful responses come to this point - no need to check response.ok
       
       // This is a critical fix - we need to set these values but NOT redirect immediately
       // Let the form show its own success message first
