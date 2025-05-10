@@ -116,7 +116,7 @@ const TutorStudents = () => {
 
       console.log('Sending student data:', formattedData) // Debug log
 
-      const response = await fetch('http://localhost:5000/api/students', {
+      const response = await fetch('https://mtc-backend-jn5y.onrender.com/api/students', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -173,7 +173,7 @@ const TutorStudents = () => {
           throw new Error('Please login to continue')
         }
 
-        const response = await fetch(`http://localhost:5000/api/students/${id}`, {
+        const response = await fetch(`https://mtc-backend-jn5y.onrender.com/api/students/${id}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -287,7 +287,7 @@ const TutorStudents = () => {
         throw new Error('Please login to continue')
       }
 
-      const response = await fetch(`http://localhost:5000/api/students/${selectedStudent._id}/attendance`, {
+      const response = await fetch(`https://mtc-backend-jn5y.onrender.com/api/students/${selectedStudent._id}/attendance`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -407,7 +407,7 @@ const TutorStudents = () => {
       
       console.log('Updating student with data:', updatedData)
       
-      const response = await fetch(`http://localhost:5000/api/students/${editFormData._id}`, {
+      const response = await fetch(`https://mtc-backend-jn5y.onrender.com/api/students/${editFormData._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -444,7 +444,7 @@ const TutorStudents = () => {
     try {
       const token = localStorage.getItem('token')
       if (!token) throw new Error('Please login to continue')
-      const response = await fetch(`http://localhost:5000/api/students/${studentId}`, {
+      const response = await fetch(`https://mtc-backend-jn5y.onrender.com/api/students/${studentId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

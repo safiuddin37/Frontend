@@ -80,7 +80,7 @@ const TutorPage = () => {
         currentLocation: currentLocation
       };
 
-      const result = await post("http://localhost:5000/api/auth/tutor/login", payload);
+      const result = await post("https://mtc-backend-jn5y.onrender.com/api/auth/tutor/login", payload);
       
       if (result.data.message && result.data.message.includes('within 100 meters')) {
         setError(result.data.message);
@@ -99,7 +99,7 @@ const TutorPage = () => {
     setShowLocationPermission(true);
     try {
       const currentLocation = await getCurrentLocation();
-      await post("http://localhost:5000/api/tutors/update-location", { currentLocation, token });
+      await post("https://mtc-backend-jn5y.onrender.com/api/tutors/update-location", { currentLocation, token });
       setPendingLocationUpdate(false);
       setShowLocationPermission(false);
     } catch (err) {
@@ -118,7 +118,7 @@ const TutorPage = () => {
       const token = userDataString ? JSON.parse(userDataString).token : null;
       if (!token) throw new Error('Authentication token not found');
       
-      const result = await post("http://localhost:5000/api/tutors/attendance", {
+      const result = await post("https://mtc-backend-jn5y.onrender.com/api/tutors/attendance", {
         currentLocation,
         token
       });
@@ -149,7 +149,7 @@ const TutorPage = () => {
         phone: phone,
         password: password
       };
-      const result = await post("http://localhost:5000/api/auth/tutor/login", payload);
+      const result = await post("https://mtc-backend-jn5y.onrender.com/api/auth/tutor/login", payload);
       if (!result || !result.data) {
         setError("Server not responding or network error.");
         return;

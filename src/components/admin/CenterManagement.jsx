@@ -155,9 +155,9 @@ const CenterManagement = () => {
       // Define URL based on whether we're editing or creating
       let url;
       if (editingCenter) {
-        url = `http://localhost:5000/api/centers/${editingCenter._id}`;
+        url = `https://mtc-backend-jn5y.onrender.com/api/centers/${editingCenter._id}`;
       } else {
-        url = 'http://localhost:5000/api/centers';
+        url = 'https://mtc-backend-jn5y.onrender.com/api/centers';
       }
 
       const response = await fetch(url, {
@@ -209,7 +209,7 @@ const CenterManagement = () => {
       if (!token) {
         throw new Error('No token found in local storage');
       }
-      const response = await fetch(`http://localhost:5000/api/centers/${deletingCenter._id}`, {
+      const response = await fetch(`https://mtc-backend-jn5y.onrender.com/api/centers/${deletingCenter._id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

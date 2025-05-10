@@ -11,7 +11,7 @@ const useGet = (endpoint) => {
 
     try {
       setLoading(true);
-      const res = await fetch(`http://localhost:5000/api${endpoint}`, {
+      const res = await fetch(`https://mtc-backend-jn5y.onrender.com/api${endpoint}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
