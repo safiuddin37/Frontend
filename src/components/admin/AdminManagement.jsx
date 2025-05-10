@@ -178,7 +178,7 @@ const AdminManagement = () => {
     try {
       setIsLoading(true);
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/admin/${adminToDelete._id}`,
+        `https://muhalla-tuition-center.netlify.app/admin/${adminToDelete._id}`,
         {
           method: 'DELETE',
           headers: {
