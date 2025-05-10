@@ -81,7 +81,7 @@ console.log('[AddTutorForm] JWT token from localStorage:', token);
         return;
       }
       try {
-        const res = await fetch('/api/centers', {
+        const res = await fetch('https://mtc-backend-jn5y.onrender.com/api/centers', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -130,7 +130,7 @@ console.log('[AddTutorForm] JWT token from localStorage:', token);
         return;
       }
       try {
-        const res = await fetch('/api/centers', {
+        const res = await fetch('https://mtc-backend-jn5y.onrender.com/api/centers', {
           headers: {
             Authorization: `Bearer ${token}`,
           },

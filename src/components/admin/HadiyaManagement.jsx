@@ -9,7 +9,7 @@ import Papa from 'papaparse';
 const fetchHadiyaReportAPI = async (params) => {
   const queryString = new URLSearchParams(params).toString();
   try {
-    return await authFetch(`http://localhost:5000/api/hadiya/report?${queryString}`);
+    return await authFetch(`https://mtc-backend-jn5y.onrender.com/api/hadiya/report?${queryString}`);
   } catch (error) {
     console.error('API Error:', error);
     throw error;
@@ -19,7 +19,7 @@ const fetchHadiyaReportAPI = async (params) => {
 // API function to record a hadiya payment
 const recordHadiyaPaymentAPI = async (paymentData) => {
   try {
-    return await authFetch('http://localhost:5000/api/hadiya/record', {
+    return await authFetch('https://mtc-backend-jn5y.onrender.com/api/hadiya/record', {
       method: 'POST',
       body: JSON.stringify(paymentData),
     });
@@ -50,7 +50,7 @@ const HadiyaManagement = () => {
   useEffect(() => {
     const fetchCenters = async () => {
       try {
-        const data = await authFetch('http://localhost:5000/api/centers');
+        const data = await authFetch('https://mtc-backend-jn5y.onrender.com/api/centers');
         setCenters(data);
       } catch (error) {
         console.error('Error fetching centers:', error);

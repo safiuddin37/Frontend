@@ -132,7 +132,7 @@ const UpdateTutorForm = ({ onSubmit, formData, fieldErrors, isSubmitting, tutorI
         }
       }
       
-      const response = await fetch('/api/centers', {
+      const response = await fetch('https://mtc-backend-jn5y.onrender.com/api/centers', {
         headers: {
           Authorization: `Bearer ${token}`,
         },

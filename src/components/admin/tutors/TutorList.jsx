@@ -62,7 +62,7 @@ const TutorList = ({ onEdit, onDelete, onProfile }) => {
         return;
       }
 
-      const response = await fetch('/api/tutors', {
+      const response = await fetch('https://mtc-backend-jn5y.onrender.com/api/tutors', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -108,7 +108,7 @@ const TutorList = ({ onEdit, onDelete, onProfile }) => {
         return;
       }
 
-      const response = await fetch(`/api/tutors/${tutorId}`, {
+      const response = await fetch(`https://mtc-backend-jn5y.onrender.com/api/tutors/${tutorId}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
