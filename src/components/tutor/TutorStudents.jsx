@@ -442,8 +442,18 @@ const TutorStudents = () => {
     if (!window.confirm('Are you sure you want to delete this student?')) return
     setIsDeleting(true)
     try {
-      const token = localStorage.getItem('token')
-      if (!token) throw new Error('Please login to continue')
+      const userDataStr = localStorage.getItem('userData')
+      if (!userDataStr) throw new Error('Please login to continue')
+      
+      // Parse the user data to get the token
+      let token
+      try {
+        const userData = JSON.parse(userDataStr)
+        token = userData.token
+        if (!token) throw new Error('Invalid authentication token')
+      } catch (e) {
+        throw new Error('Session expired. Please login again.')
+      }
       const response = await fetch(`https://mtc-backend-jn5y.onrender.com/api/students/${studentId}`, {
         method: 'DELETE',
         headers: {
