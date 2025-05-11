@@ -152,10 +152,7 @@ const HadiyaManagement = () => {
       return;
     }
     
-    if (amount > tutor.assignedHadiyaAmount) {
-      toast.error(`Amount cannot exceed ₹${tutor.assignedHadiyaAmount.toLocaleString('en-IN')}`);
-      return;
-    }
+    // Removed validation check to allow amounts greater than assigned Hadiya amount
     
     // Update UI state
     setTutors(current => 
@@ -441,9 +438,9 @@ const HadiyaManagement = () => {
                             <div className="w-full pl-2 py-1.5 bg-gray-100 border border-gray-300 rounded text-sm flex items-center">
                               <FiLock className="text-gray-500 mr-2" />
                               <span className="font-medium">₹ {amountPaid.toLocaleString('en-IN')}</span>
-                            </div>
-                            <div className="absolute right-0 top-0 bottom-0 py-1 px-2 bg-gray-200 rounded-r border border-gray-300 flex items-center text-xs text-gray-700">
-                              Locked
+                              <span className="ml-auto text-xs font-medium bg-gray-200 px-2 py-0.5 rounded text-gray-700">
+                                Locked
+                              </span>
                             </div>
                           </div>
                         ) : (
