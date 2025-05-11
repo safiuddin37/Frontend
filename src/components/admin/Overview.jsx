@@ -84,7 +84,7 @@ const Overview = () => {
       setLocalAttendance([]);
       
       // Then send request to clear data on server
-      const response = await fetch('/api/attendance/clear-recent', {
+      const response = await fetch('https://mtc-backend-jn5y.onrender.com/api/attendance/clear_recent', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

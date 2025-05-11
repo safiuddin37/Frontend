@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Popover from '../../common/Popover';
 
 const initialState = {
@@ -58,6 +59,7 @@ const selectStyle = {
 };
 
 const AddTutorForm = ({ onSubmit, formData, setFormData, fieldErrors, isSubmitting }) => {
+  const navigate = useNavigate();
   const [centers, setCenters] = useState([]);
   const [centersError, setCentersError] = useState(null);
   const [showSuccessPopover, setShowSuccessPopover] = useState(false);
@@ -611,11 +613,20 @@ console.log('[AddTutorForm] JWT token from localStorage:', token);
         onClose={() => {
           setShowSuccessPopover(false);
           setLocalForm({ ...initialState }); // Reset form on success
+          // Redirect specifically to the tutor management page
+          navigate('/admin-dashboard/tutors'); // Navigate directly to tutor management section
         }}
         title="Success!"
         message="Tutor has been added successfully. Default password: tutor123"
         type="success"
       />
+      
+      {/* Auto-redirect after success - matching the UpdateTutorForm behavior */}
+      {showSuccessPopover && setTimeout(() => {
+        setShowSuccessPopover(false);
+        setLocalForm({ ...initialState }); // Reset form on success
+        navigate('/admin-dashboard/tutors'); // Navigate directly to tutor management section
+      }, 1500)}
     </form>
   );
 };

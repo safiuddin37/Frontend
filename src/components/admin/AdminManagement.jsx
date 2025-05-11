@@ -178,7 +178,7 @@ const AdminManagement = () => {
     try {
       setIsLoading(true);
       const response = await fetch(
-        `https://muhalla-tuition-center.netlify.app/admin/${adminToDelete._id}`,
+        `https://mtc-backend-jn5y.onrender.com/api/admin/${adminToDelete._id}`,
         {
           method: 'DELETE',
           headers: {
