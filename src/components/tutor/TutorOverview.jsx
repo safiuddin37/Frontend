@@ -56,8 +56,7 @@ const LocationMarker = ({ onLocationUpdate }) => {
 import { useRef } from 'react';
 
 const TutorOverview = () => {
-  // Get hooks for attendance check with refresh capability
-  const { alreadyMarked, loading: attendanceCheckLoading, error: attendanceCheckError, refreshAttendanceCheck } = useTodayAttendance();
+  const { alreadyMarked, loading: attendanceCheckLoading, error: attendanceCheckError } = useTodayAttendance();
   const [showDeniedPopover, setShowDeniedPopover] = useState(false);
   const popoverRef = useRef();
 
@@ -126,7 +125,7 @@ const TutorOverview = () => {
   const handleMarkAttendance = async () => {
     if (locationMatch && currentLocation) {
       try {
-        const userDataString = localStorage.getItem('userData');
+        const userDataString = localStorage.getItem('userData'); // Changed from 'user' to 'userData' for consistency
         const token = userDataString ? JSON.parse(userDataString).token : null;
         if (!token) {
           throw new Error('Authentication token not found')
@@ -141,36 +140,21 @@ const TutorOverview = () => {
           body: JSON.stringify({
             currentLocation: [currentLocation.lat, currentLocation.lng]
           })
-        });
+        })
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          if (errorData.message && errorData.message.includes('already marked')) {
-            setShowDeniedPopover(true);
-            // Refresh the attendance check to update the UI
-            if (refreshAttendanceCheck) refreshAttendanceCheck();
-            return;
-          }
-          throw new Error(errorData.message || `Error: ${response.status}`);
-        }
-
-        const data = await response.json();
+        const data = await response.json()
         if (data.message === 'Attendance submitted successfully') {
-          setAttendanceMarked(true);
-          setError(null);
-          // Refresh the attendance check to update the UI
-          if (refreshAttendanceCheck) refreshAttendanceCheck();
+          setAttendanceMarked(true)
+          setError(null)
         }
       } catch (error) {
-        console.error('Error marking attendance:', error);
         // Detect duplicate key error (E11000) from backend
-        if (error.message && (error.message.includes('E11000') || error.message.includes('already marked'))) {
+        if (error.message && error.message.includes('E11000')) {
           setShowDeniedPopover(true);
-          // Refresh the attendance check to update the UI
-          if (refreshAttendanceCheck) refreshAttendanceCheck();
         } else {
           setError(error.message || 'Failed to mark attendance');
         }
+        console.error('Error marking attendance:', error);
       }
     }
   }
@@ -306,7 +290,7 @@ const TutorOverview = () => {
                   }`}
                 >
                   {attendanceMarked ? <FiCheck className="mr-2" /> : null}
-                  {alreadyMarked || attendanceMarked ? 'Marked' : 'Mark Attendance'}
+                  {attendanceMarked ? 'Marked' : 'Mark Attendance'}
                 </button>
               </div>
             </div>
