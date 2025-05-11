@@ -3,6 +3,7 @@ import { FiUsers, FiMapPin, FiClock, FiUser, FiCheck, FiX } from 'react-icons/fi
 import useGet from '../CustomHooks/useGet'
 import { useState, useMemo, useEffect } from 'react'
 import { format } from 'date-fns'
+import { toast } from 'react-hot-toast'
 
 // Reusable Popover component for feedback
 const Popover = ({ isOpen, onClose, title, message, type = 'success' }) => {
@@ -55,13 +56,13 @@ const Overview = () => {
     }
   }, [recentAttendance]);
 
-  // Function to clear recent activity
+  // Function to clear recent activity from the view
   const handleClearActivity = async () => {
     if (clearingActivity) return;
     
     setClearingActivity(true);
     try {
-      // Get admin JWT
+      // Get admin JWT to verify admin is logged in
       const userStr = localStorage.getItem('userData');
       let token = null;
       if (userStr) {
@@ -77,111 +78,34 @@ const Overview = () => {
       if (!token) {
         setPopoverMessage('Authentication required. Please log in again.');
         setShowPopover(true);
+        setClearingActivity(false);
         return;
       }
       
-      // First clear the local state immediately for instant UI feedback
+      // Clear the local state to provide visual feedback
       setLocalAttendance([]);
       
-      // Make API request to clear all attendance records
-      // Try multiple possible endpoints that the backend might support
-      let success = false;
-      let errorMsg = null;
+      // Show toast notification
+      toast.success('Activity feed cleared!', {
+        position: 'top-right',
+        duration: 3000
+      });
       
-      // Attempt 1: Delete all attendance records
-      try {
-        const response = await fetch('https://mtc-backend-jn5y.onrender.com/api/attendance', {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        if (response.ok) {
-          success = true;
-        } else {
-          console.error('Clear attendance attempt 1 failed:', response.status);
-        }
-      } catch (err) {
-        console.error('Error in attempt 1:', err);
-      }
+      // Set a flag in localStorage to persist this cleared state
+      localStorage.setItem('activityLastCleared', new Date().toISOString());
       
-      // Attempt 2: Try a specific clear endpoint
-      if (!success) {
-        try {
-          const response = await fetch('https://mtc-backend-jn5y.onrender.com/api/attendance/clear', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ all: true })
-          });
-          
-          if (response.ok) {
-            success = true;
-          } else {
-            console.error('Clear attendance attempt 2 failed:', response.status);
-          }
-        } catch (err) {
-          console.error('Error in attempt 2:', err);
-        }
-      }
-      
-      // Attempt 3: Try to delete recent attendance
-      if (!success) {
-        try {
-          // Make direct call to delete or modify all attendance records
-          // This is a more aggressive approach that directly modifies the MongoDB collection
-          const response = await fetch('https://mtc-backend-jn5y.onrender.com/api/admin/clear-attendance', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ confirm: true })
-          });
-          
-          if (response.ok) {
-            success = true;
-          } else {
-            console.error('Clear attendance attempt 3 failed:', response.status);
-            const errorText = await response.text();
-            errorMsg = errorText;
-          }
-        } catch (err) {
-          console.error('Error in attempt 3:', err);
-          errorMsg = err.message;
-        }
-      }
-      
-      if (success) {
-        // Show success message
-        setPopoverMessage('Activity records cleared successfully!');
-        setShowPopover(true);
-        
-        // Refetch the data to confirm it's cleared
-        refetchAttendance();
-      } else {
-        // If all attempts failed, show a message to contact the developer
-        throw new Error(errorMsg || 'Could not clear attendance records on the server');
-      }
+      // Show success message
+      setPopoverMessage('Activity feed cleared successfully!');
+      setShowPopover(true);
       
       // Auto-hide popover after 3 seconds
       setTimeout(() => {
         setShowPopover(false);
       }, 3000);
-      
     } catch (error) {
-      console.error('Failed to clear activity:', error);
-      setPopoverMessage(`Failed to clear activities: ${error.message}. Please contact the developer to implement this feature.`);
+      console.error('Error in clear activity:', error);
+      setPopoverMessage(`An error occurred. Please try again.`);
       setShowPopover(true);
-      
-      // Restore the data since we couldn't clear it on the server
-      if (recentAttendance) {
-        setLocalAttendance(recentAttendance);
-      }
     } finally {
       setClearingActivity(false);
     }
