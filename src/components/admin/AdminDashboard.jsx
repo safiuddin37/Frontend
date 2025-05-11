@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Overview from './Overview';
 import TutorManagement from './TutorManagement';
@@ -16,13 +16,14 @@ const AdminDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false); // State to control sidebar visibility on mobile
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    // Check if there's a tab query parameter and set the active tab accordingly
-    const urlParams = new URLSearchParams(window.location.search);
-    const tabParam = urlParams.get('tab');
-    if (tabParam) {
-      setActiveTab(tabParam);
+    // Check if there's a tab param in location state and set active tab accordingly
+    if (location.state && location.state.activeTab) {
+      setActiveTab(location.state.activeTab);
+      // Clear the state after using it to prevent it from persisting on refresh
+      window.history.replaceState({}, document.title);
     }
     
     const loadUserData = () => {

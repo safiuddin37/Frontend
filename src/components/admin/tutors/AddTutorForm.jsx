@@ -614,7 +614,7 @@ console.log('[AddTutorForm] JWT token from localStorage:', token);
           setShowSuccessPopover(false);
           setLocalForm({ ...initialState }); // Reset form on success
           // Redirect to admin dashboard with tab parameter to show tutor management
-          navigate('/admin-dashboard?tab=tutors'); // Pass query parameter to indicate tutor tab
+          navigate('/admin-dashboard', { state: { activeTab: 'tutors' } }); // Use state to indicate tutor tab
         }}
         title="Success!"
         message="Tutor has been added successfully. Default password: tutor123"
@@ -625,7 +625,7 @@ console.log('[AddTutorForm] JWT token from localStorage:', token);
       {showSuccessPopover && setTimeout(() => {
         setShowSuccessPopover(false);
         setLocalForm({ ...initialState }); // Reset form on success
-        navigate('/admin-dashboard/tutors'); // Navigate directly to tutor management section
+        navigate('/admin-dashboard', { state: { activeTab: 'tutors' } }); // Use state to indicate tutor tab
       }, 1500)}
     </form>
   );
