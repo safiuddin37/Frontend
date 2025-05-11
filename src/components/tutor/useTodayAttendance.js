@@ -2,15 +2,12 @@ import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 
 // Custom hook to check if today's attendance is already marked for the logged-in tutor
-export default function useTodayAttendance(refreshTrigger = 0) {
+export default function useTodayAttendance() {
   const [alreadyMarked, setAlreadyMarked] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Reset states when fetching again
-    setLoading(true);
-    setError(null);
     const userData = JSON.parse(localStorage.getItem('userData') || '{}');
     const token = userData.token;
     const tutorId = userData._id;
@@ -20,7 +17,7 @@ export default function useTodayAttendance(refreshTrigger = 0) {
       return;
     }
     const today = format(new Date(), 'yyyy-MM-dd');
-    fetch(`https://mtc-backend-jn5y.onrender.com/api/attendance/recent`, {
+    fetch(`/api/attendance/recent`, {
       headers: { 'Authorization': `Bearer ${token}` }
     })
       .then(async res => {
@@ -46,7 +43,7 @@ export default function useTodayAttendance(refreshTrigger = 0) {
         setError(e.message);
         setLoading(false);
       });
-  }, [refreshTrigger]); // Adding refreshTrigger to dependency array to refetch when it changes
+  }, []);
 
   return { alreadyMarked, loading, error };
 }

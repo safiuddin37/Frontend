@@ -30,8 +30,6 @@ const TutorStudents = () => {
   const [editMode, setEditMode] = useState(false)
   const [editFormData, setEditFormData] = useState(null)
   const [isDeleting, setIsDeleting] = useState(false)
-  const [showDeletePopover, setShowDeletePopover] = useState(false)
-  const [studentToDelete, setStudentToDelete] = useState(null)
 
   // Get tutor data from localStorage
   const tutorData = JSON.parse(localStorage.getItem('userData') || '{}')
@@ -167,7 +165,8 @@ const TutorStudents = () => {
 
   const handleDelete = async (id) => {
     setIsDeleting(true)
-    try {
+    if (window.confirm('Are you sure you want to delete this student?')) {
+      try {
         // Get token from userData in localStorage
         const userData = JSON.parse(localStorage.getItem('userData') || '{}')
         const token = userData.token
@@ -199,9 +198,10 @@ const TutorStudents = () => {
         toast.error(error.message || 'Failed to delete student')
       } finally {
         setIsDeleting(false)
-        setShowDeletePopover(false)
-        setStudentToDelete(null)
       }
+    } else {
+      setIsDeleting(false)
+    }
   }
 
   const handleExportCSV = () => {
@@ -521,51 +521,7 @@ const TutorStudents = () => {
   }
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      {/* Delete Confirmation Popover */}
-      {showDeletePopover && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 p-4">
-          <motion.div 
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-white rounded-lg shadow-xl max-w-sm w-full p-6"
-          >
-            <div className="flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mb-4">
-                <FiTrash2 className="text-red-600 text-xl" />
-              </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Delete Student</h3>
-              <p className="text-center text-gray-600 mb-6">Are you sure you want to delete this student? This action cannot be undone.</p>
-              
-              <div className="flex space-x-4 w-full">
-                <button
-                  onClick={() => setShowDeletePopover(false)}
-                  className="flex-1 py-2 px-4 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
-                  disabled={isDeleting}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => handleDelete(studentToDelete)}
-                  className="flex-1 py-2 px-4 border border-transparent rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors flex justify-center items-center"
-                  disabled={isDeleting}
-                >
-                  {isDeleting ? (
-                    <>
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Deleting...
-                    </>
-                  ) : 'Delete'}
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      )}
+    <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
         <h1 className="text-2xl font-bold bg-gradient-to-r from-accent-600 to-primary-600 bg-clip-text text-transparent">
           Students Management
@@ -679,8 +635,7 @@ const TutorStudents = () => {
                             e.stopPropagation(); // Stop event bubbling
                             e.preventDefault(); // Prevent default behavior
                             console.log('Delete button clicked for student:', student._id);
-                            setStudentToDelete(student._id);
-                            setShowDeletePopover(true);
+                            handleDeleteStudent(student._id);
                           }}
                           className="text-red-600 hover:text-red-800 transition-colors"
                         >
@@ -724,8 +679,7 @@ const TutorStudents = () => {
                       onClick={(e) => {
                         e.stopPropagation();
                         e.preventDefault();
-                        setStudentToDelete(student._id);
-                        setShowDeletePopover(true);
+                        handleDeleteStudent(student._id);
                       }}
                       className="p-2 text-red-600 hover:text-red-800 transition-colors"
                     >
@@ -1410,26 +1364,8 @@ const TutorStudents = () => {
           </motion.div>
         )}
       </AnimatePresence>
-
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4 sm:mb-0">Student Management</h1>
-        <div className="flex space-x-4">
-          <button
-            onClick={() => setShowForm(true)}
-            className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors flex items-center shadow-sm"
-          >
-            <FiUserPlus className="mr-2" /> Add Student
-          </button>
-          <button
-            onClick={handleExportCSV}
-            className="px-4 py-2 bg-white text-primary-600 border border-primary-600 rounded-md hover:bg-primary-50 transition-colors flex items-center shadow-sm"
-          >
-            <FiDownload className="mr-2" /> Export CSV
-          </button>
-        </div>
-      </div>
     </div>
-  );
-};
+  )
+}
 
-export default TutorStudents;
+export default TutorStudents

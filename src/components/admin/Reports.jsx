@@ -79,16 +79,11 @@ const Reports = () => {
     })
 
     const data = tutors.map(tutor => {
-      const totalDays = monthDays.length;
-      const presentDays = Object.values(tutor.attendance).filter(Boolean).length;
-      const absentDays = Object.values(tutor.attendance).filter(day => !day).length;
-      
       const attendanceData = {
         'Tutor Name': tutor.tutor.name,
         'Center': tutor.center.name,
-        'Total Days': totalDays,
-        'Present Days': presentDays,
-        'Absent Days': absentDays
+        'Present Days': Object.values(tutor.attendance).filter(Boolean).length,
+        'Absent Days': Object.values(tutor.attendance).filter(day => !day).length,
       }
 
       // Add attendance for each day
@@ -126,19 +121,14 @@ const Reports = () => {
 
     // Create table data
     const tableData = tutors.map(tutor => {
-      const monthDays = eachDayOfInterval({
-        start: startOfMonth(selectedDate),
-        end: endOfMonth(selectedDate)
-      });
-      const totalDays = monthDays.length;
       const presentDays = Object.values(tutor.attendance).filter(Boolean).length;
-      const absentDays = Object.values(tutor.attendance).filter(day => !day).length;
+      const totalDays = Object.values(tutor.attendance).length;
+      const absentDays = totalDays - presentDays;
       const absentPercentage = totalDays > 0 ? (absentDays / totalDays * 100).toFixed(1) : 0;
       
       return [
         tutor.tutor.name,
         tutor.center.name,
-        totalDays,
         presentDays,
         absentDays,
         `${absentPercentage}%`
@@ -147,7 +137,7 @@ const Reports = () => {
 
     doc.autoTable({
       startY: selectedCenter ? 45 : 35,
-      head: [['Tutor Name', 'Center', 'Total Days', 'Present Days', 'Absent Days', 'Absent %']],
+      head: [['Tutor Name', 'Center', 'Present Days', 'Absent Days', 'Absent %']],
       body: tableData,
       theme: 'grid',
       styles: { fontSize: 8 },
