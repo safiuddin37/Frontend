@@ -83,37 +83,105 @@ const Overview = () => {
       // First clear the local state immediately for instant UI feedback
       setLocalAttendance([]);
       
-      // Since we're having issues with the API endpoint, let's implement a client-side solution
-      // and inform the user that we've cleared the local view (but server data might persist)
+      // Make API request to clear all attendance records
+      // Try multiple possible endpoints that the backend might support
+      let success = false;
+      let errorMsg = null;
       
-      // Show success message
-      setPopoverMessage('Activity view cleared successfully! (Note: This is a temporary clear of your current view)');
-      setShowPopover(true);
+      // Attempt 1: Delete all attendance records
+      try {
+        const response = await fetch('https://mtc-backend-jn5y.onrender.com/api/attendance', {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (response.ok) {
+          success = true;
+        } else {
+          console.error('Clear attendance attempt 1 failed:', response.status);
+        }
+      } catch (err) {
+        console.error('Error in attempt 1:', err);
+      }
+      
+      // Attempt 2: Try a specific clear endpoint
+      if (!success) {
+        try {
+          const response = await fetch('https://mtc-backend-jn5y.onrender.com/api/attendance/clear', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ all: true })
+          });
+          
+          if (response.ok) {
+            success = true;
+          } else {
+            console.error('Clear attendance attempt 2 failed:', response.status);
+          }
+        } catch (err) {
+          console.error('Error in attempt 2:', err);
+        }
+      }
+      
+      // Attempt 3: Try to delete recent attendance
+      if (!success) {
+        try {
+          // Make direct call to delete or modify all attendance records
+          // This is a more aggressive approach that directly modifies the MongoDB collection
+          const response = await fetch('https://mtc-backend-jn5y.onrender.com/api/admin/clear-attendance', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ confirm: true })
+          });
+          
+          if (response.ok) {
+            success = true;
+          } else {
+            console.error('Clear attendance attempt 3 failed:', response.status);
+            const errorText = await response.text();
+            errorMsg = errorText;
+          }
+        } catch (err) {
+          console.error('Error in attempt 3:', err);
+          errorMsg = err.message;
+        }
+      }
+      
+      if (success) {
+        // Show success message
+        setPopoverMessage('Activity records cleared successfully!');
+        setShowPopover(true);
+        
+        // Refetch the data to confirm it's cleared
+        refetchAttendance();
+      } else {
+        // If all attempts failed, show a message to contact the developer
+        throw new Error(errorMsg || 'Could not clear attendance records on the server');
+      }
       
       // Auto-hide popover after 3 seconds
       setTimeout(() => {
         setShowPopover(false);
       }, 3000);
       
-      // For debugging purposes, let's try a GET request to see what endpoints are available
-      // This is just for our development information and won't affect the user
-      try {
-        const testResponse = await fetch('https://mtc-backend-jn5y.onrender.com/api/attendance/recent', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-        console.log('Test GET attendance/recent status:', testResponse.status);
-      } catch (testError) {
-        console.log('Test GET failed:', testError);
-      }
-      
     } catch (error) {
       console.error('Failed to clear activity:', error);
-      setPopoverMessage(`Note: Activity view has been cleared locally.`);
+      setPopoverMessage(`Failed to clear activities: ${error.message}. Please contact the developer to implement this feature.`);
       setShowPopover(true);
+      
+      // Restore the data since we couldn't clear it on the server
+      if (recentAttendance) {
+        setLocalAttendance(recentAttendance);
+      }
     } finally {
       setClearingActivity(false);
     }
