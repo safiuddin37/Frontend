@@ -8,6 +8,7 @@ import useGet from '../CustomHooks/useGet'
 import { toast } from 'react-hot-toast'
 import "react-datepicker/dist/react-datepicker.css"
 import { useCenterRefetch } from '../../context/CenterRefetchContext'
+import axios from 'axios' // Add axios import
 
 const TutorStudents = () => {
   const [showForm, setShowForm] = useState(false)
@@ -439,74 +440,50 @@ const TutorStudents = () => {
   }
 
   const handleDeleteStudent = async (studentId) => {
-    if (!window.confirm('Are you sure you want to delete this student?')) return
-    setIsDeleting(true)
+    if (!window.confirm('Are you sure you want to delete this student?')) return;
+    
     try {
-      // Log student ID to confirm we're getting the right ID
-      console.log('Deleting student with ID:', studentId)
+      setIsDeleting(true);
+      // Remove the alert as it might be interfering with the flow
       
-      const userDataStr = localStorage.getItem('userData')
-      if (!userDataStr) {
-        console.error('No userData found in localStorage')
-        throw new Error('Please login to continue')
+      // Get user data and token
+      const userData = JSON.parse(localStorage.getItem('userData'));
+      if (!userData || !userData.token) {
+        throw new Error('Authentication required. Please login again.');
       }
       
-      // Parse the user data to get the token
-      let token
-      let userData
-      try {
-        userData = JSON.parse(userDataStr)
-        token = userData.token
-        console.log('Token retrieved:', token ? 'Valid token exists' : 'No token found')
-        
-        if (!token) throw new Error('Invalid authentication token')
-      } catch (e) {
-        console.error('Error parsing userData:', e)
-        throw new Error('Session expired. Please login again.')
-      }
+      // Make the DELETE request
+      const deleteUrl = `https://mtc-backend-jn5y.onrender.com/api/students/${studentId}`;
       
-      // Log the request we're about to make
-      console.log('Making DELETE request to:', `https://mtc-backend-jn5y.onrender.com/api/students/${studentId}`)
-      
-      const response = await fetch(`https://mtc-backend-jn5y.onrender.com/api/students/${studentId}`, {
+      // Use fetch instead of axios for consistency
+      const response = await fetch(deleteUrl, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${userData.token}`
         }
-      })
-      
-      console.log('Delete response status:', response.status)
+      });
       
       if (!response.ok) {
-        const errorText = await response.text()
-        console.error('Error response:', errorText)
-        
-        let errorMessage = 'Failed to delete student'
-        try {
-          const errorData = JSON.parse(errorText)
-          errorMessage = errorData.message || errorMessage
-        } catch (e) {
-          // If JSON parsing fails, use the error text as is
-          errorMessage = errorText || errorMessage
-        }
-        
-        throw new Error(errorMessage)
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Server responded with status: ${response.status}`);
       }
       
-      toast.success('Student deleted successfully!')
-      setShowDetails(null)
-      refetch()
+      // If successful
+      toast.success('Student deleted successfully!');
+      setShowDetails(null);
+      refetch();
       
-      // Trigger center refetch for instant update
+      // Refresh center data if needed
       if (refetchCenterContext && refetchCenterContext.current) {
         refetchCenterContext.current();
       }
+      
     } catch (error) {
-      console.error('Error in handleDeleteStudent:', error)
-      toast.error(error.message || 'Failed to delete student')
+      console.error('Delete student error:', error);
+      toast.error(error.message || 'Failed to delete student');
     } finally {
-      setIsDeleting(false)
+      setIsDeleting(false);
     }
   }
 
@@ -654,7 +631,12 @@ const TutorStudents = () => {
                           <FiEdit2 size={18} />
                         </button>
                         <button
-                          onClick={() => handleDeleteStudent(student._id)}
+                          onClick={(e) => {
+                            e.stopPropagation(); // Stop event bubbling
+                            e.preventDefault(); // Prevent default behavior
+                            console.log('Delete button clicked for student:', student._id);
+                            handleDeleteStudent(student._id);
+                          }}
                           className="text-red-600 hover:text-red-800 transition-colors"
                         >
                           <FiTrash2 size={18} />
@@ -694,7 +676,11 @@ const TutorStudents = () => {
                       <FiEdit2 size={18} />
                     </button>
                     <button
-                      onClick={() => handleDeleteStudent(student._id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        handleDeleteStudent(student._id);
+                      }}
                       className="p-2 text-red-600 hover:text-red-800 transition-colors"
                     >
                       <FiTrash2 size={18} />
