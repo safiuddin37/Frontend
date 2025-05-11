@@ -442,36 +442,68 @@ const TutorStudents = () => {
     if (!window.confirm('Are you sure you want to delete this student?')) return
     setIsDeleting(true)
     try {
+      // Log student ID to confirm we're getting the right ID
+      console.log('Deleting student with ID:', studentId)
+      
       const userDataStr = localStorage.getItem('userData')
-      if (!userDataStr) throw new Error('Please login to continue')
+      if (!userDataStr) {
+        console.error('No userData found in localStorage')
+        throw new Error('Please login to continue')
+      }
       
       // Parse the user data to get the token
       let token
+      let userData
       try {
-        const userData = JSON.parse(userDataStr)
+        userData = JSON.parse(userDataStr)
         token = userData.token
+        console.log('Token retrieved:', token ? 'Valid token exists' : 'No token found')
+        
         if (!token) throw new Error('Invalid authentication token')
       } catch (e) {
+        console.error('Error parsing userData:', e)
         throw new Error('Session expired. Please login again.')
       }
+      
+      // Log the request we're about to make
+      console.log('Making DELETE request to:', `https://mtc-backend-jn5y.onrender.com/api/students/${studentId}`)
+      
       const response = await fetch(`https://mtc-backend-jn5y.onrender.com/api/students/${studentId}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       })
+      
+      console.log('Delete response status:', response.status)
+      
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || 'Failed to delete student')
+        const errorText = await response.text()
+        console.error('Error response:', errorText)
+        
+        let errorMessage = 'Failed to delete student'
+        try {
+          const errorData = JSON.parse(errorText)
+          errorMessage = errorData.message || errorMessage
+        } catch (e) {
+          // If JSON parsing fails, use the error text as is
+          errorMessage = errorText || errorMessage
+        }
+        
+        throw new Error(errorMessage)
       }
+      
       toast.success('Student deleted successfully!')
       setShowDetails(null)
       refetch()
+      
       // Trigger center refetch for instant update
       if (refetchCenterContext && refetchCenterContext.current) {
         refetchCenterContext.current();
       }
     } catch (error) {
+      console.error('Error in handleDeleteStudent:', error)
       toast.error(error.message || 'Failed to delete student')
     } finally {
       setIsDeleting(false)
