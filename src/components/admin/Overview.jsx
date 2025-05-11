@@ -83,16 +83,17 @@ const Overview = () => {
       // First clear the local state immediately for instant UI feedback
       setLocalAttendance([]);
       
-      // Then send request to clear data on server
+      // First try to get the exact API format from the error
       console.log('Sending clear activity request with token:', token ? 'Token exists' : 'No token');
       
-      // Fixed endpoint URL - using correct path format
-      const response = await fetch('https://mtc-backend-jn5y.onrender.com/api/attendance/clear-recent', {
-        method: 'DELETE', // Changed from POST to DELETE to match backend expectation
+      // Try with the POST method - the backend might expect POST instead of DELETE
+      const response = await fetch('https://mtc-backend-jn5y.onrender.com/api/attendance/clear_recent', {
+        method: 'POST', // Try POST instead of DELETE
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
-        }
+        },
+        body: JSON.stringify({}) // Send empty body to satisfy POST requirements
       });
       
       console.log('Clear activity response status:', response.status);
