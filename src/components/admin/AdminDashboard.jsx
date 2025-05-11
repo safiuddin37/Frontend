@@ -18,6 +18,13 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Check if there's a tab query parameter and set the active tab accordingly
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+    
     const loadUserData = () => {
       const userData = localStorage.getItem('userData');
       if (!userData) {

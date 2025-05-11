@@ -613,8 +613,8 @@ console.log('[AddTutorForm] JWT token from localStorage:', token);
         onClose={() => {
           setShowSuccessPopover(false);
           setLocalForm({ ...initialState }); // Reset form on success
-          // Redirect specifically to the tutor management page
-          navigate('/admin-dashboard/tutors'); // Navigate directly to tutor management section
+          // Redirect to admin dashboard with tab parameter to show tutor management
+          navigate('/admin-dashboard?tab=tutors'); // Pass query parameter to indicate tutor tab
         }}
         title="Success!"
         message="Tutor has been added successfully. Default password: tutor123"
