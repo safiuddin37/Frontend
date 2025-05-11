@@ -84,16 +84,39 @@ const Overview = () => {
       setLocalAttendance([]);
       
       // Then send request to clear data on server
-      const response = await fetch('https://mtc-backend-jn5y.onrender.com/api/attendance/clear_recent', {
-        method: 'POST',
+      console.log('Sending clear activity request with token:', token ? 'Token exists' : 'No token');
+      
+      // Fixed endpoint URL - using correct path format
+      const response = await fetch('https://mtc-backend-jn5y.onrender.com/api/attendance/clear-recent', {
+        method: 'DELETE', // Changed from POST to DELETE to match backend expectation
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         }
       });
       
+      console.log('Clear activity response status:', response.status);
+      
       if (!response.ok) {
-        throw new Error(`Error ${response.status}: ${response.statusText}`);
+        // Get detailed error information
+        const errorText = await response.text();
+        console.error('Error response text:', errorText);
+        
+        let errorMessage = `Error ${response.status}: ${response.statusText}`;
+        try {
+          // Try to parse as JSON to get more specific error message
+          const errorData = JSON.parse(errorText);
+          if (errorData.message) {
+            errorMessage = errorData.message;
+          }
+        } catch (e) {
+          // If not valid JSON, use the raw text
+          if (errorText) {
+            errorMessage = errorText;
+          }
+        }
+        
+        throw new Error(errorMessage);
       }
       
       setPopoverMessage('Recent activity cleared successfully!');
