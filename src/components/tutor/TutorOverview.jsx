@@ -56,7 +56,8 @@ const LocationMarker = ({ onLocationUpdate }) => {
 import { useRef } from 'react';
 
 const TutorOverview = () => {
-  const { alreadyMarked, loading: attendanceCheckLoading, error: attendanceCheckError } = useTodayAttendance();
+  const [attendanceRefreshTrigger, setAttendanceRefreshTrigger] = useState(0);
+  const { alreadyMarked, loading: attendanceCheckLoading, error: attendanceCheckError } = useTodayAttendance(attendanceRefreshTrigger);
   const [showDeniedPopover, setShowDeniedPopover] = useState(false);
   const popoverRef = useRef();
 
@@ -146,6 +147,8 @@ const TutorOverview = () => {
         if (data.message === 'Attendance submitted successfully') {
           setAttendanceMarked(true)
           setError(null)
+          // Trigger refresh of attendance status to update UI
+          setAttendanceRefreshTrigger(prev => prev + 1)
         }
       } catch (error) {
         // Detect duplicate key error (E11000) from backend
