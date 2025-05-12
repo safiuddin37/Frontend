@@ -79,11 +79,20 @@ const Reports = () => {
     })
 
     const data = tutors.map(tutor => {
+      // Calculate days in month for the selected month
+      const daysInMonth = eachDayOfInterval({
+        start: startOfMonth(selectedDate),
+        end: endOfMonth(selectedDate)
+      }).length;
+      
+      const presentDays = Object.values(tutor.attendance).filter(Boolean).length;
+      
       const attendanceData = {
         'Tutor Name': tutor.tutor.name,
         'Center': tutor.center.name,
-        'Present Days': Object.values(tutor.attendance).filter(Boolean).length,
-        'Absent Days': Object.values(tutor.attendance).filter(day => !day).length,
+        'Total Days': daysInMonth,
+        'Present Days': presentDays,
+        'Absent Days': daysInMonth - presentDays,
       }
 
       // Add attendance for each day
@@ -121,14 +130,21 @@ const Reports = () => {
 
     // Create table data
     const tableData = tutors.map(tutor => {
+      // Get the total days in the selected month
+      const daysInMonth = eachDayOfInterval({
+        start: startOfMonth(selectedDate),
+        end: endOfMonth(selectedDate)
+      }).length;
+      
       const presentDays = Object.values(tutor.attendance).filter(Boolean).length;
-      const totalDays = Object.values(tutor.attendance).length;
+      const totalDays = daysInMonth; // Use all days in month
       const absentDays = totalDays - presentDays;
       const absentPercentage = totalDays > 0 ? (absentDays / totalDays * 100).toFixed(1) : 0;
       
       return [
         tutor.tutor.name,
         tutor.center.name,
+        totalDays,
         presentDays,
         absentDays,
         `${absentPercentage}%`
@@ -137,7 +153,7 @@ const Reports = () => {
 
     doc.autoTable({
       startY: selectedCenter ? 45 : 35,
-      head: [['Tutor Name', 'Center', 'Present Days', 'Absent Days', 'Absent %']],
+      head: [['Tutor Name', 'Center', 'Total Days', 'Present Days', 'Absent Days', 'Absent %']],
       body: tableData,
       theme: 'grid',
       styles: { fontSize: 8 },
@@ -277,6 +293,9 @@ const Reports = () => {
                   Center
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Total Days
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Present Days
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -289,8 +308,20 @@ const Reports = () => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {tutors.map((tutor) => {
-                const presentDays = Object.values(tutor.attendance).filter(Boolean).length
-                const totalDays = Object.values(tutor.attendance).length
+                // Get the total days in the selected month
+                const daysInMonth = eachDayOfInterval({
+                  start: startOfMonth(selectedDate),
+                  end: endOfMonth(selectedDate)
+                }).length;
+                
+                // Present days are those marked as present
+                const presentDays = Object.values(tutor.attendance).filter(Boolean).length;
+                
+                // Total days are all days in the month (not just days with attendance records)
+                const totalDays = daysInMonth;
+                
+                // Absent days are days without attendance or explicitly marked absent
+                const absentDays = totalDays - presentDays;
 
                 return (
                   <tr key={tutor.tutor._id} className="hover:bg-gray-50">
@@ -303,14 +334,17 @@ const Reports = () => {
                       <div className="text-sm text-gray-900">{tutor.center.name}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{totalDays}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">{presentDays}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{totalDays - presentDays}</div>
+                      <div className="text-sm text-gray-900">{absentDays}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
-                        {totalDays > 0 ? `${((totalDays - presentDays) / totalDays * 100).toFixed(1)}%` : '0%'}
+                        {totalDays > 0 ? `${(absentDays / totalDays * 100).toFixed(1)}%` : '0%'}
                       </div>
                     </td>
                   </tr>

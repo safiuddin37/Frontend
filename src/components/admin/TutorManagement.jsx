@@ -119,8 +119,21 @@ const TutorManagement = () => {
           // Create a more detailed error message for 500 errors
           let detailedError = 'Server Error (500): The server encountered an unexpected condition.';
           
-          // Try to extract more info if available
-          if (err.response.data) {
+          // Check for specific known errors
+          const errorText = err.response.data?.error || '';
+          
+          // Handle duplicate email error
+          if (errorText.includes('duplicate key error') && errorText.includes('email')) {
+            const email = formData.email || 'This email';
+            detailedError = `Email already in use: "${email}" is already registered for another tutor. Please use a different email address.`;
+          }
+          // Handle duplicate phone error
+          else if (errorText.includes('duplicate key error') && errorText.includes('phone')) {
+            const phone = formData.phone || 'This phone number';
+            detailedError = `Phone number already in use: "${phone}" is already registered for another tutor. Please use a different phone number.`;
+          }
+          // Generic error handling if not one of the above specific cases
+          else if (err.response.data) {
             if (typeof err.response.data === 'string') {
               detailedError += '\n\nServer message: ' + err.response.data;
             } else if (err.response.data.message) {
