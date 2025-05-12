@@ -152,11 +152,6 @@ const HadiyaManagement = () => {
       return;
     }
     
-    if (amount > tutor.assignedHadiyaAmount) {
-      toast.error(`Amount cannot exceed ₹${tutor.assignedHadiyaAmount.toLocaleString('en-IN')}`);
-      return;
-    }
-    
     // Update UI state
     setTutors(current => 
       current.map(t => 
@@ -164,7 +159,8 @@ const HadiyaManagement = () => {
           ...t,
           confirmedAmount: amount,
           paymentStatus: 'Paid',
-          confirmedNotes: notes
+          confirmedNotes: notes,
+          forceEdit: false
         } : t
       )
     );
@@ -436,15 +432,9 @@ const HadiyaManagement = () => {
                       {/* Payment Amount Cell */}
                       <td className="px-4 py-3">
                         {isLocked ? (
-                          // LOCKED - Display frozen amount with lock icon
-                          <div className="relative flex items-center">
-                            <div className="w-full pl-2 py-1.5 bg-gray-100 border border-gray-300 rounded text-sm flex items-center">
-                              <FiLock className="text-gray-500 mr-2" />
-                              <span className="font-medium">₹ {amountPaid.toLocaleString('en-IN')}</span>
-                            </div>
-                            <div className="absolute right-0 top-0 bottom-0 py-1 px-2 bg-gray-200 rounded-r border border-gray-300 flex items-center text-xs text-gray-700">
-                              Locked
-                            </div>
+                          // LOCKED - Display frozen amount (no lock icon/text)
+                          <div className="w-full pl-2 py-1.5 bg-gray-100 border border-gray-300 rounded text-sm flex items-center">
+                            <span className="font-medium">₹ {amountPaid.toLocaleString('en-IN')}</span>
                           </div>
                         ) : (
                           // UNLOCKED - Allow new payment entry without button
@@ -463,7 +453,7 @@ const HadiyaManagement = () => {
                       {/* Notes Cell */}
                       <td className="px-4 py-3">
                         {isLocked ? (
-                          // Display saved notes for locked payments
+                          // Display saved notes for locked payments (no lock icon/text)
                           <div className="text-sm text-gray-600 bg-gray-50 p-2 rounded border border-gray-200 min-h-[48px]">
                             {existingRecord?.notes || '-'}
                           </div>
@@ -483,19 +473,9 @@ const HadiyaManagement = () => {
                       <td className="px-4 py-3">
                         <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${isLocked ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
                           {isLocked ? (
-                            <>
-                              <svg className="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                              </svg>
-                              Paid
-                            </>
+                            'Paid'
                           ) : (
-                            <>
-                              <svg className="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                              </svg>
-                              Pending
-                            </>
+                            'Pending'
                           )}
                         </span>
                       </td>
@@ -503,9 +483,12 @@ const HadiyaManagement = () => {
                       {/* Action Cell */}
                       <td className="px-4 py-3 text-center">
                         {isLocked ? (
-                          <div className="text-xs text-gray-500 italic">
-                            Payment locked for {months.find(m => m.value === selectedMonth)?.label} {selectedYear}
-                          </div>
+                          <button
+                            onClick={() => setTutors(current => current.map(t => t.tutorId === tutor.tutorId ? { ...t, tempAmount: existingRecord.amountPaid, tempNotes: existingRecord.notes, forceEdit: true } : t))}
+                            className="px-3 py-1.5 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 transition-colors flex items-center mx-auto"
+                          >
+                            Edit
+                          </button>
                         ) : (
                           <button 
                             onClick={() => handleConfirmAmount(tutor.tutorId)}
