@@ -93,12 +93,54 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-100 flex">
-      <Sidebar activeTab={activeTab} onTabChange={setActiveTab} className="w-64 bg-gray-800 text-white" />
-      <div className="flex-1 p-6 ml-64">
-        <div className="bg-white/80 backdrop-blur-lg rounded-xl shadow-md p-6">
-          {renderContent()}
+    <div className="flex flex-col h-screen bg-gray-50">
+      {/* Mobile Header - Only visible on small screens */}
+      <header className="md:hidden bg-white shadow-sm p-4 flex justify-between items-center">
+        <div className="flex items-center">
+          <button 
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            {sidebarOpen ? <FiX size={24} /> : <FiMenu size={24} />}
+          </button>
+          <h1 className="ml-3 text-xl font-semibold text-gray-800">Admin Panel</h1>
         </div>
+        <div className="flex items-center">
+          <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white text-lg font-medium">
+            {user?.name.charAt(0)}
+          </div>
+        </div>
+      </header>
+      
+      {/* Main Content Area */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar - Responsive behavior */}
+        <div className={`
+          ${sidebarOpen ? 'fixed inset-0 z-40 md:relative md:inset-auto' : 'hidden md:block'}
+          md:relative w-full md:w-64 md:flex-shrink-0 transition-all duration-300 ease-in-out
+        `}>
+          {/* Mobile overlay - only visible when sidebar is open on mobile */}
+          {sidebarOpen && (
+            <div 
+              className="fixed inset-0 bg-gray-600 bg-opacity-50 z-30 md:hidden"
+              onClick={() => setSidebarOpen(false)}
+            ></div>
+          )}
+          <Sidebar 
+            activeTab={activeTab} 
+            onTabChange={(tab) => {
+              setActiveTab(tab);
+              // Close sidebar on mobile after tab change
+              if (window.innerWidth < 768) setSidebarOpen(false);
+            }} 
+            className="z-40 relative h-full"
+          />
+        </div>
+        
+        {/* Main Content */}
+        <main className="flex-1 overflow-y-auto z-0">
+          {renderContent()}
+        </main>
       </div>
     </div>
   );

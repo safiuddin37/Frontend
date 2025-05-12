@@ -67,39 +67,52 @@ const Sidebar = ({ activeTab, onTabChange, className }) => {
 
   return (
     <motion.div
-      initial={{ x: -300 }}
-      animate={{ x: 0 }}
-      exit={{ x: -300 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className={`fixed top-0 left-0 h-screen w-64 bg-gray-800 text-white shadow-2xl border-r border-gray-700 overflow-hidden flex flex-col ${className}`}
+      initial={{ x: -100, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      className={`bg-white h-full shadow-lg flex flex-col ${className || ''}`}
     >
-      <div className="p-6 border-b border-gray-700 bg-gray-900">
-        <h2 className="text-lg font-bold text-white">Admin Panel</h2>
-      </div>
-      <nav className="p-4 flex-1 overflow-y-auto">
-        <div className="space-y-2">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => onTabChange(tab.id)}
-              className={`w-full flex items-center px-4 py-3 rounded-xl text-left transition-all duration-300 relative group ${activeTab === tab.id
-                ? 'bg-gradient-to-r from-gray-700 to-gray-600 text-white shadow-lg'
-                : 'text-gray-300 hover:bg-gray-700 hover:shadow-md'}`}
-              aria-current={activeTab === tab.id ? 'page' : undefined}
-            >
-              <span className={`mr-3 transition-transform duration-300 transform group-hover:scale-110 ${activeTab === tab.id ? 'text-white' : 'text-gray-400'}`}>{tab.icon}</span>
-              <span className="font-medium">{tab.label}</span>
-            </button>
-          ))}
+      {/* Profile Section */}
+      <div className="p-6 border-b">
+        <div className="flex items-center space-x-4">
+          <div className="h-12 w-12 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white text-xl font-medium">
+            {adminProfile.name.charAt(0)}
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold text-gray-800">{adminProfile.name}</h2>
+            <p className="text-sm text-gray-500">{adminProfile.email}</p>
+          </div>
         </div>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 p-4">
+        <ul className="space-y-2">
+          {tabs.map((tab) => (
+            <li key={tab.id}>
+              <button
+                onClick={() => onTabChange(tab.id)}
+                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+                  activeTab === tab.id
+                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <tab.icon size={20} />
+                <span>{tab.label}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
       </nav>
-      <div className="p-4 border-t border-gray-700 bg-gray-900">
+
+      {/* Logout Button */}
+      <div className="p-4 border-t">
         <button
           onClick={handleLogout}
-          className="w-full flex items-center justify-center px-4 py-3 text-red-500 hover:text-red-600 hover:bg-red-50/80 rounded-xl transition-all duration-300 font-medium"
+          className="w-full flex items-center space-x-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
         >
-          <FiLogOut className="mr-2 text-lg" />
-          Logout
+          <FiLogOut size={20} />
+          <span>Logout</span>
         </button>
       </div>
     </motion.div>

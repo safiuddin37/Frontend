@@ -154,45 +154,47 @@ const Overview = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-6">
-        <div className="bg-white/80 backdrop-blur-lg rounded-xl shadow-md p-6">
-          <h1 className="text-2xl font-bold text-blue-600 mb-4">Dashboard Overview</h1>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <motion.div
+      <div className="p-6">
+        <h1 className="text-2xl font-bold mb-6">Dashboard Overview</h1>
+        
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          {[1, 2, 3].map((i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-gray-100 rounded-lg p-6 animate-pulse"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-600 text-sm h-4 w-24 bg-gray-200 rounded"></p>
+                  <p className="text-2xl font-bold mt-1 h-6 w-20 bg-gray-200 rounded"></p>
+                </div>
+                <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Recent Activity */}
+        <div className="bg-gray-100 rounded-lg p-6 animate-pulse">
+          <h2 className="text-xl font-semibold mb-4 h-6 bg-gray-200 rounded"></h2>
+          <div className="space-y-4">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div
                 key={i}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-gradient-to-br from-white to-blue-50 p-4 rounded-lg shadow-md"
+                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
               >
-                <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-5 h-5 bg-gray-200 rounded-full"></div>
                   <div>
-                    <p className="text-gray-600 text-sm h-4 w-24 bg-gray-200 rounded"></p>
-                    <p className="text-2xl font-bold mt-1 h-6 w-20 bg-gray-200 rounded"></p>
+                    <p className="font-medium h-4 w-24 bg-gray-200 rounded"></p>
+                    <p className="text-sm text-gray-600 mt-1 h-4 w-20 bg-gray-200 rounded"></p>
                   </div>
-                  <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
                 </div>
-              </motion.div>
+              </div>
             ))}
-          </div>
-          <div className="bg-white/80 backdrop-blur-lg rounded-xl shadow-md p-6 mt-6">
-            <h2 className="text-xl font-semibold text-blue-600 mb-4">Recent Activity</h2>
-            <div className="space-y-4">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div
-                  key={i}
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="w-5 h-5 bg-gray-200 rounded-full"></div>
-                    <div>
-                      <p className="font-medium h-4 w-24 bg-gray-200 rounded"></p>
-                      <p className="text-sm text-gray-600 mt-1 h-4 w-20 bg-gray-200 rounded"></p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </div>
@@ -200,76 +202,78 @@ const Overview = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-6">
-      <div className="bg-white/80 backdrop-blur-lg rounded-xl shadow-md p-6">
-        <h1 className="text-2xl font-bold text-blue-600 mb-4">Dashboard Overview</h1>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {stats.map((stat, index) => (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-gradient-to-br from-white to-blue-50 p-4 rounded-lg shadow-md"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-600 text-sm">{stat.label}</p>
-                  <p className="text-2xl font-bold mt-1">{stat.value}</p>
-                </div>
-                <stat.icon className="w-8 h-8 text-blue-500" />
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-6">Dashboard Overview</h1>
+      
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {stats.map((stat, index) => (
+          <motion.div
+            key={stat.label}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+            className="bg-white rounded-lg shadow-md p-6"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 text-sm">{stat.label}</p>
+                <p className="text-2xl font-bold mt-1">{stat.value}</p>
               </div>
-            </motion.div>
-          ))}
-        </div>
-        <div className="bg-white/80 backdrop-blur-lg rounded-xl shadow-md p-6 mt-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-blue-600">Recent Activity</h2>
-            <button
-              onClick={handleClearActivity}
-              disabled={clearingActivity}
-              className={`px-3 py-1 rounded text-sm ${clearingActivity ? 'bg-gray-300 cursor-not-allowed' : 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200'} transition-colors duration-200`}
-            >
-              {clearingActivity ? 'Clearing...' : 'Clear Activity'}
-            </button>
-          </div>
-          <div className="space-y-4">
-            {attendanceLoading ? (
-              <p>Loading recent activity...</p>
-            ) : localAttendance && localAttendance.length > 0 ? (
-              localAttendance.slice(0, 5).map((record, index) => (
-                <motion.div
-                  key={record._id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20, transition: { duration: 0.3 } }}
-                  transition={{ delay: index * 0.1 }}
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-                >
-                  <div className="flex items-center space-x-3">
-                    <FiCheck className="w-5 h-5 text-green-500" />
-                    <div>
-                      <p className="font-medium">{record.tutor?.name || 'Unknown Tutor'}</p>
-                      <p className="text-sm text-gray-600">Marked attendance at {record.center?.name || 'Unknown Center'}</p>
-                    </div>
-                  </div>
-                  <span className="text-sm text-gray-500">{formatDate(record.createdAt)}</span>
-                </motion.div>
-              ))
-            ) : (
-              <p className="text-gray-500">No recent activity</p>
-            )}
-          </div>
-        </div>
-        
-        {/* Feedback Popover */}
-        <Popover
-          isOpen={showPopover}
-          onClose={() => setShowPopover(false)}
-          message={popoverMessage}
-          type={popoverMessage.includes('success') ? 'success' : 'error'}
-        />
+              <stat.icon className="w-8 h-8 text-blue-500" />
+            </div>
+          </motion.div>
+        ))}
       </div>
+
+      {/* Recent Activity */}
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold">Recent Activity</h2>
+          <button
+            onClick={handleClearActivity}
+            disabled={clearingActivity}
+            className={`px-3 py-1 rounded text-sm ${clearingActivity ? 'bg-gray-300 cursor-not-allowed' : 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200'} transition-colors duration-200`}
+          >
+            {clearingActivity ? 'Clearing...' : 'Clear Activity'}
+          </button>
+        </div>
+        <div className="space-y-4">
+          {attendanceLoading ? (
+            <p>Loading recent activity...</p>
+          ) : localAttendance && localAttendance.length > 0 ? (
+            localAttendance.slice(0, 5).map((record, index) => (
+              <motion.div
+                key={record._id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20, transition: { duration: 0.3 } }}
+                transition={{ delay: index * 0.1 }}
+                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+              >
+                <div className="flex items-center space-x-3">
+                  <FiCheck className="w-5 h-5 text-green-500" />
+                  <div>
+                    <p className="font-medium">{record.tutor?.name || 'Unknown Tutor'}</p>
+                    <p className="text-sm text-gray-600">Marked attendance at {record.center?.name || 'Unknown Center'}</p>
+                  </div>
+                </div>
+                <span className="text-sm text-gray-500">{formatDate(record.createdAt)}</span>
+              </motion.div>
+            ))
+          ) : (
+            <p className="text-gray-500">No recent activity</p>
+          )}
+        </div>
+      </div>
+      
+      {/* Feedback Popover */}
+      <Popover
+        isOpen={showPopover}
+        onClose={() => setShowPopover(false)}
+        message={popoverMessage}
+        type={popoverMessage.includes('success') ? 'success' : 'error'}
+      />
     </div>
   )
 }
