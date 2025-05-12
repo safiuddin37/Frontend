@@ -168,24 +168,24 @@ const TutorOverview = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="mb-4">
-        <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 flex items-center justify-between transition-all duration-300 hover:shadow-xl">
-           <div>
-             <div className="text-xl sm:text-2xl font-bold text-primary-600">
-               {loading ? (
-                 <svg className="animate-spin h-5 w-5 sm:h-6 sm:w-6 text-primary-600 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-                 </svg>
-               ) : centerStudents}
-             </div>
-             <div className="text-sm sm:text-base text-gray-600">Center Students</div>
-           </div>
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-blue-50 flex items-center justify-center">
-            <FiUsers className="text-2xl sm:text-3xl text-blue-500" />
+    <div className="min-h-screen w-full bg-gradient-to-br from-blue-50 via-white to-accent-100 py-6 px-2 sm:px-6 md:px-12 space-y-8">
+      {/* Dashboard Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <div className="rounded-2xl shadow-xl bg-gradient-to-tr from-primary-600 to-accent-600 text-white p-6 flex flex-col items-center justify-center transition-transform hover:scale-105">
+          <div className="w-14 h-14 rounded-full bg-white bg-opacity-20 flex items-center justify-center mb-3">
+            <FiUsers className="text-3xl text-white" />
           </div>
+          <div className="text-3xl font-extrabold mb-1">
+            {loading ? (
+              <svg className="animate-spin h-6 w-6 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+              </svg>
+            ) : centerStudents}
+          </div>
+          <div className="text-lg font-medium tracking-wide opacity-90">Center Students</div>
         </div>
+        {/* Add more cards here for other stats if needed in future */}
       </div>
 
       {showDeniedPopover && (
