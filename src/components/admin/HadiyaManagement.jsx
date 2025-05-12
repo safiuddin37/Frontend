@@ -84,16 +84,13 @@ const HadiyaManagement = () => {
   
   // Handle payment amount change
   const handleAmountChange = (tutorId, amount) => {
-    // Only allow changes if no payment record exists for this month/year
     setTutors(current => 
       current.map(tutor => {
-        // Check if this tutor already has a payment record for this month/year
         const existingRecord = tutor.hadiyaRecords?.find(
           r => r.month === selectedMonth && r.year === selectedYear
         );
-        
-        // Only update if this is the target tutor AND there's no existing record
-        if (tutor.tutorId === tutorId && !existingRecord) {
+        // Allow update if not locked, or if forceEdit is true
+        if (tutor.tutorId === tutorId && (!existingRecord || tutor.forceEdit)) {
           return {
             ...tutor,
             tempAmount: amount,
@@ -107,16 +104,13 @@ const HadiyaManagement = () => {
   
   // Handle notes change
   const handleNotesChange = (tutorId, notes) => {
-    // Only allow changes if no payment record exists for this month/year
     setTutors(current => 
       current.map(tutor => {
-        // Check if this tutor already has a payment record for this month/year
         const existingRecord = tutor.hadiyaRecords?.find(
           r => r.month === selectedMonth && r.year === selectedYear
         );
-        
-        // Only update if this is the target tutor AND there's no existing record
-        if (tutor.tutorId === tutorId && !existingRecord) {
+        // Allow update if not locked, or if forceEdit is true
+        if (tutor.tutorId === tutorId && (!existingRecord || tutor.forceEdit)) {
           return {
             ...tutor,
             tempNotes: notes
@@ -482,19 +476,11 @@ const HadiyaManagement = () => {
                       
                       {/* Action Cell */}
                       <td className="px-4 py-3 text-center">
-                        {(isLocked && !tutor.forceEdit) ? (
-                           <button
-                             onClick={() => setTutors(current => current.map(t => t.tutorId === tutor.tutorId ? { ...t, tempAmount: existingRecord.amountPaid, tempNotes: existingRecord.notes, forceEdit: true } : t))}
-                             className="px-3 py-1.5 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 transition-colors flex items-center mx-auto"
-                           >
-                             Edit
-                           </button>
+                        {isLocked ? (
+                           <div className="text-xs text-gray-400 italic">Locked</div>
                          ) : (
                            <button 
-                             onClick={() => {
-                               handleConfirmAmount(tutor.tutorId);
-                               setTutors(current => current.map(t => t.tutorId === tutor.tutorId ? { ...t, forceEdit: false } : t));
-                             }}
+                             onClick={() => handleConfirmAmount(tutor.tutorId)}
                              className="px-3 py-1.5 bg-primary-600 text-white rounded text-sm font-medium hover:bg-primary-700 transition-colors flex items-center mx-auto"
                            >
                              <FiSave className="mr-1" /> Save
