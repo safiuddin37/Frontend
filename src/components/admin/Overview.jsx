@@ -202,9 +202,9 @@ const Overview = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-blue-50 to-sky-100 p-6 transition-all duration-300">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-violet-50 to-rose-50 p-6">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-indigo-600 via-blue-600 to-sky-600 bg-clip-text text-transparent">Dashboard Overview</h1>
+        <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-amber-600 bg-clip-text text-transparent">Dashboard Overview</h1>
         <p className="text-slate-600 mb-8">Welcome to your admin control center</p>
       
       {/* Stats Grid */}
@@ -215,14 +215,14 @@ const Overview = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="bg-gradient-to-br from-white/80 to-white/40 backdrop-blur-sm rounded-2xl p-6 shadow-lg shadow-indigo-200/30 border border-white/50 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+            className="bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg shadow-violet-200/30 border border-violet-100/20 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
           >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-slate-600 text-sm font-medium">{stat.label}</p>
-                <p className="text-3xl font-bold mt-1 bg-gradient-to-br from-indigo-600 to-blue-600 bg-clip-text text-transparent">{stat.value}</p>
+                <p className="text-3xl font-bold mt-1 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-amber-600 bg-clip-text text-transparent">{stat.value}</p>
               </div>
-              <div className="p-3 rounded-xl bg-gradient-to-br from-indigo-500 via-blue-500 to-sky-500 text-white shadow-lg shadow-indigo-200/50">
+              <div className="p-3 rounded-xl bg-gradient-to-br from-violet-500 via-fuchsia-500 to-amber-500 text-white shadow-lg shadow-violet-200/50">
                 <stat.icon className="w-6 h-6" />
               </div>
             </div>
@@ -231,9 +231,9 @@ const Overview = () => {
       </div>
 
       {/* Recent Activity */}
-      <div className="bg-gradient-to-br from-white/80 to-white/40 backdrop-blur-sm rounded-2xl p-6 shadow-lg shadow-indigo-200/30 border border-white/50">
+      <div className="bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg shadow-violet-200/30 border border-violet-100/20">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 via-blue-600 to-sky-600 bg-clip-text text-transparent mb-1">Recent Activity</h2>
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-violet-600 via-fuchsia-600 to-amber-600 bg-clip-text text-transparent mb-1">Recent Activity</h2>
           <p className="text-slate-500 text-sm mb-4">Track the latest updates and changes</p>
           <button
             onClick={handleClearActivity}
@@ -245,9 +245,9 @@ const Overview = () => {
         </div>
         <div className="space-y-4">
           {attendanceLoading ? (
-            <div className="flex items-center justify-center p-8 text-indigo-500">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500 mr-3"></div>
-              <span className="bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent font-medium">
+            <div className="flex items-center justify-center p-8 text-violet-500">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-violet-500 mr-3"></div>
+              <span className="bg-gradient-to-r from-violet-600 via-fuchsia-600 to-amber-600 bg-clip-text text-transparent font-medium">
                 Loading recent activity...
               </span>
             </div>
@@ -264,11 +264,11 @@ const Overview = () => {
                 <div className="flex items-center space-x-3">
                   <FiCheck className="w-5 h-5 text-green-500" />
                   <div>
-                    <p className="font-medium bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">{record.tutor?.name || 'Unknown Tutor'}</p>
-                    <p className="text-sm text-slate-600">Marked attendance at <span className="font-medium text-indigo-600">{record.center?.name || 'Unknown Center'}</span></p>
+                    <p className="font-medium bg-gradient-to-r from-violet-600 via-fuchsia-600 to-amber-600 bg-clip-text text-transparent">{record.tutor?.name || 'Unknown Tutor'}</p>
+                    <p className="text-sm text-slate-600">Marked attendance at <span className="font-medium text-fuchsia-600">{record.center?.name || 'Unknown Center'}</span></p>
                   </div>
                 </div>
-                <span className="text-sm text-slate-500 font-medium px-3 py-1 bg-indigo-50/50 rounded-lg border border-indigo-100/30">{formatDate(record.createdAt)}</span>
+                <span className="text-sm text-slate-500 font-medium px-3 py-1 bg-violet-50/50 rounded-lg border border-violet-100/30">{formatDate(record.createdAt)}</span>
               </motion.div>
             ))
           ) : (
