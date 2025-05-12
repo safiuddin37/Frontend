@@ -17,7 +17,7 @@ export default function useTodayAttendance() {
       return;
     }
     const today = format(new Date(), 'yyyy-MM-dd');
-    fetch(`/api/attendance/recent`, {
+    fetch(`https://mtc-backend-jn5y.onrender.com/api/attendance/recent`, {
       headers: { 'Authorization': `Bearer ${token}` }
     })
       .then(async res => {
