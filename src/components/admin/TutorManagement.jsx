@@ -106,7 +106,38 @@ const TutorManagement = () => {
     } catch (err) {
       console.error('Add Tutor Error:', err);
       if (!showErrorPopover) { // Only set if not already set by inner catch
-        setErrorMessage(err.message || 'Failed to add tutor');
+        // Specific handling for 500 errors
+        if (err.response && err.response.status === 500) {
+          console.error('500 Server Error Details:', {
+            data: err.response.data,
+            headers: err.response.headers,
+            url: err.response.config?.url,
+            method: err.response.config?.method,
+            requestData: err.response.config?.data,
+          });
+          
+          // Create a more detailed error message for 500 errors
+          let detailedError = 'Server Error (500): The server encountered an unexpected condition.';
+          
+          // Try to extract more info if available
+          if (err.response.data) {
+            if (typeof err.response.data === 'string') {
+              detailedError += '\n\nServer message: ' + err.response.data;
+            } else if (err.response.data.message) {
+              detailedError += '\n\nServer message: ' + err.response.data.message;
+            } else if (err.response.data.error) {
+              detailedError += '\n\nServer error: ' + err.response.data.error;
+            }
+          }
+          
+          // Add timestamp to help identify patterns
+          const timestamp = new Date().toISOString();
+          detailedError += `\n\nError Timestamp: ${timestamp}`;
+          
+          setErrorMessage(detailedError);
+        } else {
+          setErrorMessage(err.message || 'Failed to add tutor');
+        }
         setShowErrorPopover(true);
       }
     } finally {
@@ -402,6 +433,19 @@ const TutorManagement = () => {
         title="Error"
         message={errorMessage}
         type="error"
+        actions={errorMessage.includes('Server Error (500)') ? [
+          {
+            label: 'Retry',
+            onClick: () => {
+              setShowErrorPopover(false);
+              // Retry the last submission with the same data
+              if (mode === 'add' && formData) {
+                console.log('Retrying submission with:', formData);
+                handleAddTutor(formData);
+              }
+            }
+          }
+        ] : undefined}
       />
       
       {/* Login Required Popover */}
