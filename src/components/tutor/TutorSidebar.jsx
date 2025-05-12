@@ -50,7 +50,7 @@ const TutorSidebar = ({ activeTab, setActiveTab, tabs, isMobile, isOpen, onClose
         initial={isMobile ? { x: -320 } : false}
         animate={isMobile ? { x: isOpen ? 0 : -320 } : false}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className={`fixed top-0 left-0 h-screen z-50 ${isMobile ? 'w-[280px]' : 'w-64'} bg-gradient-to-br from-white via-white to-accent-50/10 shadow-2xl border-r border-white/20 overflow-y-auto overflow-x-hidden`}
+        className={`fixed top-0 left-0 h-screen z-50 ${isMobile ? 'w-[280px]' : 'w-64'} bg-gradient-to-br from-white via-white to-accent-50/10 shadow-2xl border-r border-white/20 overflow-hidden flex flex-col`}
       >
         {/* Profile Section */}
         <div className="p-6 border-b border-accent-100/20 bg-white/50 backdrop-blur-sm">
@@ -73,7 +73,7 @@ const TutorSidebar = ({ activeTab, setActiveTab, tabs, isMobile, isOpen, onClose
         </div>
         
         {/* Navigation */}
-        <nav className="p-4">
+        <nav className="p-4 flex-1 overflow-y-auto">
           <div className="space-y-2">
             {tabs.map((tab) => (
               <button
@@ -95,6 +95,20 @@ const TutorSidebar = ({ activeTab, setActiveTab, tabs, isMobile, isOpen, onClose
             ))}
           </div>
         </nav>
+
+        {/* Logout Button */}
+        <div className="p-4 border-t border-accent-100/20 bg-white/50 backdrop-blur-sm mt-auto">
+          <button
+            onClick={() => {
+              handleLogout();
+              if (isMobile) onClose();
+            }}
+            className="w-full flex items-center justify-center px-4 py-3 text-red-500 hover:text-red-600 hover:bg-red-50/80 rounded-xl transition-all duration-300 font-medium group"
+          >
+            <FiLogOut className="mr-2 text-lg group-hover:scale-110 transition-transform duration-300" />
+            Logout
+          </button>
+        </div>
 
         {/* Profile Modal */}
         {showProfile && (
