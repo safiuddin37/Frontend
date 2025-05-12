@@ -154,8 +154,8 @@ const Overview = () => {
 
   if (isLoading) {
     return (
-      <div className="p-6">
-        <h1 className="text-2xl font-bold mb-6">Dashboard Overview</h1>
+      <div className="p-6 bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+        <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-slate-800 to-blue-800 bg-clip-text text-transparent">Dashboard Overview</h1>
         
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -164,7 +164,7 @@ const Overview = () => {
               key={i}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-gray-100 rounded-lg p-6 animate-pulse"
+              className="bg-white/60 backdrop-blur-sm rounded-xl p-6 animate-pulse shadow-lg shadow-slate-200/50"
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -178,7 +178,7 @@ const Overview = () => {
         </div>
 
         {/* Recent Activity */}
-        <div className="bg-gray-100 rounded-lg p-6 animate-pulse">
+        <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 animate-pulse shadow-lg shadow-slate-200/50 border border-slate-100">
           <h2 className="text-xl font-semibold mb-4 h-6 bg-gray-200 rounded"></h2>
           <div className="space-y-4">
             {[1, 2, 3, 4, 5].map((i) => (
@@ -202,8 +202,8 @@ const Overview = () => {
   }
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Dashboard Overview</h1>
+    <div className="p-6 bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+      <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-slate-800 to-blue-800 bg-clip-text text-transparent">Dashboard Overview</h1>
       
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -213,34 +213,37 @@ const Overview = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="bg-white rounded-lg shadow-md p-6"
+            className="bg-white/60 backdrop-blur-sm rounded-xl p-6 shadow-lg shadow-slate-200/50 border border-white/50 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
           >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600 text-sm">{stat.label}</p>
                 <p className="text-2xl font-bold mt-1">{stat.value}</p>
               </div>
-              <stat.icon className="w-8 h-8 text-blue-500" />
+              <stat.icon className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent" />
             </div>
           </motion.div>
         ))}
       </div>
 
       {/* Recent Activity */}
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 shadow-lg shadow-slate-200/50 border border-white/50">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold">Recent Activity</h2>
+          <h2 className="text-xl font-semibold bg-gradient-to-r from-slate-700 to-blue-700 bg-clip-text text-transparent">Recent Activity</h2>
           <button
             onClick={handleClearActivity}
             disabled={clearingActivity}
-            className={`px-3 py-1 rounded text-sm ${clearingActivity ? 'bg-gray-300 cursor-not-allowed' : 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200'} transition-colors duration-200`}
+            className={`px-4 py-2 rounded-lg text-sm font-medium ${clearingActivity ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-red-50/50 text-red-600 hover:bg-red-100/50 border border-red-200/50 hover:shadow-md hover:-translate-y-0.5'} backdrop-blur-sm transition-all duration-300`}
           >
             {clearingActivity ? 'Clearing...' : 'Clear Activity'}
           </button>
         </div>
         <div className="space-y-4">
           {attendanceLoading ? (
-            <p>Loading recent activity...</p>
+            <div className="flex items-center justify-center p-8 text-slate-500">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-500 mr-3"></div>
+              Loading recent activity...
+            </div>
           ) : localAttendance && localAttendance.length > 0 ? (
             localAttendance.slice(0, 5).map((record, index) => (
               <motion.div

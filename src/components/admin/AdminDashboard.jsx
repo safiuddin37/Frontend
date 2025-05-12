@@ -93,10 +93,10 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+    <div className="flex flex-col h-screen bg-gray-50">
       {/* Mobile Header - Only visible on small screens */}
-      <header className="md:hidden bg-white/80 backdrop-blur-sm shadow-lg p-4 flex justify-between items-center sticky top-0 z-30">
-        <div className="flex items-center gap-3">
+      <header className="md:hidden bg-white shadow-sm p-4 flex justify-between items-center">
+        <div className="flex items-center">
           <button 
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -119,34 +119,28 @@ const AdminDashboard = () => {
           ${sidebarOpen ? 'fixed inset-0 z-40 md:relative md:inset-auto' : 'hidden md:block'}
           md:relative w-full md:w-64 md:flex-shrink-0 transition-all duration-300 ease-in-out
         `}>
-          {/* Mobile Overlay */}
+          {/* Mobile overlay - only visible when sidebar is open on mobile */}
           {sidebarOpen && (
-            <div
-              className="fixed inset-0 bg-black/30 backdrop-blur-sm z-30 md:hidden"
+            <div 
+              className="fixed inset-0 bg-gray-600 bg-opacity-50 z-30 md:hidden"
               onClick={() => setSidebarOpen(false)}
-            />
+            ></div>
           )}
-
-          {/* Sidebar */}
-          <Sidebar
-            activeTab={activeTab}
-            setActiveTab={(tab) => {
+          <Sidebar 
+            activeTab={activeTab} 
+            onTabChange={(tab) => {
               setActiveTab(tab);
+              // Close sidebar on mobile after tab change
               if (window.innerWidth < 768) setSidebarOpen(false);
-            }}
-            isOpen={sidebarOpen}
-            onClose={() => setSidebarOpen(false)}
+            }} 
+            className="z-40 relative h-full"
           />
-
-          {/* Main Content */}
-          <main className="flex-1 overflow-auto p-4 md:p-6 lg:p-8">
-            <div className="max-w-7xl mx-auto">
-              <div className="bg-white/60 backdrop-blur-sm shadow-xl rounded-2xl p-6 border border-white/20">
-                {renderContent()}
-              </div>
-            </div>
-          </main>
         </div>
+        
+        {/* Main Content */}
+        <main className="flex-1 overflow-y-auto z-0">
+          {renderContent()}
+        </main>
       </div>
     </div>
   );
