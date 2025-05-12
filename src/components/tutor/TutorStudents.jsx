@@ -11,6 +11,8 @@ import { useCenterRefetch } from '../../context/CenterRefetchContext'
 import axios from 'axios' // Add axios import
 
 const TutorStudents = () => {
+  const [showDeletePopover, setShowDeletePopover] = useState(false);
+  const [studentToDelete, setStudentToDelete] = useState(null);
   const [showForm, setShowForm] = useState(false)
   const [showDetails, setShowDetails] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
@@ -440,8 +442,6 @@ const TutorStudents = () => {
   }
 
   const handleDeleteStudent = async (studentId) => {
-    if (!window.confirm('Are you sure you want to delete this student?')) return;
-    
     try {
       setIsDeleting(true);
       // Remove the alert as it might be interfering with the flow
@@ -484,6 +484,8 @@ const TutorStudents = () => {
       toast.error(error.message || 'Failed to delete student');
     } finally {
       setIsDeleting(false);
+      setShowDeletePopover(false);
+      setStudentToDelete(null);
     }
   }
 
@@ -573,6 +575,51 @@ const TutorStudents = () => {
           </div>
         </div>
 
+        {/* Delete Confirmation Popover */}
+      <AnimatePresence>
+        {showDeletePopover && studentToDelete && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50"
+          >
+            <motion.div
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.95 }}
+              className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm"
+            >
+              <div className="flex flex-col items-center">
+                <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-3">
+                  <FiTrash2 className="text-red-600 text-2xl" />
+                </div>
+                <div className="text-lg font-bold mb-2 text-red-700">Delete Student</div>
+                <div className="text-gray-700 text-center mb-4">Are you sure you want to delete this student?</div>
+                <div className="flex gap-4 mt-2">
+                  <button
+                    className="px-5 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                    onClick={() => {
+                      setShowDeletePopover(false);
+                      setStudentToDelete(null);
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                    onClick={() => handleDeleteStudent(studentToDelete)}
+                    disabled={isDeleting}
+                  >
+                    {isDeleting ? 'Deleting...' : 'Delete'}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
         {/* Students Table */}
         <div className="overflow-x-auto">
           {/* Desktop Table View */}
@@ -632,10 +679,10 @@ const TutorStudents = () => {
                         </button>
                         <button
                           onClick={(e) => {
-                            e.stopPropagation(); // Stop event bubbling
-                            e.preventDefault(); // Prevent default behavior
-                            console.log('Delete button clicked for student:', student._id);
-                            handleDeleteStudent(student._id);
+                            e.stopPropagation();
+                            e.preventDefault();
+                            setShowDeletePopover(true);
+                            setStudentToDelete(student._id);
                           }}
                           className="text-red-600 hover:text-red-800 transition-colors"
                         >
