@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion'
-import { FiLogOut, FiUser } from 'react-icons/fi'
+import { FiLogOut, FiUser, FiX } from 'react-icons/fi'
 import { useState, useEffect } from 'react'
 import { useNavigate } from "react-router-dom";
 
-const TutorSidebar = ({ activeTab, setActiveTab, tabs, isMobile }) => {
+const TutorSidebar = ({ activeTab, setActiveTab, tabs, isMobile, isOpen, onClose }) => {
   const [showProfile, setShowProfile] = useState(false);
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(true);
@@ -36,108 +36,122 @@ const TutorSidebar = ({ activeTab, setActiveTab, tabs, isMobile }) => {
   };
 
   return (
-    <aside className={`bg-white shadow-xl ${isMobile ? 'w-64 h-full overflow-y-auto' : 'w-64 fixed h-screen bg-gradient-to-b from-white to-blue-50'}`}>
-      <div className="p-4 sm:p-6 border-b border-blue-100">
-        <div 
-          className="flex items-center cursor-pointer group"
-          onClick={() => setShowProfile(!showProfile)}
-          aria-expanded={showProfile}
-          aria-haspopup="true"
-        >
-          <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 mr-3 group-hover:bg-primary-200 transition-colors">
-            <FiUser size={20} />
-          </div>
-          <div className="overflow-hidden">
-            <h2 className="text-lg font-semibold text-gray-900 truncate">{tutorProfile.name}</h2>
-            <p className="text-sm text-gray-600 truncate">{getCenterName()}</p>
-          </div>
-        </div>
-      </div>
-      
-      <nav className="mt-4 sm:mt-6">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`w-full flex items-center px-4 sm:px-6 py-3 text-left transition-all duration-300 relative ${
-              activeTab === tab.id
-                ? 'text-primary-600 bg-primary-50 border-r-4 border-primary-600'
-                : 'text-gray-600 hover:bg-primary-50 hover:text-primary-600'
-            }`}
-            aria-current={activeTab === tab.id ? 'page' : undefined}
-          >
-            <span className="mr-3 transition-transform duration-300 transform group-hover:scale-110">
-              {tab.icon}
-            </span>
-            <span className="font-medium">{tab.label}</span>
-          </button>
-        ))}
-      </nav>
-
-      {showProfile && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          className="absolute top-20 left-4 right-4 bg-white rounded-lg shadow-xl p-4 z-50 border border-gray-100"
-        >
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="text-lg font-semibold">Profile Details</h3>
-            <button 
-              onClick={() => setShowProfile(false)}
-              className="text-gray-400 hover:text-gray-600"
-              aria-label="Close profile details"
-            >
-              <FiX size={18} />
-            </button>
-          </div>
-          
-          <div className="space-y-2">
-            <p className="text-sm flex flex-wrap">
-              <span className="text-gray-600 w-24 flex-shrink-0">Email:</span> 
-              <span className="flex-1 break-all">{tutorProfile.email}</span>
-            </p>
-            <p className="text-sm flex flex-wrap">
-              <span className="text-gray-600 w-24 flex-shrink-0">Phone:</span> 
-              <span className="flex-1">{tutorProfile.phone}</span>
-            </p>
-            <p className="text-sm flex flex-wrap">
-              <span className="text-gray-600 w-24 flex-shrink-0">Center:</span> 
-              <span className="flex-1">{getCenterName()}</span>
-            </p>
-            <p className="text-sm flex flex-wrap">
-              <span className="text-gray-600 w-24 flex-shrink-0">Join Date:</span> 
-              <span className="flex-1">{new Date(tutorProfile.createdAt).toLocaleDateString()}</span>
-            </p>
-            {tutorProfile.subjects && tutorProfile.subjects.length > 0 && (
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Subjects:</p>
-                <div className="flex flex-wrap gap-1 mt-1">
-                  {tutorProfile.subjects.map((subject, index) => (
-                    <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
-                      {subject}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </motion.div>
+    <>
+      {/* Mobile Overlay */}
+      {isMobile && isOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity"
+          onClick={onClose}
+        />
       )}
 
-      <div className={`${isMobile ? 'mt-8 border-t border-blue-100 p-4 sm:p-6' : 'absolute bottom-0 w-full p-4 sm:p-6 border-t border-blue-100 bg-white bg-opacity-90 backdrop-blur-sm'}`}>
-        <button 
-          type="button"
-          onClick={handleLogout}
-          className="w-full flex items-center justify-center sm:justify-start px-4 py-2 text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
-          aria-label="Logout from account"
-        >
-          <FiLogOut className="mr-3" />
-          <span className="font-medium">Logout</span>
-        </button>
-      </div>
-    </aside>
-  )
+      {/* Sidebar */}
+      <motion.aside
+        initial={isMobile ? { x: -320 } : false}
+        animate={isMobile ? { x: isOpen ? 0 : -320 } : false}
+        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+        className={`fixed top-0 left-0 h-screen z-50 ${isMobile ? 'w-[280px]' : 'w-64'} bg-gradient-to-br from-white via-white to-accent-50/10 shadow-2xl border-r border-white/20 overflow-y-auto overflow-x-hidden`}
+      >
+        {/* Profile Section */}
+        <div className="p-6 border-b border-accent-100/20 bg-white/50 backdrop-blur-sm">
+          <div 
+            className="flex items-center cursor-pointer group"
+            onClick={() => setShowProfile(!showProfile)}
+            aria-expanded={showProfile}
+            aria-haspopup="true"
+          >
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-primary-600 to-accent-600 flex items-center justify-center text-white mr-4 group-hover:shadow-lg group-hover:shadow-primary-500/20 transition-all duration-300 group-hover:-translate-y-0.5">
+              <FiUser size={24} />
+            </div>
+            <div className="overflow-hidden">
+              <h2 className="text-lg font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent truncate">
+                {tutorProfile.name}
+              </h2>
+              <p className="text-sm text-gray-600 truncate">{getCenterName()}</p>
+            </div>
+          </div>
+        </div>
+        
+        {/* Navigation */}
+        <nav className="p-4">
+          <div className="space-y-2">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  if (isMobile) onClose();
+                }}
+                className={`w-full flex items-center px-4 py-3 rounded-xl text-left transition-all duration-300 relative group ${activeTab === tab.id
+                  ? 'bg-gradient-to-r from-primary-600 to-accent-600 text-white shadow-lg shadow-primary-500/20'
+                  : 'text-gray-600 hover:bg-white/60 hover:shadow-md'}`}
+                aria-current={activeTab === tab.id ? 'page' : undefined}
+              >
+                <span className={`mr-3 transition-transform duration-300 transform group-hover:scale-110 ${activeTab === tab.id ? 'text-white' : 'text-primary-600'}`}>
+                  {tab.icon}
+                </span>
+                <span className="font-medium">{tab.label}</span>
+              </button>
+            ))}
+          </div>
+        </nav>
+
+        {/* Profile Modal */}
+        {showProfile && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="absolute top-24 left-4 right-4 bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 z-50 border border-white/20"
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
+                Profile Details
+              </h3>
+              <button 
+                onClick={() => setShowProfile(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+                aria-label="Close profile details"
+              >
+                <FiX size={20} />
+              </button>
+            </div>
+            
+            <div className="space-y-3">
+              <div className="p-3 rounded-xl bg-gray-50/80 hover:bg-white transition-colors">
+                <p className="text-sm flex flex-wrap items-center">
+                  <span className="text-gray-500 w-20 flex-shrink-0 font-medium">Email:</span> 
+                  <span className="flex-1 text-gray-900">{tutorProfile.email}</span>
+                </p>
+              </div>
+              <div className="p-3 rounded-xl bg-gray-50/80 hover:bg-white transition-colors">
+                <p className="text-sm flex flex-wrap items-center">
+                  <span className="text-gray-500 w-20 flex-shrink-0 font-medium">Phone:</span>
+                  <span className="flex-1 text-gray-900">{tutorProfile.phone}</span>
+                </p>
+              </div>
+              <div className="p-3 rounded-xl bg-gray-50/80 hover:bg-white transition-colors">
+                <p className="text-sm flex flex-wrap items-center">
+                  <span className="text-gray-500 w-20 flex-shrink-0 font-medium">Center:</span> 
+                  <span className="flex-1 text-gray-900">{getCenterName()}</span>
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 pt-4 border-t border-gray-200/50">
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center justify-center px-4 py-3 text-red-500 hover:text-red-600 hover:bg-red-50/80 rounded-xl transition-all duration-300 font-medium"
+              >
+                <FiLogOut className="mr-2 text-lg" />
+                Logout
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </motion.aside>
+    </>
+  );
 }
 
 export default TutorSidebar
