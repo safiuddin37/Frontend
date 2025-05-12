@@ -166,9 +166,8 @@ const TutorStudents = () => {
   }
 
   const handleDelete = async (id) => {
-    setIsDeleting(true)
-    if (window.confirm('Are you sure you want to delete this student?')) {
-      try {
+    setIsDeleting(true);
+    try {
         // Get token from userData in localStorage
         const userData = JSON.parse(localStorage.getItem('userData') || '{}')
         const token = userData.token
@@ -199,11 +198,10 @@ const TutorStudents = () => {
         console.error('Error deleting student:', error)
         toast.error(error.message || 'Failed to delete student')
       } finally {
-        setIsDeleting(false)
+        setIsDeleting(false);
+        setShowDeletePopover(false);
+        setStudentToDelete(null);
       }
-    } else {
-      setIsDeleting(false)
-    }
   }
 
   const handleExportCSV = () => {
@@ -1187,7 +1185,10 @@ const TutorStudents = () => {
                   <FiEdit2 className="mr-2" /> Edit
                 </button>
                 <button
-                  onClick={() => handleDeleteStudent(showDetails._id)}
+                  onClick={() => {
+                    setShowDeletePopover(true);
+                    setStudentToDelete(showDetails._id);
+                  }}
                   className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-300 flex items-center"
                   disabled={isDeleting}
                 >
