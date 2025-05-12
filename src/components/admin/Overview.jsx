@@ -254,18 +254,26 @@ const Overview = () => {
             </button>
           </div>
           <div className="space-y-4">
-            {localAttendance.map((record, i) => (
-              <div key={i} className="flex items-center justify-between p-4 bg-slate-700/30 rounded-xl">
-                <div className="flex items-center space-x-4">
-                  <div className="w-10 h-10 bg-slate-700 rounded-full"></div>
-                  <div>
-                    <p className="text-lg font-medium text-slate-50">{record.tutor.name}</p>
-                    <p className="text-sm text-slate-400">{formatDate(record.date)}</p>
+            {localAttendance && localAttendance.length > 0 ? (
+              localAttendance.map((record, i) => (
+                <div key={i} className="flex items-center justify-between p-4 bg-slate-700/30 rounded-xl">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-10 h-10 bg-blue-500/10 flex items-center justify-center">
+                      <FiCheck className="w-5 h-5 text-blue-400" />
+                    </div>
+                    <div>
+                      <p className="text-lg font-medium text-slate-50">{record?.tutor?.name || 'Unknown Tutor'}</p>
+                      <p className="text-sm text-slate-400">At {record?.center?.name || 'Unknown Center'}</p>
+                    </div>
                   </div>
+                  <div className="text-sm text-slate-400">{formatDate(record?.createdAt)}</div>
                 </div>
-                <div className="text-lg font-medium text-slate-50">{record.status}</div>
+              ))
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-slate-400">No recent activity</p>
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>
