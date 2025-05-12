@@ -46,11 +46,12 @@ const TutorSidebar = ({ activeTab, setActiveTab, tabs, isMobile, isOpen, onClose
       )}
 
       {/* Sidebar */}
-      <motion.aside
-        initial={isMobile ? { x: -320 } : false}
-        animate={isMobile ? { x: isOpen ? 0 : -320 } : false}
+      <motion.div
+        initial={isMobile ? { x: -280 } : false}
+        animate={isMobile ? { x: 0 } : false}
+        exit={isMobile ? { x: -280 } : false}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className={`fixed top-0 left-0 h-screen z-50 ${isMobile ? 'w-[280px]' : 'w-64'} bg-gradient-to-br from-white via-white to-accent-50/10 shadow-2xl border-r border-white/20 overflow-hidden flex flex-col`}
+        className={`${isMobile ? 'fixed top-0 left-0 h-screen z-50 w-[280px]' : 'relative w-64'} bg-gradient-to-br from-white via-white to-accent-50/10 shadow-2xl border-r border-white/20 flex flex-col`}
       >
         {/* Profile Section */}
         <div className="p-6 border-b border-accent-100/20 bg-white/50 backdrop-blur-sm">
@@ -163,7 +164,7 @@ const TutorSidebar = ({ activeTab, setActiveTab, tabs, isMobile, isOpen, onClose
             </div>
           </motion.div>
         )}
-      </motion.aside>
+      </motion.div>
     </>
   );
 }
