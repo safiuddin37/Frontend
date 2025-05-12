@@ -51,7 +51,7 @@ const TutorSidebar = ({ activeTab, setActiveTab, tabs, isMobile, isOpen, onClose
         animate={isMobile ? { x: 0 } : false}
         exit={isMobile ? { x: -280 } : false}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className={`${isMobile ? 'fixed top-0 left-0 h-screen z-50 w-[280px]' : 'relative w-64'} bg-gradient-to-br from-white via-white to-accent-50/10 shadow-2xl border-r border-white/20 flex flex-col`}
+        className={`${isMobile ? 'fixed' : 'fixed'} top-0 left-0 h-screen ${isMobile ? 'z-50' : 'z-20'} ${isMobile ? 'w-[280px]' : 'w-64'} bg-gradient-to-br from-white via-white to-accent-50/10 shadow-2xl border-r border-white/20 flex flex-col`}
       >
         {/* Profile Section */}
         <div className="p-6 border-b border-accent-100/20 bg-white/50 backdrop-blur-sm">

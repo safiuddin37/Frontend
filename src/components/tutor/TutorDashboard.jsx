@@ -68,23 +68,11 @@ const TutorDashboard = () => {
       </header>
       
       <div className="flex flex-1 relative overflow-hidden">
-        {/* Desktop Sidebar */}
-        {!isMobile && (
-          <div className="relative">
-            <TutorSidebar 
-              activeTab={activeTab} 
-              setActiveTab={setActiveTab}
-              tabs={tabs}
-              isMobile={false}
-            />
-          </div>
-        )}
-
-        {/* Mobile Sidebar with Animation */}
-        <AnimatePresence>
-          {isMobile && isSidebarOpen && (
-            <>
-              {/* Overlay */}
+        {/* Sidebar - Both Mobile and Desktop */}
+        {(!isMobile || isSidebarOpen) && (
+          <AnimatePresence>
+            {/* Overlay - Mobile Only */}
+            {isMobile && isSidebarOpen && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -92,35 +80,38 @@ const TutorDashboard = () => {
                 className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40"
                 onClick={() => setIsSidebarOpen(false)}
               />
-              {/* Sidebar */}
-              <TutorSidebar
-                activeTab={activeTab}
-                setActiveTab={(tab) => {
-                  setActiveTab(tab);
-                  setIsSidebarOpen(false);
-                }}
-                tabs={tabs}
-                isMobile={true}
-                isOpen={isSidebarOpen}
-                onClose={() => setIsSidebarOpen(false)}
-              />
-            </>
-          )}
-        </AnimatePresence>
+            )}
+            
+            {/* Sidebar Component */}
+            <TutorSidebar
+              activeTab={activeTab}
+              setActiveTab={(tab) => {
+                setActiveTab(tab);
+                if (isMobile) setIsSidebarOpen(false);
+              }}
+              tabs={tabs}
+              isMobile={isMobile}
+              isOpen={isSidebarOpen}
+              onClose={() => setIsSidebarOpen(false)}
+            />
+          </AnimatePresence>
+        )}
 
         {/* Main Content */}
-        <div className={`flex-1 p-4 md:p-6 ${!isMobile ? 'ml-64' : ''}`}>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeTab}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            >
-              {renderContent()}
-            </motion.div>
-          </AnimatePresence>
+        <div className="flex-1 p-4 md:p-6 transition-all duration-300">
+          <div className={`${!isMobile ? 'ml-64' : ''}`}>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              >
+                {renderContent()}
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </div>
       </div>
     </div>
