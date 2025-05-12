@@ -521,8 +521,8 @@ const TutorStudents = () => {
   }
 
   return (
-    <div className="min-h-screen w-full bg-[conic-gradient(at_top_right,_var(--tw-gradient-stops))] from-blue-100 via-accent-50 to-primary-50 py-6 px-4 sm:px-6 space-y-6">
-      <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-white/20">
+    <div className="min-h-screen w-full bg-gradient-to-br from-indigo-500 via-purple-500 to-accent-500 py-6 px-4 sm:px-6 space-y-6 bg-fixed">
+      <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-6 border border-white/30 hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300">
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-6 mb-8">
           <div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent mb-2">

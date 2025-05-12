@@ -168,7 +168,7 @@ const TutorOverview = () => {
   }
 
   return (
-    <div className="min-h-screen w-full bg-[conic-gradient(at_top_right,_var(--tw-gradient-stops))] from-blue-100 via-accent-50 to-primary-50 py-6 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen w-full bg-gradient-to-br from-indigo-500 via-purple-500 to-accent-500 py-6 px-4 sm:px-6 lg:px-8 bg-fixed">
       {/* Dashboard Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">Tutor Dashboard</h1>
