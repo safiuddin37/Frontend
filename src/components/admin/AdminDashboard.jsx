@@ -95,7 +95,7 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-100 flex">
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} className="w-64 bg-gray-800 text-white" />
-      <div className="flex-1 p-6">
+      <div className="flex-1 p-6 ml-64">
         <div className="bg-white/80 backdrop-blur-lg rounded-xl shadow-md p-6">
           {renderContent()}
         </div>
