@@ -160,7 +160,7 @@ const HadiyaManagement = () => {
           confirmedAmount: amount,
           paymentStatus: 'Paid',
           confirmedNotes: notes,
-          forceEdit: false
+          forceEdit: false // After save, lock again
         } : t
       )
     );
@@ -431,7 +431,7 @@ const HadiyaManagement = () => {
                       
                       {/* Payment Amount Cell */}
                       <td className="px-4 py-3">
-                        {isLocked ? (
+                        {(isLocked && !tutor.forceEdit) ? (
                           // LOCKED - Display frozen amount (no lock icon/text)
                           <div className="w-full pl-2 py-1.5 bg-gray-100 border border-gray-300 rounded text-sm flex items-center">
                             <span className="font-medium">₹ {amountPaid.toLocaleString('en-IN')}</span>
@@ -452,12 +452,12 @@ const HadiyaManagement = () => {
                       
                       {/* Notes Cell */}
                       <td className="px-4 py-3">
-                        {isLocked ? (
-                          // Display saved notes for locked payments (no lock icon/text)
-                          <div className="text-sm text-gray-600 bg-gray-50 p-2 rounded border border-gray-200 min-h-[48px]">
-                            {existingRecord?.notes || '-'}
-                          </div>
-                        ) : (
+                        {(isLocked && !tutor.forceEdit) ? (
+                           // Display saved notes for locked payments (no lock icon/text)
+                           <div className="text-sm text-gray-600 bg-gray-50 p-2 rounded border border-gray-200 min-h-[48px]">
+                             {existingRecord?.notes || '-'}
+                           </div>
+                         ) : (
                           // Notes input field for new payments
                           <textarea
                             placeholder="Add payment notes"
@@ -482,21 +482,24 @@ const HadiyaManagement = () => {
                       
                       {/* Action Cell */}
                       <td className="px-4 py-3 text-center">
-                        {isLocked ? (
-                          <button
-                            onClick={() => setTutors(current => current.map(t => t.tutorId === tutor.tutorId ? { ...t, tempAmount: existingRecord.amountPaid, tempNotes: existingRecord.notes, forceEdit: true } : t))}
-                            className="px-3 py-1.5 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 transition-colors flex items-center mx-auto"
-                          >
-                            Edit
-                          </button>
-                        ) : (
-                          <button 
-                            onClick={() => handleConfirmAmount(tutor.tutorId)}
-                            className="px-3 py-1.5 bg-primary-600 text-white rounded text-sm font-medium hover:bg-primary-700 transition-colors flex items-center mx-auto"
-                          >
-                            <FiSave className="mr-1" /> Save
-                          </button>
-                        )}
+                        {(isLocked && !tutor.forceEdit) ? (
+                           <button
+                             onClick={() => setTutors(current => current.map(t => t.tutorId === tutor.tutorId ? { ...t, tempAmount: existingRecord.amountPaid, tempNotes: existingRecord.notes, forceEdit: true } : t))}
+                             className="px-3 py-1.5 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 transition-colors flex items-center mx-auto"
+                           >
+                             Edit
+                           </button>
+                         ) : (
+                           <button 
+                             onClick={() => {
+                               handleConfirmAmount(tutor.tutorId);
+                               setTutors(current => current.map(t => t.tutorId === tutor.tutorId ? { ...t, forceEdit: false } : t));
+                             }}
+                             className="px-3 py-1.5 bg-primary-600 text-white rounded text-sm font-medium hover:bg-primary-700 transition-colors flex items-center mx-auto"
+                           >
+                             <FiSave className="mr-1" /> Save
+                           </button>
+                         )}
                       </td>
                     </tr>
                   );
