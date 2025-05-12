@@ -86,16 +86,21 @@ const ReportManagement = () => {
     });
     
     // Add summary columns
+    headers['Total Days'] = 'Total Days';
     headers['Present Days'] = 'Present Days';
     headers['Absent Days'] = 'Absent Days';
     headers['Attendance %'] = 'Attendance %';
     
     // Create rows for each tutor
     const rows = attendanceReport.map(report => {
-      const totalDays = Object.keys(report.attendance).length;
+      // Calculate days in the selected month
+      const date = new Date(selectedYear, selectedMonth - 1, 1);
+      const lastDay = new Date(selectedYear, selectedMonth, 0).getDate();
+      const daysInMonth = lastDay; // Total days in month
+      
       const presentDays = Object.values(report.attendance).filter(Boolean).length;
-      const absentDays = totalDays - presentDays;
-      const attendancePercentage = totalDays > 0 ? Math.round((presentDays / totalDays) * 100) : 0;
+      const absentDays = daysInMonth - presentDays;
+      const attendancePercentage = daysInMonth > 0 ? Math.round((presentDays / daysInMonth) * 100) : 0;
       
       const row = {
         'Tutor Name': report.tutor.name,
@@ -109,6 +114,7 @@ const ReportManagement = () => {
       });
       
       // Add summary data
+      row['Total Days'] = daysInMonth;
       row['Present Days'] = presentDays;
       row['Absent Days'] = absentDays;
       row['Attendance %'] = `${attendancePercentage}%`;
@@ -146,20 +152,26 @@ const ReportManagement = () => {
 
     // Create table data
     const tableData = attendanceReport.map(report => {
-      const totalDays = Object.keys(report.attendance).length;
+      // Calculate days in the selected month
+      const date = new Date(selectedYear, selectedMonth - 1, 1);
+      const lastDay = new Date(selectedYear, selectedMonth, 0).getDate();
+      const daysInMonth = lastDay; // Total days in month
+      
       const presentDays = Object.values(report.attendance).filter(Boolean).length;
+      const absentDays = daysInMonth - presentDays;
 
       return [
         report.tutor.name,
         report.center.name,
+        daysInMonth.toString(),
         presentDays.toString(),
-        (totalDays - presentDays).toString()
+        absentDays.toString()
       ];
     });
 
     doc.autoTable({
       startY: selectedCenter ? 45 : 35,
-      head: [['Tutor Name', 'Center', 'Present Days', 'Absent Days']],
+      head: [['Tutor Name', 'Center', 'Total Days', 'Present Days', 'Absent Days']],
       body: tableData,
       theme: 'grid',
       styles: { fontSize: 8 },
@@ -281,6 +293,9 @@ const ReportManagement = () => {
                     Center
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Total Days
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Present Days
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -290,8 +305,16 @@ const ReportManagement = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {attendanceReport.map((report) => {
-                  const totalDays = Object.keys(report.attendance).length;
+                  // Calculate days in the selected month
+                  const date = new Date(selectedYear, selectedMonth - 1, 1);
+                  const lastDay = new Date(selectedYear, selectedMonth, 0).getDate();
+                  const daysInMonth = lastDay; // Total days in month
+                  
+                  // Count present days
                   const presentDays = Object.values(report.attendance).filter(Boolean).length;
+                  
+                  // Calculate absent days (total month days - present days)
+                  const absentDays = daysInMonth - presentDays;
 
                   return (
                     <tr key={report.tutor._id} className="hover:bg-gray-50">
@@ -304,10 +327,13 @@ const ReportManagement = () => {
                         <div className="text-sm text-gray-900">{report.center.name}</div>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{daysInMonth}</div>
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">
                         <div className="text-sm text-gray-900">{presentDays}</div>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{totalDays - presentDays}</div>
+                        <div className="text-sm text-gray-900">{absentDays}</div>
                       </td>
                     </tr>
                   );
