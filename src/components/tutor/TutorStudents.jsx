@@ -521,39 +521,42 @@ const TutorStudents = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0">
-        <h1 className="text-2xl font-bold bg-gradient-to-r from-accent-600 to-primary-600 bg-clip-text text-transparent">
-          Students Management
-        </h1>
-        <div className="flex flex-wrap w-full sm:w-auto justify-center sm:justify-end gap-2 sm:gap-4">
-          <button
-            onClick={() => setShowForm(true)}
-            className="px-4 py-2 bg-accent-600 text-white rounded-lg hover:bg-accent-700 transition-all duration-300 shadow-md hover:shadow-lg flex items-center"
-          >
-            <FiUserPlus className="mr-2" /> Add Student
-          </button>
-          <button
-            onClick={handleExportCSV}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-300 shadow-md hover:shadow-lg flex items-center"
-          >
-            <FiDownload className="mr-2" /> Export CSV
-          </button>
+    <div className="min-h-screen w-full bg-[conic-gradient(at_top_right,_var(--tw-gradient-stops))] from-blue-100 via-accent-50 to-primary-50 py-6 px-4 sm:px-6 space-y-6">
+      <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-white/20">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-6 mb-8">
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent mb-2">
+              Students Management
+            </h1>
+            <p className="text-gray-600">Manage your center's students</p>
+          </div>
+          <div className="flex flex-wrap w-full sm:w-auto justify-center sm:justify-end gap-3">
+            <button
+              onClick={() => setShowForm(true)}
+              className="px-5 py-2.5 bg-gradient-to-r from-accent-600 to-primary-600 text-white rounded-xl hover:shadow-lg hover:shadow-accent-500/25 hover:-translate-y-0.5 transition-all duration-300 flex items-center font-medium"
+            >
+              <FiUserPlus className="mr-2 text-lg" /> Add Student
+            </button>
+            <button
+              onClick={handleExportCSV}
+              className="px-5 py-2.5 bg-gradient-to-r from-green-600 to-emerald-500 text-white rounded-xl hover:shadow-lg hover:shadow-green-500/25 hover:-translate-y-0.5 transition-all duration-300 flex items-center font-medium"
+            >
+              <FiDownload className="mr-2 text-lg" /> Export CSV
+            </button>
+          </div>
         </div>
-      </div>
 
-      {/* Filters */}
-      <div className="bg-white rounded-xl shadow-lg p-6">
+        {/* Filters */}
         <div className="flex flex-col sm:flex-row flex-wrap gap-4 mb-6">
           <div className="w-full sm:flex-1">
-            <div className="relative">
-              <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <div className="relative group">
+              <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-accent-500 transition-colors duration-200" />
               <input
                 type="text"
                 placeholder="Search students..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
+                className="w-full pl-10 pr-4 py-3 bg-white/50 backdrop-blur-sm border border-white/20 rounded-xl focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-all duration-200 hover:bg-white/80"
               />
             </div>
           </div>
@@ -562,7 +565,7 @@ const TutorStudents = () => {
               <select
                 value={selectedClass}
                 onChange={(e) => setSelectedClass(e.target.value)}
-                className="w-full pl-4 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 appearance-none"
+                className="w-full pl-4 pr-4 py-3 bg-white/50 backdrop-blur-sm border border-white/20 rounded-xl focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-all duration-200 hover:bg-white/80 appearance-none"
               >
                 <option value="all">All Classes</option>
                 {Array.from({ length: 10 }, (_, i) => (
