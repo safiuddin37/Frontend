@@ -68,72 +68,46 @@ const TutorDashboard = () => {
       </header>
       
       <div className="flex flex-1 relative overflow-hidden">
-        {/* Sidebar with animation */}
-        <AnimatePresence mode="wait">
-          {isSidebarOpen && (
-            <motion.div 
-              key="sidebar"
-              initial={{ x: isMobile ? -280 : 0, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: isMobile ? -280 : 0, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className={`${isMobile ? 'fixed inset-y-0 left-0 z-20' : 'relative'}`}
-            >
-              <TutorSidebar 
-                activeTab={activeTab} 
-                setActiveTab={(tab) => {
-                  setActiveTab(tab)
-                  if (isMobile) setIsSidebarOpen(false)
-                }} 
-                tabs={tabs}
-                isMobile={isMobile}
-              />
-              
-              {/* Mobile sidebar close overlay */}
-              {isMobile && (
-                <motion.div 
-                  className="fixed inset-0 bg-black bg-opacity-30 z-10" 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  onClick={() => setIsSidebarOpen(false)}
-                />
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Sidebar */}
+        <TutorSidebar 
+          activeTab={activeTab} 
+          setActiveTab={(tab) => {
+            setActiveTab(tab)
+            if (isMobile) setIsSidebarOpen(false)
+          }} 
+          tabs={tabs}
+          isMobile={isMobile}
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
+        />
         
         {/* Main Content with animation */}
-        <main 
-          className={`flex-1 p-4 sm:p-6 md:p-8 transition-all duration-300 overflow-auto ${isSidebarOpen && !isMobile ? 'md:ml-64' : 'ml-0'}`}
-        >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeTab}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3 }}
-              className="mt-0 md:mt-4"
-            >
-              {/* Mobile back button when sidebar is closed */}
-              {isMobile && !isSidebarOpen && (
-                <button 
-                  onClick={toggleSidebar}
-                  className="mb-4 inline-flex items-center text-primary-600 hover:text-primary-800 transition-colors"
-                >
-                  <FiChevronLeft className="mr-1" />
-                  <span>Menu</span>
-                </button>
-              )}
-              
-              {renderContent()}
-            </motion.div>
-          </AnimatePresence>
-        </main>
+        <AnimatePresence mode="wait">
+          <motion.main
+            key={activeTab}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2 }}
+            className={`flex-1 p-4 md:p-6 ${isMobile ? 'mt-16' : ''}`}
+          >
+            {/* Mobile back button when sidebar is closed */}
+            {isMobile && !isSidebarOpen && (
+              <button 
+                onClick={toggleSidebar}
+                className="mb-4 inline-flex items-center text-primary-600 hover:text-primary-800 transition-colors"
+              >
+                <FiChevronLeft className="mr-1" />
+                <span>Menu</span>
+              </button>
+            )}
+            
+            {renderContent()}
+          </motion.main>
+        </AnimatePresence>
       </div>
     </div>
-  )
+  );
 }
 
 export default TutorDashboard
