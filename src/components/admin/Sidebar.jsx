@@ -71,10 +71,10 @@ const Sidebar = ({ activeTab, onTabChange, className }) => {
       animate={{ x: 0 }}
       exit={{ x: -300 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className={`fixed top-0 left-0 h-screen w-64 bg-gradient-to-br from-white via-white to-blue-50 shadow-2xl border-r border-white/20 overflow-hidden flex flex-col ${className}`}
+      className={`fixed top-0 left-0 h-screen w-64 bg-gray-800 text-white shadow-2xl border-r border-gray-700 overflow-hidden flex flex-col ${className}`}
     >
-      <div className="p-6 border-b border-blue-100 bg-white/50 backdrop-blur-sm">
-        <h2 className="text-lg font-bold text-blue-600">Admin Panel</h2>
+      <div className="p-6 border-b border-gray-700 bg-gray-900">
+        <h2 className="text-lg font-bold text-white">Admin Panel</h2>
       </div>
       <nav className="p-4 flex-1 overflow-y-auto">
         <div className="space-y-2">
@@ -83,17 +83,17 @@ const Sidebar = ({ activeTab, onTabChange, className }) => {
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
               className={`w-full flex items-center px-4 py-3 rounded-xl text-left transition-all duration-300 relative group ${activeTab === tab.id
-                ? 'bg-gradient-to-r from-blue-600 to-blue-400 text-white shadow-lg'
-                : 'text-gray-600 hover:bg-white/60 hover:shadow-md'}`}
+                ? 'bg-gradient-to-r from-gray-700 to-gray-600 text-white shadow-lg'
+                : 'text-gray-300 hover:bg-gray-700 hover:shadow-md'}`}
               aria-current={activeTab === tab.id ? 'page' : undefined}
             >
-              <span className={`mr-3 transition-transform duration-300 transform group-hover:scale-110 ${activeTab === tab.id ? 'text-white' : 'text-blue-600'}`}>{tab.icon}</span>
+              <span className={`mr-3 transition-transform duration-300 transform group-hover:scale-110 ${activeTab === tab.id ? 'text-white' : 'text-gray-400'}`}>{tab.icon}</span>
               <span className="font-medium">{tab.label}</span>
             </button>
           ))}
         </div>
       </nav>
-      <div className="p-4 border-t border-blue-100 bg-white/50 backdrop-blur-sm">
+      <div className="p-4 border-t border-gray-700 bg-gray-900">
         <button
           onClick={handleLogout}
           className="w-full flex items-center justify-center px-4 py-3 text-red-500 hover:text-red-600 hover:bg-red-50/80 rounded-xl transition-all duration-300 font-medium"
