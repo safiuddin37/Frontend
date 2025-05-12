@@ -178,45 +178,45 @@ const TutorOverview = () => {
       {/* Dashboard Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {/* Students Card */}
-        <div className="rounded-2xl shadow-xl bg-gradient-to-tr from-primary-600 to-accent-600 text-white p-6 flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-primary-500/20">
-          <div className="w-14 h-14 rounded-full bg-white bg-opacity-20 flex items-center justify-center mb-3 backdrop-blur-sm">
-            <FiUsers className="text-3xl text-white" />
+        <div className="rounded-xl shadow-lg bg-gradient-to-tr from-primary-600 to-accent-600 text-white p-4 flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-primary-500/20">
+          <div className="w-10 h-10 rounded-full bg-white bg-opacity-20 flex items-center justify-center mb-2 backdrop-blur-sm">
+            <FiUsers className="text-xl text-white" />
           </div>
-          <div className="text-3xl font-extrabold mb-1">
+          <div className="text-2xl font-bold mb-0.5">
             {loading ? (
-              <svg className="animate-spin h-6 w-6 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <svg className="animate-spin h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
               </svg>
             ) : centerStudents}
           </div>
-          <div className="text-lg font-medium tracking-wide opacity-90">Center Students</div>
+          <div className="text-sm font-medium tracking-wide opacity-90">Center Students</div>
         </div>
 
         {/* Time Card */}
-        <div className="rounded-2xl shadow-xl bg-gradient-to-tr from-blue-600 to-blue-400 text-white p-6 flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/20">
-          <div className="w-14 h-14 rounded-full bg-white bg-opacity-20 flex items-center justify-center mb-3 backdrop-blur-sm">
-            <FiClock className="text-3xl text-white" />
+        <div className="rounded-xl shadow-lg bg-gradient-to-tr from-blue-600 to-blue-400 text-white p-4 flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-blue-500/20">
+          <div className="w-10 h-10 rounded-full bg-white bg-opacity-20 flex items-center justify-center mb-2 backdrop-blur-sm">
+            <FiClock className="text-xl text-white" />
           </div>
-          <div className="text-3xl font-extrabold mb-1">
+          <div className="text-2xl font-bold mb-0.5">
             {currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
           </div>
-          <div className="text-lg font-medium tracking-wide opacity-90">Current Time</div>
+          <div className="text-sm font-medium tracking-wide opacity-90">Current Time</div>
         </div>
 
         {/* Attendance Status Card */}
-        <div className="rounded-2xl shadow-xl bg-gradient-to-tr from-green-600 to-emerald-400 text-white p-6 flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-green-500/20">
-          <div className="w-14 h-14 rounded-full bg-white bg-opacity-20 flex items-center justify-center mb-3 backdrop-blur-sm">
+        <div className="rounded-xl shadow-lg bg-gradient-to-tr from-green-600 to-emerald-400 text-white p-4 flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-green-500/20">
+          <div className="w-10 h-10 rounded-full bg-white bg-opacity-20 flex items-center justify-center mb-2 backdrop-blur-sm">
             {attendanceMarked || alreadyMarked ? (
-              <FiCheck className="text-3xl text-white" />
+              <FiCheck className="text-xl text-white" />
             ) : (
-              <FiClock className="text-3xl text-white" />
+              <FiClock className="text-xl text-white" />
             )}
           </div>
-          <div className="text-xl font-bold mb-1 text-center">
+          <div className="text-2xl font-bold mb-0.5 text-center">
             {attendanceMarked || alreadyMarked ? 'Marked' : 'Pending'}
           </div>
-          <div className="text-lg font-medium tracking-wide opacity-90">Today's Attendance</div>
+          <div className="text-sm font-medium tracking-wide opacity-90">Today's Attendance</div>
         </div>
       </div>
 
