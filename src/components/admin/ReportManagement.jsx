@@ -313,8 +313,12 @@ const ReportManagement = () => {
                   // Count present days
                   const presentDays = Object.values(report.attendance).filter(Boolean).length;
                   
-                  // Calculate absent days (total month days - present days)
-                  const absentDays = daysInMonth - presentDays;
+                  // Determine if this is the current month and year
+                  const now = new Date();
+                  const isCurrentMonth = (selectedYear === now.getFullYear()) && (selectedMonth === now.getMonth() + 1);
+                  const daysElapsed = isCurrentMonth ? now.getDate() : daysInMonth;
+                  // Calculate absent days: only count days that have passed
+                  const absentDays = daysElapsed - presentDays;
 
                   return (
                     <tr key={report.tutor._id} className="hover:bg-gray-50">
