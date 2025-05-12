@@ -168,11 +168,18 @@ const TutorOverview = () => {
   }
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-blue-50 via-white to-accent-100 py-6 px-2 sm:px-6 md:px-12 space-y-8">
+    <div className="min-h-screen w-full bg-[conic-gradient(at_top_right,_var(--tw-gradient-stops))] from-blue-100 via-accent-50 to-primary-50 py-6 px-4 sm:px-6 lg:px-8">
+      {/* Dashboard Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">Tutor Dashboard</h1>
+        <p className="text-gray-600 mt-2">Welcome back, {tutorData.name || 'Tutor'}</p>
+      </div>
+
       {/* Dashboard Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        <div className="rounded-2xl shadow-xl bg-gradient-to-tr from-primary-600 to-accent-600 text-white p-6 flex flex-col items-center justify-center transition-transform hover:scale-105">
-          <div className="w-14 h-14 rounded-full bg-white bg-opacity-20 flex items-center justify-center mb-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        {/* Students Card */}
+        <div className="rounded-2xl shadow-xl bg-gradient-to-tr from-primary-600 to-accent-600 text-white p-6 flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-primary-500/20">
+          <div className="w-14 h-14 rounded-full bg-white bg-opacity-20 flex items-center justify-center mb-3 backdrop-blur-sm">
             <FiUsers className="text-3xl text-white" />
           </div>
           <div className="text-3xl font-extrabold mb-1">
@@ -185,7 +192,32 @@ const TutorOverview = () => {
           </div>
           <div className="text-lg font-medium tracking-wide opacity-90">Center Students</div>
         </div>
-        {/* Add more cards here for other stats if needed in future */}
+
+        {/* Time Card */}
+        <div className="rounded-2xl shadow-xl bg-gradient-to-tr from-blue-600 to-blue-400 text-white p-6 flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/20">
+          <div className="w-14 h-14 rounded-full bg-white bg-opacity-20 flex items-center justify-center mb-3 backdrop-blur-sm">
+            <FiClock className="text-3xl text-white" />
+          </div>
+          <div className="text-3xl font-extrabold mb-1">
+            {currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+          </div>
+          <div className="text-lg font-medium tracking-wide opacity-90">Current Time</div>
+        </div>
+
+        {/* Attendance Status Card */}
+        <div className="rounded-2xl shadow-xl bg-gradient-to-tr from-green-600 to-emerald-400 text-white p-6 flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-green-500/20">
+          <div className="w-14 h-14 rounded-full bg-white bg-opacity-20 flex items-center justify-center mb-3 backdrop-blur-sm">
+            {attendanceMarked || alreadyMarked ? (
+              <FiCheck className="text-3xl text-white" />
+            ) : (
+              <FiClock className="text-3xl text-white" />
+            )}
+          </div>
+          <div className="text-xl font-bold mb-1 text-center">
+            {attendanceMarked || alreadyMarked ? 'Marked' : 'Pending'}
+          </div>
+          <div className="text-lg font-medium tracking-wide opacity-90">Today's Attendance</div>
+        </div>
       </div>
 
       {showDeniedPopover && (
@@ -220,31 +252,43 @@ const TutorOverview = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="bg-white rounded-xl shadow-lg p-4 sm:p-6"
+        className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl p-6 sm:p-8 border border-white/20"
       >
-        <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Mark Attendance</h2>
+        <h2 className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent mb-6">Mark Attendance</h2>
         {attendanceCheckLoading ? (
-          <div className="mb-4 p-3 bg-blue-50 text-blue-700 rounded">Checking attendance status...</div>
+          <div className="mb-6 p-4 bg-blue-50/80 backdrop-blur-sm text-blue-700 rounded-xl border border-blue-100 flex items-center">
+            <svg className="animate-spin h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+            </svg>
+            Checking attendance status...
+          </div>
         ) : alreadyMarked ? (
-          <div className="mb-4 p-3 bg-green-50 text-green-700 rounded">Today's attendance has already been marked.</div>
+          <div className="mb-6 p-4 bg-green-50/80 backdrop-blur-sm text-green-700 rounded-xl border border-green-100 flex items-center">
+            <FiCheck className="h-5 w-5 mr-3" />
+            Today's attendance has already been marked.
+          </div>
         ) : (
           <>
             {error && (
-              <div className="mb-4 p-3 bg-red-50 text-red-700 rounded">
+              <div className="mb-6 p-4 bg-red-50/80 backdrop-blur-sm text-red-700 rounded-xl border border-red-100 flex items-center">
+                <FiX className="h-5 w-5 mr-3" />
                 {error}
               </div>
             )}
             {locationError && (
-              <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg">
+              <div className="mb-6 p-4 bg-red-50/80 backdrop-blur-sm text-red-700 rounded-xl border border-red-100 flex items-center">
+                <FiX className="h-5 w-5 mr-3" />
                 {locationError}
               </div>
             )}
-            <div className="h-[300px] sm:h-[350px] md:h-[400px] rounded-lg overflow-hidden mb-4 shadow-md border border-gray-100">
+            <div className="relative h-[300px] sm:h-[350px] md:h-[400px] rounded-2xl overflow-hidden mb-6 shadow-2xl border border-white/20 bg-white/5 backdrop-blur-sm transition-all duration-300 hover:shadow-accent-500/20">
               <MapContainer
                 center={[centerLocation.lat, centerLocation.lng]}
                 zoom={15}
                 style={{ height: '100%', width: '100%' }}
                 attributionControl={false}
+                className="z-10"
               >
                 <TileLayer
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -258,38 +302,37 @@ const TutorOverview = () => {
                 <Circle
                   center={[centerLocation.lat, centerLocation.lng]}
                   radius={1300}
-                  pathOptions={{ color: 'blue', fillColor: 'blue', fillOpacity: 0.1 }}
+                  pathOptions={{ color: '#4F46E5', fillColor: '#4F46E5', fillOpacity: 0.1 }}
                 />
               </MapContainer>
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
               <div className="w-full sm:w-auto">
                 {locationMatch !== null && (
-                  <div className="space-y-1 sm:space-y-2 bg-white rounded-lg p-3 border border-gray-100 shadow-sm">
+                  <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-white/20 shadow-lg transition-all duration-300 hover:shadow-xl hover:shadow-primary-500/10">
                     <div className="flex items-center">
-                      <div className={`w-3 h-3 rounded-full mr-2 ${locationMatch ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                      <p className={`text-sm sm:text-base font-medium ${locationMatch ? 'text-green-600' : 'text-red-600'}`}>
+                      <div className={`w-4 h-4 rounded-full mr-3 ${locationMatch ? 'bg-green-500' : 'bg-red-500'} shadow-lg`}></div>
+                      <p className={`text-base sm:text-lg font-medium ${locationMatch ? 'text-green-600' : 'text-red-600'}`}>
                         {locationMatch 
                           ? 'Location verified'
                           : 'Location mismatch'}
                       </p>
                     </div>
-                    {/* Distance to center text removed */}
                   </div>
                 )}
               </div>
-              <div className="flex gap-3 sm:gap-4 w-full sm:w-auto justify-end">
+              <div className="flex gap-4 w-full sm:w-auto justify-end">
                 <button
                   onClick={handleMarkAttendance}
                   disabled={!locationMatch || attendanceMarked}
-                  className={`px-3 sm:px-4 py-2 rounded-lg transition-colors flex items-center justify-center flex-1 sm:flex-none text-sm sm:text-base ${
+                  className={`px-6 py-3 rounded-xl transition-all duration-300 flex items-center justify-center flex-1 sm:flex-none text-base font-medium shadow-lg ${
                     locationMatch && !attendanceMarked
-                      ? 'bg-green-600 text-white hover:bg-green-700'
+                      ? 'bg-gradient-to-r from-green-600 to-emerald-500 text-white hover:shadow-xl hover:shadow-green-500/25 hover:-translate-y-0.5'
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
                 >
-                  {attendanceMarked ? <FiCheck className="mr-2" /> : null}
+                  {attendanceMarked ? <FiCheck className="mr-2 text-lg" /> : null}
                   {attendanceMarked ? 'Marked' : 'Mark Attendance'}
                 </button>
               </div>
