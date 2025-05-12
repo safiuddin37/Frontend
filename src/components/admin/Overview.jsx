@@ -32,31 +32,6 @@ const Popover = ({ isOpen, onClose, title, message, type = 'success' }) => {
   );
 };
 
-const StatCard = ({ icon: Icon, title, value, trend, color }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    className={`${color} rounded-2xl p-6 shadow-lg backdrop-blur-lg bg-opacity-10 border border-slate-700/20`}
-  >
-    <div className="flex items-center justify-between">
-      <div className="flex-1">
-        <div className="flex items-center mb-2">
-          <Icon className="w-5 h-5 mr-2 text-slate-50" />
-          <h3 className="text-sm font-medium text-slate-400">{title}</h3>
-        </div>
-        <div className="flex items-baseline">
-          <p className="text-2xl font-semibold text-slate-50">{value}</p>
-          {trend && (
-            <span className={`ml-2 text-sm ${trend > 0 ? 'text-emerald-500' : 'text-red-500'}`}>
-              {trend > 0 ? '+' : ''}{trend}%
-            </span>
-          )}
-        </div>
-      </div>
-    </div>
-  </motion.div>
-);
-
 const Overview = () => {
   // State for clearing activity
   const [clearingActivity, setClearingActivity] = useState(false);
@@ -179,50 +154,47 @@ const Overview = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-900 text-slate-50 p-6">
-        <div className="max-w-7xl mx-auto space-y-8">
-          {/* Welcome Section */}
-          <div className="mb-8 animate-pulse">
-            <div className="h-8 w-64 bg-slate-800 rounded-lg mb-2"></div>
-            <div className="h-4 w-48 bg-slate-800 rounded-lg"></div>
-          </div>
-
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="bg-slate-800 rounded-2xl p-6 animate-pulse">
-                <div className="flex items-center mb-2">
-                  <div className="w-5 h-5 bg-slate-700 rounded mr-2"></div>
-                  <div className="h-4 w-24 bg-slate-700 rounded"></div>
+      <div className="p-6">
+        <h1 className="text-2xl font-bold mb-6">Dashboard Overview</h1>
+        
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          {[1, 2, 3].map((i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-gray-100 rounded-lg p-6 animate-pulse"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-600 text-sm h-4 w-24 bg-gray-200 rounded"></p>
+                  <p className="text-2xl font-bold mt-1 h-6 w-20 bg-gray-200 rounded"></p>
                 </div>
-                <div className="h-8 w-16 bg-slate-700 rounded mt-2"></div>
+                <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Recent Activity */}
+        <div className="bg-gray-100 rounded-lg p-6 animate-pulse">
+          <h2 className="text-xl font-semibold mb-4 h-6 bg-gray-200 rounded"></h2>
+          <div className="space-y-4">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div
+                key={i}
+                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="w-5 h-5 bg-gray-200 rounded-full"></div>
+                  <div>
+                    <p className="font-medium h-4 w-24 bg-gray-200 rounded"></p>
+                    <p className="text-sm text-gray-600 mt-1 h-4 w-20 bg-gray-200 rounded"></p>
+                  </div>
+                </div>
               </div>
             ))}
-          </div>
-
-          {/* Recent Activity */}
-          <div className="bg-slate-800 rounded-2xl p-6 animate-pulse">
-            <div className="flex justify-between items-center mb-6">
-              <div>
-                <div className="h-6 w-32 bg-slate-700 rounded mb-2"></div>
-                <div className="h-4 w-48 bg-slate-700 rounded"></div>
-              </div>
-              <div className="h-10 w-24 bg-slate-700 rounded"></div>
-            </div>
-            <div className="space-y-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center justify-between p-4 bg-slate-700/30 rounded-xl">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-10 h-10 bg-slate-700 rounded-full"></div>
-                    <div>
-                      <div className="h-4 w-32 bg-slate-700 rounded mb-2"></div>
-                      <div className="h-3 w-48 bg-slate-700 rounded"></div>
-                    </div>
-                  </div>
-                  <div className="h-4 w-20 bg-slate-700 rounded"></div>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </div>
@@ -230,55 +202,80 @@ const Overview = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-50 p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold">Dashboard Overview</h1>
-          <p className="text-lg text-slate-400">Welcome to the dashboard!</p>
-        </div>
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat, i) => (
-            <StatCard key={i} icon={stat.icon} title={stat.label} value={stat.value} />
-          ))}
-        </div>
-
-        {/* Recent Activity */}
-        <div className="bg-slate-800 rounded-2xl p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold">Recent Activity</h2>
-            <button onClick={handleClearActivity} className="text-slate-400 hover:text-slate-50">
-              Clear Activity
-            </button>
-          </div>
-          <div className="space-y-4">
-            {localAttendance && localAttendance.length > 0 ? (
-              localAttendance.map((record, i) => (
-                <div key={i} className="flex items-center justify-between p-4 bg-slate-700/30 rounded-xl">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-10 h-10 bg-blue-500/10 flex items-center justify-center">
-                      <FiCheck className="w-5 h-5 text-blue-400" />
-                    </div>
-                    <div>
-                      <p className="text-lg font-medium text-slate-50">{record?.tutor?.name || 'Unknown Tutor'}</p>
-                      <p className="text-sm text-slate-400">At {record?.center?.name || 'Unknown Center'}</p>
-                    </div>
-                  </div>
-                  <div className="text-sm text-slate-400">{formatDate(record?.createdAt)}</div>
-                </div>
-              ))
-            ) : (
-              <div className="text-center py-8">
-                <p className="text-slate-400">No recent activity</p>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-6">Dashboard Overview</h1>
+      
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {stats.map((stat, index) => (
+          <motion.div
+            key={stat.label}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+            className="bg-white rounded-lg shadow-md p-6"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 text-sm">{stat.label}</p>
+                <p className="text-2xl font-bold mt-1">{stat.value}</p>
               </div>
-            )}
-          </div>
+              <stat.icon className="w-8 h-8 text-blue-500" />
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Recent Activity */}
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold">Recent Activity</h2>
+          <button
+            onClick={handleClearActivity}
+            disabled={clearingActivity}
+            className={`px-3 py-1 rounded text-sm ${clearingActivity ? 'bg-gray-300 cursor-not-allowed' : 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200'} transition-colors duration-200`}
+          >
+            {clearingActivity ? 'Clearing...' : 'Clear Activity'}
+          </button>
+        </div>
+        <div className="space-y-4">
+          {attendanceLoading ? (
+            <p>Loading recent activity...</p>
+          ) : localAttendance && localAttendance.length > 0 ? (
+            localAttendance.slice(0, 5).map((record, index) => (
+              <motion.div
+                key={record._id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20, transition: { duration: 0.3 } }}
+                transition={{ delay: index * 0.1 }}
+                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+              >
+                <div className="flex items-center space-x-3">
+                  <FiCheck className="w-5 h-5 text-green-500" />
+                  <div>
+                    <p className="font-medium">{record.tutor?.name || 'Unknown Tutor'}</p>
+                    <p className="text-sm text-gray-600">Marked attendance at {record.center?.name || 'Unknown Center'}</p>
+                  </div>
+                </div>
+                <span className="text-sm text-gray-500">{formatDate(record.createdAt)}</span>
+              </motion.div>
+            ))
+          ) : (
+            <p className="text-gray-500">No recent activity</p>
+          )}
         </div>
       </div>
+      
+      {/* Feedback Popover */}
+      <Popover
+        isOpen={showPopover}
+        onClose={() => setShowPopover(false)}
+        message={popoverMessage}
+        type={popoverMessage.includes('success') ? 'success' : 'error'}
+      />
     </div>
-  );
-};
+  )
+}
 
 export default Overview
