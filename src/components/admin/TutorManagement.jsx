@@ -48,45 +48,15 @@ const TutorManagement = () => {
         setIsSubmitting(false);
         return;
       }
-      // Prepare FormData for file uploads
-      const fd = new FormData();
-      Object.entries(formData).forEach(([key, value]) => {
-        if (key === 'documents' && typeof value === 'object' && value !== null) {
-          // Nested documents
-          Object.entries(value).forEach(([docKey, docValue]) => {
-            if (docKey === 'bankAccount' && typeof docValue === 'object' && docValue !== null) {
-              Object.entries(docValue).forEach(([bankKey, bankValue]) => {
-                if (bankValue instanceof File) {
-                  fd.append(`documents.bankAccount.${bankKey}`, bankValue);
-                } else if (bankValue) {
-                  fd.append(`documents.bankAccount.${bankKey}`, bankValue);
-                }
-              });
-            } else if (Array.isArray(docValue)) {
-              docValue.forEach((file, idx) => {
-                if (file instanceof File) {
-                  fd.append(`documents.${docKey}`, file);
-                }
-              });
-            } else if (docValue instanceof File) {
-              fd.append(`documents.${docKey}`, docValue);
-            } else if (docValue) {
-              fd.append(`documents.${docKey}`, docValue);
-            }
-          });
-        } else if (Array.isArray(value)) {
-          value.forEach((v) => fd.append(key, v));
-        } else if (value !== undefined && value !== null) {
-          fd.append(key, value);
-        }
-      });
-      // Define proper JSON data instead of FormData for API endpoints expecting JSON
+      
+      // Define proper JSON data for API
       const jsonData = {};
       
-      // Convert FormData to JSON object
+      // Convert form data to JSON object, ensuring subjects is always an array
       Object.entries(formData).forEach(([key, value]) => {
-        if (key === 'subjects' && Array.isArray(value)) {
-          jsonData[key] = value;
+        if (key === 'subjects') {
+          // Always ensure subjects is an array, even if empty
+          jsonData[key] = Array.isArray(value) ? value : (value ? [value] : []);
         } else if (value !== undefined && value !== null) {
           jsonData[key] = value;
         }
@@ -94,22 +64,51 @@ const TutorManagement = () => {
       
       console.log('Sending JSON data to API:', jsonData);
       
-      // POST to backend using axios instance
-      const response = await API.post('/tutors', jsonData, {
-        headers: {
-          Authorization: `Bearer ${token}`
+      try {
+        // POST to backend using axios instance
+        const response = await API.post('/tutors', jsonData, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        const data = response.data;
+        // With axios, successful responses come to this point
+        setIsSubmitting(false);
+        // Don't immediately reset - let the form show its success message first
+      } catch (apiError) {
+        // Detailed error handling for API errors
+        console.error('API Error:', apiError);
+        
+        // Get detailed error message from the response if available
+        let errorMsg = 'Failed to add tutor';
+        
+        if (apiError.response) {
+          // The server responded with a status code outside of 2xx range
+          console.error('Error Response Data:', apiError.response.data);
+          console.error('Error Response Status:', apiError.response.status);
+          
+          if (apiError.response.data && apiError.response.data.message) {
+            errorMsg = `Server Error: ${apiError.response.data.message}`;
+          } else if (apiError.response.data && apiError.response.data.error) {
+            errorMsg = `Server Error: ${apiError.response.data.error}`;
+          } else {
+            errorMsg = `Server Error ${apiError.response.status}: ${apiError.message}`;
+          }
+        } else if (apiError.request) {
+          // Request was made but no response was received
+          errorMsg = 'No response from server. Please check your network connection.';
         }
-      });
-      const data = response.data;
-      // With axios, successful responses come to this point - no need to check response.ok
-      // Don't show an alert here - the AddTutorForm will show its own success popover
-      // The form component will handle this with its own popover
-      setIsSubmitting(false);
-      // Don't immediately reset - let the form show its success message first
-      // The form's success popover onClose handler will reset the form
+        
+        setErrorMessage(errorMsg);
+        setShowErrorPopover(true);
+        throw apiError; // Re-throw to be caught by outer catch
+      }
     } catch (err) {
-      setErrorMessage(err.message || 'Failed to add tutor');
-      setShowErrorPopover(true);
+      console.error('Add Tutor Error:', err);
+      if (!showErrorPopover) { // Only set if not already set by inner catch
+        setErrorMessage(err.message || 'Failed to add tutor');
+        setShowErrorPopover(true);
+      }
     } finally {
       setIsSubmitting(false);
     }
