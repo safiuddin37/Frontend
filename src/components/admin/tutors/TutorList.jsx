@@ -232,6 +232,8 @@ const TutorList = ({ onEdit, onDelete, onProfile }) => {
               <th style={{ padding: '14px 16px', borderBottom: '1px solid #e5e7eb', fontWeight: '600', color: '#374151' }}>Email</th>
               <th style={{ padding: '14px 16px', borderBottom: '1px solid #e5e7eb', fontWeight: '600', color: '#374151' }}>Center</th>
               <th style={{ padding: '14px 16px', borderBottom: '1px solid #e5e7eb', fontWeight: '600', color: '#374151' }}>Actions</th>
+              <th style={{ padding: '14px 16px', borderBottom: '1px solid #e5e7eb', fontWeight: '600', color: '#374151' }}>Status</th>
+
             </tr>
           </thead>
           <tbody>
@@ -338,6 +340,7 @@ const TutorList = ({ onEdit, onDelete, onProfile }) => {
                       </button>
                     </div>
                   </td>
+                  <td style={{ padding: '14px 16px', color: '#4b5563' }}>Active</td>
                 </tr>
               ))
             )}
