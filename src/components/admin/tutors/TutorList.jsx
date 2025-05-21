@@ -340,7 +340,7 @@ const TutorList = ({ onEdit, onDelete, onProfile }) => {
                       </button>
                     </div>
                   </td>
-                  <td style={{ padding: '14px 16px', color: '#4b5563', backgroundColor:'green' }}>{tutor.status}</td>
+                  <td style={{ padding: '14px 16px', color: '#4b5563', color:'green' }}>{tutor.status}</td>
                 </tr>
               ))
             )}
