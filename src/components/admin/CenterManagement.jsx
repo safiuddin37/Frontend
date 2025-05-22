@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
-import { motion } from 'framer-motion';
-import { FiEdit2, FiTrash2, FiX, FiMapPin, FiAlertTriangle } from 'react-icons/fi';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FiEdit2, FiTrash2, FiX, FiMapPin, FiAlertTriangle, FiFilter } from 'react-icons/fi';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import useGet from '../CustomHooks/useGet';
@@ -55,6 +55,7 @@ const CenterManagement = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deletingCenter, setDeletingCenter] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
 
   // Get centers data with our fixed useGet hook
   const { response: centers, error, loading, refetch } = useGet("/Centers");
@@ -458,65 +459,76 @@ const CenterManagement = () => {
         </div>
 
         {/* Filter Panel */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-white border border-gray-200 rounded-lg mb-6 shadow-sm">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Center Name</label>
-            <input
-              type="text"
-              name="centerName"
-              value={filters.centerName}
-              onChange={handleFilterChange}
-              placeholder="Search center name..."
-              className="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Area</label>
-            <input
-              type="text"
-              name="area"
-              value={filters.area}
-              onChange={handleFilterChange}
-              placeholder="Search area..."
-              className="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Sadar Name</label>
-            <input
-              type="text"
-              name="sadarName"
-              value={filters.sadarName}
-              onChange={handleFilterChange}
-              placeholder="Search sadar name..."
-              className="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Tutor Name</label>
-            <input
-              type="text"
-              name="tutorName"
-              value={filters.tutorName}
-              onChange={handleFilterChange}
-              placeholder="Search tutor name..."
-              className="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-            />
-          </div>
-          <div className="sm:col-span-2 lg:col-span-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-            <select
-              name="status"
-              value={filters.status}
-              onChange={handleFilterChange}
-              className="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+        <AnimatePresence>
+          {showFilters && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden"
             >
-              <option value="all">All Status</option>
-              <option value="active">Active Only</option>
-              <option value="inactive">Inactive Only</option>
-            </select>
-          </div>
-        </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg mb-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Center Name</label>
+                  <input
+                    type="text"
+                    name="centerName"
+                    value={filters.centerName}
+                    onChange={handleFilterChange}
+                    placeholder="Search center name..."
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Area</label>
+                  <input
+                    type="text"
+                    name="area"
+                    value={filters.area}
+                    onChange={handleFilterChange}
+                    placeholder="Search area..."
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Sadar Name</label>
+                  <input
+                    type="text"
+                    name="sadarName"
+                    value={filters.sadarName}
+                    onChange={handleFilterChange}
+                    placeholder="Search sadar name..."
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tutor Name</label>
+                  <input
+                    type="text"
+                    name="tutorName"
+                    value={filters.tutorName}
+                    onChange={handleFilterChange}
+                    placeholder="Search tutor name..."
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                  <select
+                    name="status"
+                    value={filters.status}
+                    onChange={handleFilterChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  >
+                    <option value="all">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className="overflow-x-auto">
           <table className="w-full">
