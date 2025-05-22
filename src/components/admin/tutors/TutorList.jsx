@@ -9,10 +9,7 @@ const TutorList = ({ onEdit, onDelete, onProfile }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredTutors, setFilteredTutors] = useState([]);
   
-  // Popover states
-  const [showDeletePopover, setShowDeletePopover] = useState(false);
-  const [showDeleteSuccessPopover, setShowDeleteSuccessPopover] = useState(false);
-  const [tutorToDelete, setTutorToDelete] = useState(null);
+  // No delete functionality in this component anymore
 
   // Initial data fetch
   useEffect(() => {
@@ -82,61 +79,7 @@ const TutorList = ({ onEdit, onDelete, onProfile }) => {
     }
   };
 
-  // Show delete confirmation popover
-  const confirmDeleteTutor = (tutor) => {
-    setTutorToDelete(tutor);
-    setShowDeletePopover(true);
-  };
-  
-  // Handle delete tutor after confirmation
-  const handleDeleteTutor = async () => {
-    if (!tutorToDelete) return;
-    
-    const tutorId = tutorToDelete._id;
-    setShowDeletePopover(false); // Close confirmation popover
-    
-    try {
-      const userStr = localStorage.getItem('userData');
-      let token = null;
-      if (userStr) {
-        const userObj = JSON.parse(userStr);
-        token = userObj.token;
-      }
-      if (!token) {
-        // Show error in a better way
-        setError('You are not logged in as admin. Please log in.');
-        return;
-      }
-
-      const response = await fetch(`https://mtc-backend-jn5y.onrender.com/api/tutors/${tutorId}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete tutor');
-      }
-
-      // Remove the deleted tutor from the state
-      const updatedTutors = tutors.filter(tutor => tutor._id !== tutorId);
-      setTutors(updatedTutors);
-      setFilteredTutors(updatedTutors);
-      
-      // Show success popover instead of alert
-      setShowDeleteSuccessPopover(true);
-      
-      // Call the parent component's onDelete if provided
-      if (onDelete) {
-        onDelete(tutorId);
-      }
-    } catch (err) {
-      setError(err.message || 'Failed to delete tutor');
-    } finally {
-      setTutorToDelete(null); // Clear the tutor to delete
-    }
-  };
+  // Delete functionality has been moved to TutorProfile component
 
   // Get stats
   const getStats = () => {
@@ -313,31 +256,7 @@ const TutorList = ({ onEdit, onDelete, onProfile }) => {
                         </svg>
                         Edit
                       </button>
-                      <button 
-                        onClick={() => confirmDeleteTutor(tutor)}
-                        style={{ 
-                          padding: '6px 12px', 
-                          background: '#fee2e2', 
-                          color: '#b91c1c', 
-                          border: 'none', 
-                          borderRadius: '6px', 
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '4px',
-                          fontWeight: '500',
-                          fontSize: '13px',
-                          transition: 'all 0.2s'
-                        }}
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="3 6 5 6 21 6"></polyline>
-                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                          <line x1="10" y1="11" x2="10" y2="17"></line>
-                          <line x1="14" y1="11" x2="14" y2="17"></line>
-                        </svg>
-                        Delete
-                      </button>
+
                     </div>
                   </td>
                   <td style={{ padding: '14px 16px', color: '#4b5563', color: tutor.status==="inactive"?"red":"green"}}>{tutor.status==="inactive"?"Inactive":"Active"}</td>
@@ -348,26 +267,7 @@ const TutorList = ({ onEdit, onDelete, onProfile }) => {
         </table>
       </div>
       
-      {/* Delete Confirmation Popover */}
-      <Popover
-        isOpen={showDeletePopover}
-        onClose={() => setShowDeletePopover(false)}
-        title="Confirm Delete"
-        message={tutorToDelete ? `Are you sure you want to delete ${tutorToDelete.name}?` : 'Are you sure you want to delete this tutor?'}
-        type="confirm"
-        onConfirm={handleDeleteTutor}
-        confirmText="Yes, Delete"
-        cancelText="Cancel"
-      />
-      
-      {/* Delete Success Popover */}
-      <Popover
-        isOpen={showDeleteSuccessPopover}
-        onClose={() => setShowDeleteSuccessPopover(false)}
-        title="Success"
-        message="Tutor has been deleted successfully."
-        type="success"
-      />
+      {/* Delete functionality has been moved to TutorProfile component */}
     </div>
   );
 };

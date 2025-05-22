@@ -1,6 +1,33 @@
 import React, { useState } from 'react';
+import Popover from '../../common/Popover';
 
-const TutorProfile = ({ tutor, onClose }) => {
+const TutorProfile = ({ tutor, onClose, onDelete }) => {
+  const [showDeletePopover, setShowDeletePopover] = useState(false);
+  const [showDeleteSuccessPopover, setShowDeleteSuccessPopover] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDeleteClick = () => {
+    setShowDeletePopover(true);
+  };
+
+  const confirmDelete = async () => {
+    setShowDeletePopover(false);
+    if (onDelete && tutor?._id) {
+      try {
+        setIsDeleting(true);
+        await onDelete(tutor._id);
+        setShowDeleteSuccessPopover(true);
+        setTimeout(() => {
+          setShowDeleteSuccessPopover(false);
+          onClose();
+        }, 1500);
+      } catch (error) {
+        console.error('Error deleting tutor:', error);
+      } finally {
+        setIsDeleting(false);
+      }
+    }
+  };
   const [showPassword, setShowPassword] = useState(false);
   
   if (!tutor) {
@@ -59,30 +86,84 @@ const TutorProfile = ({ tutor, onClose }) => {
 
   return (
     <div style={{ maxWidth: '900px', margin: '0 auto', padding: '30px', backgroundColor: '#f8fafc', borderRadius: '16px', boxShadow: '0 10px 25px rgba(0, 0, 0, 0.05)' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 40 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 40, flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <h2 style={{ fontSize: 32, fontWeight: 800, margin: 0, color: '#1e40af' }}>Tutor Profile</h2>
           <p style={{ color: '#64748b', marginTop: 5 }}>{tutor.name}'s complete information</p>
         </div>
-        <button 
-          onClick={onClose}
-          style={{ 
-            padding: '10px 20px', 
-            background: '#3b82f6', 
-            color: 'white', 
-            border: 'none', 
-            borderRadius: 8, 
-            cursor: 'pointer',
-            boxShadow: '0 2px 4px rgba(59, 130, 246, 0.3)',
-            fontWeight: 600,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px'
-          }}
-        >
-          <span style={{ fontSize: '18px' }}>←</span> Back to List
-        </button>
+        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+          <button 
+            onClick={onClose}
+            style={{ 
+              padding: '10px 20px', 
+              background: '#3b82f6', 
+              color: 'white', 
+              border: 'none', 
+              borderRadius: 8, 
+              cursor: 'pointer',
+              boxShadow: '0 2px 4px rgba(59, 130, 246, 0.3)',
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              transition: 'all 0.2s',
+              ':hover': {
+                background: '#2563eb',
+                transform: 'translateY(-1px)'
+              }
+            }}
+          >
+            <span style={{ fontSize: '18px' }}>←</span> Back to List
+          </button>
+          
+          <button
+            onClick={handleDeleteClick}
+            disabled={isDeleting}
+            style={{
+              padding: '10px 20px',
+              background: isDeleting ? '#9ca3af' : '#ef4444',
+              color: 'white',
+              border: 'none',
+              borderRadius: 8,
+              cursor: isDeleting ? 'not-allowed' : 'pointer',
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              transition: 'all 0.2s',
+              ':hover': !isDeleting ? {
+                background: '#dc2626',
+                transform: 'translateY(-1px)'
+              } : {}
+            }}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              <line x1="10" y1="11" x2="10" y2="17"></line>
+              <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+            {isDeleting ? 'Deleting...' : 'Delete Tutor'}
+          </button>
+        </div>
       </div>
+      
+      {/* Delete Confirmation Popover */}
+      <DeleteConfirmation 
+        isOpen={showDeletePopover}
+        onClose={() => setShowDeletePopover(false)}
+        onConfirm={confirmDelete}
+        isDeleting={isDeleting}
+      />
+      
+      {/* Delete Success Popover */}
+      <Popover
+        isOpen={showDeleteSuccessPopover}
+        onClose={() => setShowDeleteSuccessPopover(false)}
+        title="Success"
+        message="Tutor has been deleted successfully."
+        type="success"
+      />
 
       {/* Personal Information */}
       <div style={sectionStyle}>
@@ -329,5 +410,29 @@ const TutorProfile = ({ tutor, onClose }) => {
     </div>
   );
 };
+
+// Delete Confirmation Popover
+const DeleteConfirmation = ({ isOpen, onClose, onConfirm, isDeleting }) => (
+  <Popover
+    isOpen={isOpen}
+    onClose={onClose}
+    title="Delete Tutor"
+    message="Are you sure you want to delete this tutor? This action cannot be undone."
+    type="warning"
+    actions={[
+      {
+        label: 'Cancel',
+        onClick: onClose,
+        variant: 'secondary'
+      },
+      {
+        label: isDeleting ? 'Deleting...' : 'Delete',
+        onClick: onConfirm,
+        variant: 'danger',
+        disabled: isDeleting
+      }
+    ]}
+  />
+);
 
 export default TutorProfile;

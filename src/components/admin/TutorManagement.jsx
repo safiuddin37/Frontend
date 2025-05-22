@@ -435,7 +435,11 @@ const TutorManagement = () => {
           padding: '24px',
           boxShadow: '0 4px 15px rgba(0, 0, 0, 0.05)'
         }}>
-          <TutorProfile tutor={selectedTutor} onClose={handleBackToList} />
+          <TutorProfile 
+            tutor={selectedTutor} 
+            onClose={handleBackToList} 
+            onDelete={handleDeleteTutor}
+          />
         </div>
       )}
       
