@@ -278,7 +278,15 @@ const TutorList = ({ onEdit, onDelete, onProfile }) => {
               </tr>
             ) : (
               filteredTutors.map((tutor) => (
-                <tr key={tutor._id} style={{ borderBottom: '1px solid #e5e7eb', transition: 'background-color 0.2s' }}>
+                <tr 
+                  key={tutor._id} 
+                  style={{ 
+                    borderBottom: '1px solid #e5e7eb', 
+                    transition: 'background-color 0.2s',
+                    backgroundColor: tutor.status === 'inactive' ? '#f9fafb' : 'white',
+                    opacity: tutor.status === 'inactive' ? 0.8 : 1
+                  }}
+                >
                   <td style={{ padding: '14px 16px' }}>
                     <div style={{ fontWeight: '500', color: '#111827' }}>{tutor.name}</div>
                   </td>
@@ -372,7 +380,7 @@ const TutorList = ({ onEdit, onDelete, onProfile }) => {
                           <line x1="10" y1="11" x2="10" y2="17"></line>
                           <line x1="14" y1="11" x2="14" y2="17"></line>
                         </svg>
-                        {tutor.status === 'inactive' ? 'Deleted' : 'Delete'}
+                        Delete
                       </button>
                     </div>
                   </td>
