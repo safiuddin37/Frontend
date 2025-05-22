@@ -678,17 +678,7 @@ const TutorStudents = () => {
                         >
                           <FiEdit2 size={18} />
                         </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            e.preventDefault();
-                            setShowDeletePopover(true);
-                            setStudentToDelete(student._id);
-                          }}
-                          className="text-red-600 hover:text-red-800 transition-colors"
-                        >
-                          <FiTrash2 size={18} />
-                        </button>
+                        
                       </div>
                     </td>
                   </tr>
@@ -723,16 +713,7 @@ const TutorStudents = () => {
                     >
                       <FiEdit2 size={18} />
                     </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        handleDeleteStudent(student._id);
-                      }}
-                      className="p-2 text-red-600 hover:text-red-800 transition-colors"
-                    >
-                      <FiTrash2 size={18} />
-                    </button>
+                    
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-1 text-sm mt-2">
