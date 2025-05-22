@@ -1179,24 +1179,13 @@ const TutorStudents = () => {
                 </div>
               )}
 
-              {/* Action Buttons */}
+              {/* Action Buttons - Remove Delete Button */}
               <div className="flex justify-end space-x-4 mt-6">
                 <button
                   onClick={() => handleEditStudent(showDetails)}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 flex items-center"
                 >
                   <FiEdit2 className="mr-2" /> Edit
-                </button>
-                <button
-                  onClick={() => {
-                    setShowDeletePopover(true);
-                    setStudentToDelete(showDetails._id);
-                  }}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-300 flex items-center"
-                  disabled={isDeleting}
-                >
-                  <FiTrash2 className="mr-2" />
-                  {isDeleting ? 'Deleting...' : 'Delete'}
                 </button>
                 <button
                   onClick={() => setShowDetails(null)}
