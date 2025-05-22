@@ -279,58 +279,11 @@ const TutorManagement = () => {
     setRefreshTrigger(prev => prev + 1);
   };
   
-  // Handle delete tutor
-  const handleDeleteTutor = async (tutorId) => {
-    try {
-      // Get admin JWT
-      const userStr = localStorage.getItem('userData');
-      let token = null;
-      if (userStr) {
-        try {
-          const userObj = JSON.parse(userStr);
-          token = userObj.token;
-        } catch (e) {
-          console.error('Error parsing user data:', e);
-          token = null;
-        }
-      }
-      
-      if (!token) {
-        const error = new Error('You are not logged in as admin. Please log in.');
-        console.error('No token found');
-        throw error;
-      }
-
-      console.log('Attempting to delete tutor with ID:', tutorId);
-      
-      // Make the DELETE request to the API
-      const response = await fetch(`https://mtc-backend-jn5y.onrender.com/api/tutors/${tutorId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      const responseData = await response.json().catch(() => ({}));
-      
-      if (!response.ok) {
-        console.error('Delete request failed:', responseData);
-        const error = new Error(responseData.message || `Failed to delete tutor. Status: ${response.status}`);
-        throw error;
-      }
-
-      console.log('Tutor deleted successfully:', responseData);
-      
-      // Refresh the tutor list
-      setRefreshTrigger(prev => prev + 1);
-      return responseData; // Return the response data for success handling
-      
-    } catch (err) {
-      console.error('Error in handleDeleteTutor:', err);
-      // Re-throw the error to be caught by the calling component
-      throw err;
-    }
+  // Handle delete tutor (if needed at this level)
+  const handleDeleteTutor = (tutorId) => {
+    // The actual deletion is handled in TutorList component
+    // Just refresh the list after deletion
+    setRefreshTrigger(prev => prev + 1);
   };
 
   // Render based on mode
@@ -482,11 +435,7 @@ const TutorManagement = () => {
           padding: '24px',
           boxShadow: '0 4px 15px rgba(0, 0, 0, 0.05)'
         }}>
-          <TutorProfile 
-            tutor={selectedTutor} 
-            onClose={handleBackToList} 
-            onDelete={handleDeleteTutor}
-          />
+          <TutorProfile tutor={selectedTutor} onClose={handleBackToList} />
         </div>
       )}
       

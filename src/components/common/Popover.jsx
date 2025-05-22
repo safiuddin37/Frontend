@@ -138,15 +138,7 @@ const Popover = ({
           )}
           <button 
             style={{...popoverStyles.button, ...popoverStyles.confirmButton}} 
-            onClick={(e) => {
-              e.stopPropagation();
-              if (type === 'confirm' && onConfirm) {
-                onConfirm(e);
-              } else {
-                onClose(e);
-              }
-            }}
-            disabled={type === 'confirm' && confirmText === 'Deleting...'}
+            onClick={type === 'confirm' ? onConfirm : onClose}
           >
             {type === 'confirm' ? confirmText : 'OK'}
           </button>
