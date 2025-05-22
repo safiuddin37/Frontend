@@ -290,35 +290,46 @@ const TutorManagement = () => {
           const userObj = JSON.parse(userStr);
           token = userObj.token;
         } catch (e) {
+          console.error('Error parsing user data:', e);
           token = null;
         }
       }
+      
       if (!token) {
-        setErrorMessage('You are not logged in as admin. Please log in.');
-        setShowLoginPopover(true);
-        return;
+        const error = new Error('You are not logged in as admin. Please log in.');
+        console.error('No token found');
+        throw error;
       }
 
+      console.log('Attempting to delete tutor with ID:', tutorId);
+      
       // Make the DELETE request to the API
       const response = await fetch(`https://mtc-backend-jn5y.onrender.com/api/tutors/${tutorId}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       });
 
+      const responseData = await response.json().catch(() => ({}));
+      
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Failed to delete tutor');
+        console.error('Delete request failed:', responseData);
+        const error = new Error(responseData.message || `Failed to delete tutor. Status: ${response.status}`);
+        throw error;
       }
 
+      console.log('Tutor deleted successfully:', responseData);
+      
       // Refresh the tutor list
       setRefreshTrigger(prev => prev + 1);
+      return responseData; // Return the response data for success handling
+      
     } catch (err) {
-      console.error('Error deleting tutor:', err);
-      setErrorMessage(err.message || 'Failed to delete tutor');
-      setShowErrorPopover(true);
-      throw err; // Re-throw to be caught by the TutorProfile component
+      console.error('Error in handleDeleteTutor:', err);
+      // Re-throw the error to be caught by the calling component
+      throw err;
     }
   };
 

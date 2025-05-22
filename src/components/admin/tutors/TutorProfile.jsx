@@ -11,21 +11,33 @@ const TutorProfile = ({ tutor, onClose, onDelete }) => {
   };
 
   const confirmDelete = async () => {
+    if (!tutor?._id) {
+      console.error('No tutor ID available for deletion');
+      return;
+    }
+    
     setShowDeletePopover(false);
-    if (onDelete && tutor?._id) {
-      try {
-        setIsDeleting(true);
-        await onDelete(tutor._id);
-        setShowDeleteSuccessPopover(true);
-        setTimeout(() => {
-          setShowDeleteSuccessPopover(false);
-          onClose();
-        }, 1500);
-      } catch (error) {
-        console.error('Error deleting tutor:', error);
-      } finally {
-        setIsDeleting(false);
-      }
+    setIsDeleting(true);
+    
+    try {
+      console.log('Attempting to delete tutor with ID:', tutor._id);
+      await onDelete(tutor._id);
+      
+      console.log('Delete successful, showing success message');
+      setShowDeleteSuccessPopover(true);
+      
+      // Close the success message and return to list after delay
+      setTimeout(() => {
+        setShowDeleteSuccessPopover(false);
+        onClose();
+      }, 1500);
+      
+    } catch (error) {
+      console.error('Error in confirmDelete:', error);
+      // Show error message to user
+      alert(`Failed to delete tutor: ${error.message || 'Unknown error'}`);
+    } finally {
+      setIsDeleting(false);
     }
   };
   const [showPassword, setShowPassword] = useState(false);
@@ -412,17 +424,33 @@ const TutorProfile = ({ tutor, onClose, onDelete }) => {
 };
 
 // Delete Confirmation Popover
-const DeleteConfirmation = ({ isOpen, onClose, onConfirm, isDeleting }) => (
-  <Popover
-    isOpen={isOpen}
-    onClose={onClose}
-    title="Delete Tutor"
-    message="Are you sure you want to delete this tutor? This action cannot be undone."
-    type="warning"
-    onConfirm={onConfirm}
-    confirmText={isDeleting ? 'Deleting...' : 'Delete'}
-    cancelText="Cancel"
-  />
-);
+const DeleteConfirmation = ({ isOpen, onClose, onConfirm, isDeleting }) => {
+  const handleConfirm = (e) => {
+    e?.stopPropagation?.();
+    console.log('Delete confirmation - confirm clicked');
+    onConfirm?.();
+  };
+
+  const handleClose = (e) => {
+    e?.stopPropagation?.();
+    console.log('Delete confirmation - close/cancel clicked');
+    onClose?.();
+  };
+
+  return (
+    <div onClick={(e) => e.stopPropagation()}>
+      <Popover
+        isOpen={isOpen}
+        onClose={handleClose}
+        title="Delete Tutor"
+        message="Are you sure you want to delete this tutor? This action cannot be undone."
+        type="warning"
+        onConfirm={handleConfirm}
+        confirmText={isDeleting ? 'Deleting...' : 'Delete'}
+        cancelText="Cancel"
+      />
+    </div>
+  );
+};
 
 export default TutorProfile;
