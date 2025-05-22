@@ -544,7 +544,11 @@ const CenterManagement = () => {
                 return (
                   <tr
                     key={center._id}
-                    className={`transition-colors cursor-pointer ${isInactive ? 'bg-gray-50 opacity-80' : 'hover:bg-gray-50'}`}
+                    className={`transition-all duration-200 cursor-pointer ${
+                      isInactive 
+                        ? 'bg-gray-100 hover:bg-gray-200' 
+                        : 'hover:bg-gray-50'
+                    }`}
                     onClick={() => setShowDetails(center)}
                   >
                     <td className="px-6 py-4 whitespace-nowrap">

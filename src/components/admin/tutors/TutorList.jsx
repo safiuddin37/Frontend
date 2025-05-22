@@ -282,9 +282,9 @@ const TutorList = ({ onEdit, onDelete, onProfile }) => {
                   key={tutor._id} 
                   style={{ 
                     borderBottom: '1px solid #e5e7eb', 
-                    transition: 'background-color 0.2s',
-                    backgroundColor: tutor.status === 'inactive' ? '#f9fafb' : 'white',
-                    opacity: tutor.status === 'inactive' ? 0.8 : 1
+                    transition: 'all 0.2s ease',
+                    backgroundColor: tutor.status === 'inactive' ? '#f3f4f6' : 'white',
+                    opacity: 1
                   }}
                 >
                   <td style={{ padding: '14px 16px' }}>
