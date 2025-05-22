@@ -452,75 +452,55 @@ const CenterManagement = () => {
       <div className="bg-white rounded-xl shadow-lg p-6">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold">Centers</h2>
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-            >
-              <FiFilter className="text-gray-600" />
-              <span className="text-sm font-medium">Filters</span>
-            </button>
-          </div>
         </div>
 
-        {/* Filter Panel */}
-        <AnimatePresence>
-          {showFilters && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="overflow-hidden"
-            >
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg mb-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Center Name</label>
-                  <input
-                    type="text"
-                    name="centerName"
-                    value={filters.centerName}
-                    onChange={handleFilterChange}
-                    placeholder="Search center name..."
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Area</label>
-                  <input
-                    type="text"
-                    name="area"
-                    value={filters.area}
-                    onChange={handleFilterChange}
-                    placeholder="Search area..."
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Sadar Name</label>
-                  <input
-                    type="text"
-                    name="sadarName"
-                    value={filters.sadarName}
-                    onChange={handleFilterChange}
-                    placeholder="Search sadar name..."
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Tutor Name</label>
-                  <input
-                    type="text"
-                    name="tutorName"
-                    value={filters.tutorName}
-                    onChange={handleFilterChange}
-                    placeholder="Search tutor name..."
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  />
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Filter Panel - Always Visible */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg mb-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Center Name</label>
+            <input
+              type="text"
+              name="centerName"
+              value={filters.centerName}
+              onChange={handleFilterChange}
+              placeholder="Search center name..."
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Area</label>
+            <input
+              type="text"
+              name="area"
+              value={filters.area}
+              onChange={handleFilterChange}
+              placeholder="Search area..."
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Sadar Name</label>
+            <input
+              type="text"
+              name="sadarName"
+              value={filters.sadarName}
+              onChange={handleFilterChange}
+              placeholder="Search sadar name..."
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Tutor Name</label>
+            <input
+              type="text"
+              name="tutorName"
+              value={filters.tutorName}
+              onChange={handleFilterChange}
+              placeholder="Search tutor name..."
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+            />
+          </div>
+        </div>
 
         <div className="overflow-x-auto">
           <table className="w-full">
