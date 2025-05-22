@@ -346,13 +346,6 @@ const HadiyaManagement = () => {
         {/* Action Buttons */}
         <div className="flex flex-wrap gap-3">
           <button
-            onClick={refreshData}
-            disabled={loading}
-            className="px-5 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center disabled:opacity-50"
-          >
-            <FiSave className="mr-2" /> Refresh Data
-          </button>
-          <button
             onClick={handleExportCSV}
             disabled={loading || tutors.length === 0}
             className="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center disabled:opacity-50"
