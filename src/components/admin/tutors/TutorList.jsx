@@ -314,21 +314,24 @@ const TutorList = ({ onEdit, onDelete, onProfile }) => {
                         Edit
                       </button>
                       <button 
-                        onClick={() => confirmDeleteTutor(tutor)}
+                        onClick={() => tutor.status !== 'inactive' && confirmDeleteTutor(tutor)}
+                        disabled={tutor.status === 'inactive'}
                         style={{ 
                           padding: '6px 12px', 
-                          background: '#fee2e2', 
-                          color: '#b91c1c', 
+                          background: tutor.status === 'inactive' ? '#e5e7eb' : '#fee2e2', 
+                          color: tutor.status === 'inactive' ? '#9ca3af' : '#b91c1c', 
                           border: 'none', 
                           borderRadius: '6px', 
-                          cursor: 'pointer',
+                          cursor: tutor.status === 'inactive' ? 'not-allowed' : 'pointer',
                           display: 'flex',
                           alignItems: 'center',
                           gap: '4px',
                           fontWeight: '500',
                           fontSize: '13px',
-                          transition: 'all 0.2s'
+                          transition: 'all 0.2s',
+                          opacity: tutor.status === 'inactive' ? 0.7 : 1
                         }}
+                        title={tutor.status === 'inactive' ? 'Cannot delete an inactive tutor' : 'Delete tutor'}
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <polyline points="3 6 5 6 21 6"></polyline>
@@ -336,7 +339,7 @@ const TutorList = ({ onEdit, onDelete, onProfile }) => {
                           <line x1="10" y1="11" x2="10" y2="17"></line>
                           <line x1="14" y1="11" x2="14" y2="17"></line>
                         </svg>
-                        Delete
+                        {tutor.status === 'inactive' ? 'Deleted' : 'Delete'}
                       </button>
                     </div>
                   </td>
