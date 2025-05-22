@@ -279,11 +279,47 @@ const TutorManagement = () => {
     setRefreshTrigger(prev => prev + 1);
   };
   
-  // Handle delete tutor (if needed at this level)
-  const handleDeleteTutor = (tutorId) => {
-    // The actual deletion is handled in TutorList component
-    // Just refresh the list after deletion
-    setRefreshTrigger(prev => prev + 1);
+  // Handle delete tutor
+  const handleDeleteTutor = async (tutorId) => {
+    try {
+      // Get admin JWT
+      const userStr = localStorage.getItem('userData');
+      let token = null;
+      if (userStr) {
+        try {
+          const userObj = JSON.parse(userStr);
+          token = userObj.token;
+        } catch (e) {
+          token = null;
+        }
+      }
+      if (!token) {
+        setErrorMessage('You are not logged in as admin. Please log in.');
+        setShowLoginPopover(true);
+        return;
+      }
+
+      // Make the DELETE request to the API
+      const response = await fetch(`https://mtc-backend-jn5y.onrender.com/api/tutors/${tutorId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to delete tutor');
+      }
+
+      // Refresh the tutor list
+      setRefreshTrigger(prev => prev + 1);
+    } catch (err) {
+      console.error('Error deleting tutor:', err);
+      setErrorMessage(err.message || 'Failed to delete tutor');
+      setShowErrorPopover(true);
+      throw err; // Re-throw to be caught by the TutorProfile component
+    }
   };
 
   // Render based on mode

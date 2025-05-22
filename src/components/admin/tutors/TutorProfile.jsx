@@ -419,19 +419,9 @@ const DeleteConfirmation = ({ isOpen, onClose, onConfirm, isDeleting }) => (
     title="Delete Tutor"
     message="Are you sure you want to delete this tutor? This action cannot be undone."
     type="warning"
-    actions={[
-      {
-        label: 'Cancel',
-        onClick: onClose,
-        variant: 'secondary'
-      },
-      {
-        label: isDeleting ? 'Deleting...' : 'Delete',
-        onClick: onConfirm,
-        variant: 'danger',
-        disabled: isDeleting
-      }
-    ]}
+    onConfirm={onConfirm}
+    confirmText={isDeleting ? 'Deleting...' : 'Delete'}
+    cancelText="Cancel"
   />
 );
 
