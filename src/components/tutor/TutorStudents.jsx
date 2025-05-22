@@ -1168,6 +1168,7 @@ const TutorStudents = () => {
                 >
                   <FiEdit2 className="mr-2" /> Edit
                 </button>
+                {/*
                 <button
                   onClick={() => {
                     setShowDeletePopover(true);
@@ -1179,6 +1180,7 @@ const TutorStudents = () => {
                   <FiTrash2 className="mr-2" />
                   {isDeleting ? 'Deleting...' : 'Delete'}
                 </button>
+                */}
                 <button
                   onClick={() => setShowDetails(null)}
                   className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
