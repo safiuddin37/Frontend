@@ -65,12 +65,20 @@ const HadiyaManagement = () => {
     const fetchTutors = async () => {
       setLoading(true);
       try {
-        const params = { month: selectedMonth, year: selectedYear };
+        const params = { 
+          month: selectedMonth, 
+          year: selectedYear,
+          status: 'active' // Only fetch active tutors
+        };
         if (selectedCenter) params.centerId = selectedCenter;
         if (searchTerm) params.tutorName = searchTerm.trim();
         
         const data = await fetchHadiyaReportAPI(params);
-        setTutors(data.report || []);
+        // Filter out any inactive tutors that might still be in the response
+        const activeTutors = (data.report || []).filter(tutor => 
+          tutor.status === 'active' || tutor.status === undefined
+        );
+        setTutors(activeTutors);
       } catch (error) {
         toast.error(error.message || 'Failed to fetch tutor data');
         setTutors([]);
