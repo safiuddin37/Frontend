@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { FiPhone, FiLock, FiMapPin, FiRefreshCw, FiCheckCircle, FiEye, FiEyeOff } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import TutorDashboard from "../components/tutor/TutorDashboard";
 import usePost from "../components/CustomHooks/usePost";
 
@@ -299,6 +299,16 @@ const TutorPage = () => {
               )}
             </motion.button>
           </form>
+
+          <div className="mt-4 text-center">
+            <p className="text-sm text-gray-600 mb-2">Or continue as</p>
+            <Link
+              to="/guest-tutor-login"
+              className="w-full inline-block btn bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 py-2.5 rounded-lg text-base font-medium transition-colors"
+            >
+              Guest Tutor
+            </Link>
+          </div>
 
           {isLoggedIn && (
             <div className="mt-6">
