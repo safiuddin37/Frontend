@@ -7,7 +7,7 @@ const TutorList = ({ onEdit, onDelete, onProfile }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('active'); // 'all', 'active', 'inactive'
+  const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'active', 'inactive'
   const [filteredTutors, setFilteredTutors] = useState([]);
   
   // Popover states

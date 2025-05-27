@@ -42,6 +42,12 @@ const Overview = () => {
   const { response: tutors, loading: tutorsLoading } = useGet('/tutors')
   const { response: centers, loading: centersLoading } = useGet('/centers')
   const { response: tutorApps, loading: appsLoading } = useGet('/tutor-applications')
+  
+  // Filter out inactive tutors
+  const activeTutors = useMemo(() => {
+    if (!tutors) return [];
+    return tutors.filter(tutor => tutor.status === 'active');
+  }, [tutors]);
 
   // Fetch recent attendance directly from Attendance collection
   const { response: recentAttendance, loading: attendanceLoading, refetch: refetchAttendance } = useGet('/attendance/recent');
@@ -115,7 +121,7 @@ const Overview = () => {
 
 
   const attendancePercentage = useMemo(() => {
-    if (!tutors || tutors.length === 0 || !recentAttendance) return '0%';
+    if (!activeTutors || activeTutors.length === 0 || !recentAttendance) return '0%';
 
     const today = format(new Date(), 'yyyy-MM-dd');
     const attendedToday = new Set();
@@ -130,11 +136,11 @@ const Overview = () => {
       }
     });
 
-    return `${attendedToday.size}/${tutors.length}`;
-  }, [tutors, recentAttendance]);
+    return `${attendedToday.size}/${activeTutors.length}`;
+  }, [activeTutors, recentAttendance]);
 
   const stats = [
-    { label: 'Total Tutors', value: tutorsLoading ? '...' : tutors?.length || 0, icon: FiUsers },
+    { label: 'Active Tutors', value: tutorsLoading ? '...' : activeTutors?.length || 0, icon: FiUsers },
     { label: 'Total Centers', value: centersLoading ? '...' : centers?.length || 0, icon: FiMapPin },
     { label: 'Attendance', value: attendancePercentage, icon: FiClock }
   ]
