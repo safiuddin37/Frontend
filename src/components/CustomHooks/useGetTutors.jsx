@@ -8,11 +8,16 @@ const TutorsList = () => {
 
   if (!tutors || tutors.length === 0) return <p>No tutors found.</p>;
 
+  // Filter only active tutors
+  const activeTutors = tutors.filter(tutor => tutor.status === 'active');
+
+  if (activeTutors.length === 0) return <p>No active tutors found.</p>;
+
   return (
     <div>
       <h2>List of Tutors</h2>
       <ul>
-        {tutors.map((tutor) => (
+        {activeTutors.map((tutor) => (
           <li key={tutor.id}>
             <strong>{tutor.name}</strong><br />
             Email: {tutor.email}<br />
