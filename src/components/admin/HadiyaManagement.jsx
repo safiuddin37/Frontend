@@ -67,17 +67,24 @@ const HadiyaManagement = () => {
       try {
         const params = { 
           month: selectedMonth, 
-          year: selectedYear,
-          status: 'active' // Only fetch active tutors
+          year: selectedYear
         };
         if (selectedCenter) params.centerId = selectedCenter;
         if (searchTerm) params.tutorName = searchTerm.trim();
         
         const data = await fetchHadiyaReportAPI(params);
-        // Filter out any inactive tutors that might still be in the response
+        
+        // First, fetch all tutors to get their status
+        const allTutorsResponse = await authFetch('https://mtc-backend-jn5y.onrender.com/api/tutors');
+        const activeTutorIds = allTutorsResponse
+          .filter(tutor => tutor.status === 'active')
+          .map(tutor => tutor._id);
+        
+        // Filter the hadiya report to only include active tutors
         const activeTutors = (data.report || []).filter(tutor => 
-          tutor.status === 'active' || tutor.status === undefined
+          activeTutorIds.includes(tutor.tutorId)
         );
+        
         setTutors(activeTutors);
       } catch (error) {
         toast.error(error.message || 'Failed to fetch tutor data');
