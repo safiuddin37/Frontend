@@ -60,61 +60,44 @@ const ProtectedTutorRoute = ({ children }) => {
 function App() {
   return (
     <CenterRefetchProvider>
-      <div className="flex flex-col min-h-screen">
-        {/* Show Navbar only on public pages */}
-        <main className="flex-grow">
-          <Routes>
-            <Route 
-              path="/"
-              element={
-                <>
-                  <Navbar />
-                  <HomePage />
-                </>
-              }
-            />
-            <Route 
-              path="/guest-login"
-              element={
-                <>
-                  <Navbar />
-                  <GuestLoginPage />
-                </>
-              }
-            />
-            {/* Admin and Tutor login/dashboard pages do NOT include Navbar */}
-            <Route path="/admin" element={<AdminPage />} />
-            <Route path="/tutor" element={<TutorPage />} />
-            <Route 
-              path="/admin-dashboard" 
-              element={
-                <ProtectedRoute>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/guest-requests" 
-              element={
-                <ProtectedRoute>
-                  <AdminGuestPage />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/tutor/guest-tutor" 
-              element={
-                <ProtectedTutorRoute>
-                  <GuestTutorPage />
-                </ProtectedTutorRoute>
-              } 
-            />
-            <Route path="/tutor-dashboard" element={<TutorDashboard />} />
-          </Routes>
-        </main>
-        <ToastContainer />
-        {/* <Footer /> */}
-      </div>
+    <div className="flex flex-col min-h-screen">
+      <Navbar />
+      <main className="flex-grow">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/admin" element={<AdminPage />} />
+          <Route path="/tutor" element={<TutorPage />} />
+          <Route path="/guest-login" element={<GuestLoginPage />} />
+          <Route 
+            path="/admin-dashboard" 
+            element={
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/guest-requests" 
+            element={
+              <ProtectedRoute>
+                <AdminGuestPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/tutor/guest-tutor" 
+            element={
+              <ProtectedTutorRoute>
+                <GuestTutorPage />
+              </ProtectedTutorRoute>
+            } 
+          />
+          <Route path="/tutor-dashboard" element={<TutorDashboard />} />
+        </Routes>
+      </main>
+      <ToastContainer />
+      {/* <Footer /> */}
+    </div>
     </CenterRefetchProvider>
   )
 }
