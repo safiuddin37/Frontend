@@ -231,7 +231,7 @@ const TutorPage = () => {
                 htmlFor="phone"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Phone Number
+                Phone phone Number
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
@@ -243,7 +243,7 @@ const TutorPage = () => {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-colors"
-                  placeholder="Enter your phone number"
+                  placeholder="Enter your phone phone number"
                   required
                   pattern="[0-9]{10}"
                 />
