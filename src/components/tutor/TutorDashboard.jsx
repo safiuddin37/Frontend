@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiGrid, FiUsers, FiLogOut, FiMenu, FiX, FiChevronLeft } from 'react-icons/fi'
+import { FiGrid, FiUsers, FiLogOut, FiMenu, FiX, FiChevronLeft, FiUserPlus } from 'react-icons/fi'
 import TutorSidebar from './TutorSidebar'
 import TutorOverview from './TutorOverview'
 import TutorStudents from './TutorStudents'
@@ -35,6 +35,10 @@ const TutorDashboard = () => {
     setIsSidebarOpen(!isSidebarOpen)
   }
 
+  const handleGuestTutorClick = () => {
+    window.location.href = '/tutor/guest-tutor';
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case 'overview':
@@ -48,7 +52,8 @@ const TutorDashboard = () => {
 
   const tabs = [
     { id: 'overview', label: 'Dashboard', icon: <FiGrid /> },
-    { id: 'students', label: 'Students', icon: <FiUsers /> }
+    { id: 'students', label: 'Students', icon: <FiUsers /> },
+    { id: 'guest-tutor', label: 'Guest Tutor', icon: <FiUserPlus />, onClick: handleGuestTutorClick }
   ]
 
   return (
