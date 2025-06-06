@@ -7,7 +7,7 @@ import CenterManagement from './CenterManagement';
 import ReportManagement from './ReportManagement';
 import StudentManagement from './StudentManagement';
 import AdminManagement from './AdminManagement';
-import SupervisorManagement from './SupervisorManagement';
+import AdminManagement from './AdminManagement';
 import HadiyaManagement from './HadiyaManagement';
 import { FiMenu, FiX } from 'react-icons/fi'; // Icons for mobile menu toggle
 
@@ -70,8 +70,6 @@ const AdminDashboard = () => {
         return <AdminManagement />;
       case 'hadiya': // Added hadiya case
         return <HadiyaManagement />;
-      case 'supervisors':
-        return <SupervisorManagement />;
       default:
         return (
           <div className="p-6">

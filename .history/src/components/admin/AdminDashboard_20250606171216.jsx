@@ -70,8 +70,7 @@ const AdminDashboard = () => {
         return <AdminManagement />;
       case 'hadiya': // Added hadiya case
         return <HadiyaManagement />;
-      case 'supervisors':
-        return <SupervisorManagement />;
+        
       default:
         return (
           <div className="p-6">
