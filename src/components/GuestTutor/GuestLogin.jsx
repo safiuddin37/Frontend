@@ -51,39 +51,27 @@ const GuestLogin = () => {
                             <label htmlFor="phone" className="sr-only">Phone Number</label>
                             <input
                                 id="phone"
-                                type="tel"
-                                {...register("phone", {
-                                    required: "Phone number is required",
-                                    pattern: {
-                                        value: /^[0-9]{10}$/,
-                                        message: "Please enter a valid 10-digit phone number"
-                                    }
-                                })}
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                                name="phone"
+                                type="text"
+                                autoComplete="phone"
+                                {...register('phone', { required: true })}
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                                 placeholder="Phone Number"
                             />
-                            {errors.phone && (
-                                <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>
-                            )}
+                            {errors.phone && <span className="text-red-600">Phone number is required</span>}
                         </div>
                         <div>
                             <label htmlFor="pin" className="sr-only">PIN</label>
                             <input
                                 id="pin"
+                                name="pin"
                                 type="password"
-                                {...register("pin", {
-                                    required: "PIN is required",
-                                    pattern: {
-                                        value: /^[0-9]{4}$/,
-                                        message: "PIN must be 4 digits"
-                                    }
-                                })}
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                                autoComplete="current-password"
+                                {...register('pin', { required: true })}
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                                 placeholder="PIN"
                             />
-                            {errors.pin && (
-                                <p className="mt-1 text-sm text-red-600">{errors.pin.message}</p>
-                            )}
+                            {errors.pin && <span className="text-red-600">PIN is required</span>}
                         </div>
                     </div>
 

@@ -73,67 +73,48 @@ const AdminGuestList = () => {
                     <p className="text-gray-600">No pending requests found</p>
                 </div>
             ) : (
-                <div className="space-y-6">
-                    {requests.map((request) => (
-                        <div key={request._id} className="bg-white p-6 rounded-lg shadow-md">
-                            <div className="flex justify-between items-start mb-4">
-                                <div>
-                                    <h3 className="text-lg font-semibold text-gray-800">
-                                        {request.guest.name}
-                                    </h3>
-                                    <p className="text-gray-600">{request.guest.phone}</p>
-                                </div>
-                                <button
-                                    onClick={() => handleApprove(request._id)}
-                                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-                                >
-                                    Approve
-                                </button>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4 mb-4">
-                                <div>
-                                    <p className="text-sm text-gray-500">Requested By</p>
-                                    <p className="text-gray-800">{request.tutor.name}</p>
-                                </div>
-                                <div>
-                                    <p className="text-sm text-gray-500">Request Date</p>
-                                    <p className="text-gray-800">
-                                        {new Date(request.createdAt).toLocaleDateString()}
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4 mb-4">
-                                <div>
-                                    <p className="text-sm text-gray-500">Qualification</p>
-                                    <p className="text-gray-800">{request.guest.qualification}</p>
-                                </div>
-                                <div>
-                                    <p className="text-sm text-gray-500">Department</p>
-                                    <p className="text-gray-800">{request.tutor.department}</p>
-                                </div>
-                            </div>
-
-                            <div className="border-t pt-4">
-                                <p className="text-sm text-gray-500 mb-2">Date Range</p>
-                                <div className="flex gap-4">
-                                    <div>
-                                        <p className="text-xs text-gray-500">From</p>
-                                        <p className="text-gray-800">
-                                            {new Date(request.dateRange.startDate).toLocaleDateString()}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500">To</p>
-                                        <p className="text-gray-800">
-                                            {new Date(request.dateRange.endDate).toLocaleDateString()}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
+                <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                            <tr>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Tutor Name
+                                </th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Phone Number
+                                </th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Qualification
+                                </th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Absence Duration
+                                </th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                            {requests.map((request) => (
+                                <tr key={request._id}>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{request.tutor.name}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{request.guest.phone}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{request.guest.qualification}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        {new Date(request.dateRange.startDate).toLocaleDateString()} - {new Date(request.dateRange.endDate).toLocaleDateString()}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <button
+                                            onClick={() => handleApprove(request._id)}
+                                            className="text-indigo-600 hover:text-indigo-900"
+                                        >
+                                            Approve
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             )}
         </div>

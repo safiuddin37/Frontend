@@ -48,78 +48,48 @@ const GuestTutorForm = () => {
             <h2 className="text-2xl font-bold mb-6 text-gray-800">Request Guest Tutor</h2>
             
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Guest Tutor Name
-                    </label>
-                    <input
-                        type="text"
-                        {...register("name", { 
-                            required: "Name is required",
-                            minLength: {
-                                value: 2,
-                                message: "Name must be at least 2 characters"
-                            }
-                        })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    {errors.name && (
-                        <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
-                    )}
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Phone Number
-                    </label>
-                    <input
-                        type="tel"
-                        {...register("phone", {
-                            required: "Phone number is required",
-                            pattern: {
-                                value: /^[0-9]{10}$/,
-                                message: "Please enter a valid 10-digit phone number"
-                            }
-                        })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    {errors.phone && (
-                        <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>
-                    )}
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Qualification
-                    </label>
-                    <input
-                        type="text"
-                        {...register("qualification", {
-                            required: "Qualification is required"
-                        })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    {errors.qualification && (
-                        <p className="mt-1 text-sm text-red-600">{errors.qualification.message}</p>
-                    )}
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Date Range
-                    </label>
-                    <DatePicker
-                        selectsRange={true}
-                        startDate={startDate}
-                        endDate={endDate}
-                        onChange={(update) => setDateRange(update)}
-                        minDate={new Date()}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholderText="Select date range"
-                    />
-                    {(!startDate || !endDate) && (
-                        <p className="mt-1 text-sm text-red-600">Date range is required</p>
-                    )}
+                <div className="space-y-6">
+                    <div>
+                        <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
+                        <input
+                            type="text"
+                            id="name"
+                            {...register('name', { required: true })}
+                            className="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                        />
+                        {errors.name && <span className="text-red-600">Name is required</span>}
+                    </div>
+                    <div>
+                        <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone Number</label>
+                        <input
+                            type="text"
+                            id="phone"
+                            {...register('phone', { required: true })}
+                            className="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                        />
+                        {errors.phone && <span className="text-red-600">Phone number is required</span>}
+                    </div>
+                    <div>
+                        <label htmlFor="qualification" className="block text-sm font-medium text-gray-700">Qualification</label>
+                        <input
+                            type="text"
+                            id="qualification"
+                            {...register('qualification', { required: true })}
+                            className="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                        />
+                        {errors.qualification && <span className="text-red-600">Qualification is required</span>}
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Absence Duration</label>
+                        <DatePicker
+                            selectsRange={true}
+                            startDate={startDate}
+                            endDate={endDate}
+                            onChange={(update) => setDateRange(update)}
+                            isClearable={true}
+                            className="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                        />
+                    </div>
                 </div>
 
                 <button
