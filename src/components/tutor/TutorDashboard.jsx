@@ -4,6 +4,7 @@ import { FiGrid, FiUsers, FiLogOut, FiMenu, FiX, FiChevronLeft, FiUserPlus } fro
 import TutorSidebar from './TutorSidebar'
 import TutorOverview from './TutorOverview'
 import TutorStudents from './TutorStudents'
+import GuestTutorPage from '../../pages/GuestTutorPage'
 
 const TutorDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview')
@@ -35,16 +36,14 @@ const TutorDashboard = () => {
     setIsSidebarOpen(!isSidebarOpen)
   }
 
-  const handleGuestTutorClick = () => {
-    window.location.href = '/tutor/guest-tutor';
-  };
-
   const renderContent = () => {
     switch (activeTab) {
       case 'overview':
         return <TutorOverview />
       case 'students':
         return <TutorStudents />
+      case 'guest-tutor':
+        return <GuestTutorPage />
       default:
         return <TutorOverview />
     }
@@ -53,7 +52,7 @@ const TutorDashboard = () => {
   const tabs = [
     { id: 'overview', label: 'Dashboard', icon: <FiGrid /> },
     { id: 'students', label: 'Students', icon: <FiUsers /> },
-    { id: 'guest-tutor', label: 'Guest Tutor', icon: <FiUserPlus />, onClick: handleGuestTutorClick }
+    { id: 'guest-tutor', label: 'Guest Tutor', icon: <FiUserPlus /> }
   ]
 
   return (

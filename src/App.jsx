@@ -84,15 +84,7 @@ function App() {
               </ProtectedRoute>
             } 
           />
-          <Route 
-            path="/tutor/guest-tutor" 
-            element={
-              <ProtectedTutorRoute>
-                <GuestTutorPage />
-              </ProtectedTutorRoute>
-            } 
-          />
-          <Route path="/tutor-dashboard" element={<TutorDashboard />} />
+          <Route path="/tutor-dashboard" element={<ProtectedTutorRoute><TutorDashboard /></ProtectedTutorRoute>} />
         </Routes>
       </main>
       <ToastContainer />
