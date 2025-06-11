@@ -303,7 +303,7 @@ const TutorPage = () => {
           <div className="mt-4 text-center">
             <p className="text-sm text-gray-600 mb-2">Or continue as</p>
             <Link
-              to="/guest-tutor-login"
+              to="/guest-login"
               className="w-full inline-block btn bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 py-2.5 rounded-lg text-base font-medium transition-colors"
             >
               Guest Tutor
