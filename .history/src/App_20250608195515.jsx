@@ -5,10 +5,8 @@ import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import HomePage from './pages/HomePage'
 import AdminPage from './pages/AdminPage'
-import SupervisorPage from './pages/SupervisorPage'
 import TutorPage from './pages/TutorPage'
 import AdminDashboard from './components/admin/AdminDashboard'
-import SupervisorDashboard from './components/supervisor/SupervisorDashboard'
 import TutorDashboard from './components/tutor/TutorDashboard'
 import GuestTutorPage from './pages/GuestTutorPage'
 import AdminGuestPage from './pages/AdminGuestPage'
@@ -69,7 +67,6 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/tutor" element={<TutorPage />} />
-          <Route path="/supervisor" element={<SupervisorPage />} />
           <Route path="/guest-login" element={<GuestLoginPage />} />
           <Route 
             path="/admin-dashboard" 
@@ -79,12 +76,7 @@ function App() {
               </ProtectedRoute>
             } 
           />
-          <Route path="/supervisor-dashboard" 
-            element={
-            <ProtectedRoute>
-            <SupervisorDashboard />
-              </ProtectedRoute>
-            } />
+          <Route path="/supervisor-dashboard" element
           <Route 
             path="/guest-requests" 
             element={
@@ -93,7 +85,15 @@ function App() {
               </ProtectedRoute>
             } 
           />
-          <Route path="/tutor-dashboard" element={<ProtectedTutorRoute><TutorDashboard /></ProtectedTutorRoute>} />
+          <Route 
+            path="/tutor/guest-tutor" 
+            element={
+              <ProtectedTutorRoute>
+                <GuestTutorPage />
+              </ProtectedTutorRoute>
+            } 
+          />
+          <Route path="/tutor-dashboard" element={<TutorDashboard />} />
         </Routes>
       </main>
       <ToastContainer />

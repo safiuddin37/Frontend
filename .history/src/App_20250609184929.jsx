@@ -80,11 +80,7 @@ function App() {
             } 
           />
           <Route path="/supervisor-dashboard" 
-            element={
-            <ProtectedRoute>
-            <SupervisorDashboard />
-              </ProtectedRoute>
-            } />
+            element={<SupervisorDashboard />} />
           <Route 
             path="/guest-requests" 
             element={
@@ -93,7 +89,15 @@ function App() {
               </ProtectedRoute>
             } 
           />
-          <Route path="/tutor-dashboard" element={<ProtectedTutorRoute><TutorDashboard /></ProtectedTutorRoute>} />
+          <Route 
+            path="/tutor/guest-tutor" 
+            element={
+              <ProtectedTutorRoute>
+                <GuestTutorPage />
+              </ProtectedTutorRoute>
+            } 
+          />
+          <Route path="/tutor-dashboard" element={<TutorDashboard />} />
         </Routes>
       </main>
       <ToastContainer />
