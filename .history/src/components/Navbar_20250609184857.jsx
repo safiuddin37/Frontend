@@ -10,7 +10,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
-  const isLoginPage = location.pathname === '/admin' || location.pathname === '/tutor'||location.pathname==='/supervisor';
+  const isLoginPage = location.pathname === '/admin' || location.pathname === '/tutor';
 
   const toggleMenu = () => setIsOpen(!isOpen);
   const closeMenu = () => setIsOpen(false);
@@ -23,11 +23,7 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  if (
-    location.pathname === '/admin-dashboard' ||
-    location.pathname === '/tutor-dashboard' ||
-    location.pathname === '/supervisor-dashboard'
-  ) return null;
+  if (location.pathname === '/admin-dashboard' || location.pathname === '/tutor-dashboard') return null;
 
   const navLinks = [
     { name: 'Home', path: '/' },

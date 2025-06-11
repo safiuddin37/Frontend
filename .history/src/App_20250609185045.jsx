@@ -81,9 +81,9 @@ function App() {
           />
           <Route path="/supervisor-dashboard" 
             element={
-            <ProtectedRoute>
+<ProtectedRoute>
             <SupervisorDashboard />
-              </ProtectedRoute>
+</ProtectedRoute>
             } />
           <Route 
             path="/guest-requests" 

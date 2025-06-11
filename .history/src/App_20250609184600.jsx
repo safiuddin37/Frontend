@@ -5,7 +5,6 @@ import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import HomePage from './pages/HomePage'
 import AdminPage from './pages/AdminPage'
-import SupervisorPage from './pages/SupervisorPage'
 import TutorPage from './pages/TutorPage'
 import AdminDashboard from './components/admin/AdminDashboard'
 import SupervisorDashboard from './components/supervisor/SupervisorDashboard'
@@ -69,7 +68,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/tutor" element={<TutorPage />} />
-          <Route path="/supervisor" element={<SupervisorPage />} />
+          <Route path="/supervisor" element={<SuperPage />} />
           <Route path="/guest-login" element={<GuestLoginPage />} />
           <Route 
             path="/admin-dashboard" 
@@ -79,12 +78,7 @@ function App() {
               </ProtectedRoute>
             } 
           />
-          <Route path="/supervisor-dashboard" 
-            element={
-            <ProtectedRoute>
-            <SupervisorDashboard />
-              </ProtectedRoute>
-            } />
+          <Route path="/supervisor-dashboard" element={<SupervisorDashboard />} />
           <Route 
             path="/guest-requests" 
             element={

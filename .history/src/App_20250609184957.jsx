@@ -80,10 +80,9 @@ function App() {
             } 
           />
           <Route path="/supervisor-dashboard" 
-            element={
             <ProtectedRoute>
-            <SupervisorDashboard />
-              </ProtectedRoute>
+            element={<SupervisorDashboard />
+            </ProtectedRoute>
             } />
           <Route 
             path="/guest-requests" 

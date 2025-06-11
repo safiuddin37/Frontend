@@ -16,7 +16,7 @@ const SupervisorManagement = () => {
     password: '',
     confirmPassword: '',
     phone: '',
-    assignedCenters: []
+    center: []
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -34,7 +34,7 @@ const SupervisorManagement = () => {
 
   // Handle click on Add Supervisor button
   const handleAddClick = () => {
-    setFormData({ name: '', email: '', password: '', confirmPassword: '', phone: '', assignedCenters: []});
+    setFormData({ name: '', email: '', password: '', confirmPassword: '', phone: '', center: []});
     setEditingSupervisor(null);
     setShowFormPopover(true);
   };
@@ -46,7 +46,7 @@ const SupervisorManagement = () => {
       password: '',
       confirmPassword: '',
       phone: supervisor.phone || '',
-      assignedCenters: Array.isArray(supervisor.assignedCenters) ? supervisor.assignedCenters : (supervisor.assignedCenters ? [supervisor.assignedCenters] : [])
+      center: Array.isArray(supervisor.center) ? supervisor.center : (supervisor.center ? [supervisor.center] : [])
   });
     setEditingSupervisor(supervisor);
     setShowFormPopover(true);
@@ -94,16 +94,16 @@ const SupervisorManagement = () => {
         if (formData.password) {
           requestBody.password = formData.password;
         }
-        if(formData.assignedCenters && Array.isArray(formData.assignedCenters)) {
-          requestBody.assignedCenters = formData.assignedCenters;
-        }
+        if(formData.center && Array.isArray(formData.center)) {
+          requestBody.center = formData.center;
+      }
       } else {
         // For new supervisor, include all required fields
         requestBody = {
           name: formData.name.trim(),
           email: formData.email.trim(),
           phone: formData.phone.trim(),
-          assignedCenters: formData.assignedCenters,
+          center: formData.center,
           password: formData.password
         };
       }
@@ -154,7 +154,7 @@ const SupervisorManagement = () => {
       
       // These will happen after the success popover is closed
       setEditingSupervisor(null);
-      setFormData({ name: '', email: '', password: '', confirmPassword: '', phone: '', assignedCenters: [] });
+      setFormData({ name: '', email: '', password: '', confirmPassword: '', phone: '', center: '' });
     } catch (err) {
       console.error('Error:', err);
       const errorMsg = err.message || 'An error occurred while saving the supervisor';
@@ -376,20 +376,20 @@ const SupervisorManagement = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Assigned Centers</label>
+                    <label className="block text-sm font-medium text-gray-700">Center</label>
                     <input
-                      type="text"
-                      value={formData.assignedCenters.join(', ')}
+                    type="text"
+                      value={formData.center.join(', ')}
                       onChange={(e) =>
                         setFormData(prev => ({
                           ...prev,
-                          assignedCenters: e.target.value.split(',').map(c => c.trim()).filter(Boolean)
+                          center: e.target.value.split(',').map(c => c.trim()).filter(Boolean)
                         }))
                       }
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                       placeholder="Enter centers separated by commas"
                       required={!editingSupervisor}
-                    />
+/>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
@@ -499,4 +499,4 @@ const SupervisorManagement = () => {
   );
 };
 
-export default SupervisorManagement;
+export default SupervisorManagement; 

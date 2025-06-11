@@ -10,7 +10,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
-  const isLoginPage = location.pathname === '/admin' || location.pathname === '/tutor'||location.pathname==='/supervisor';
+  const isLoginPage = location.pathname === '/admin' || location.pathname === '/tutor'||location.pathname;
 
   const toggleMenu = () => setIsOpen(!isOpen);
   const closeMenu = () => setIsOpen(false);

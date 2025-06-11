@@ -26,7 +26,7 @@ const Navbar = () => {
   if (
     location.pathname === '/admin-dashboard' ||
     location.pathname === '/tutor-dashboard' ||
-    location.pathname === '/supervisor-dashboard'
+    location.pathname === '/supervisor'
   ) return null;
 
   const navLinks = [

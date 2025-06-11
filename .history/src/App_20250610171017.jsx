@@ -60,10 +60,15 @@ const ProtectedTutorRoute = ({ children }) => {
 };
 
 function App() {
+  const location = useLocation();
+  // Hide Navbar on supervisor-dashboard
+  const hideNavbarRoutes = ['/supervisor-dashboard'];
+  const shouldHideNavbar = hideNavbarRoutes.includes(location.pathname);
+
   return (
     <CenterRefetchProvider>
     <div className="flex flex-col min-h-screen">
-      <Navbar />
+      {!shouldHideNavbar && <Navbar />}
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<HomePage />} />
