@@ -85,14 +85,6 @@ function App() {
             <SupervisorDashboard />
               </ProtectedRoute>
             } />
-          <Route 
-            path="/guest-requests" 
-            element={
-              <ProtectedRoute>
-                <AdminGuestPage />
-              </ProtectedRoute>
-            } 
-          />
           <Route path="/tutor-dashboard" element={<ProtectedTutorRoute><TutorDashboard /></ProtectedTutorRoute>} />
         </Routes>
       </main>
