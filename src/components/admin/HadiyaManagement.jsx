@@ -50,7 +50,7 @@ const HadiyaManagement = () => {
   useEffect(() => {
     const fetchCenters = async () => {
       try {
-        const data = await authFetch('https://mtc-backend-jn5y.onrender.com/api/centers');
+        const data = await authFetch(`${import.meta.env.VITE_API_URL}/centers`);
         setCenters(data);
       } catch (error) {
         console.error('Error fetching centers:', error);
@@ -75,7 +75,7 @@ const HadiyaManagement = () => {
         const data = await fetchHadiyaReportAPI(params);
         
         // First, fetch all tutors to get their status
-        const allTutorsResponse = await authFetch('https://mtc-backend-jn5y.onrender.com/api/tutors');
+        const allTutorsResponse = await authFetch(`${import.meta.env.VITE_API_URL}/tutors`);
         const activeTutorIds = allTutorsResponse
           .filter(tutor => tutor.status === 'active')
           .map(tutor => tutor._id);

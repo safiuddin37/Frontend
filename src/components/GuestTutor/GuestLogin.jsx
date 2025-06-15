@@ -14,7 +14,7 @@ const GuestLogin = () => {
     const onSubmit = async (data) => {
         setLoading(true);
         try {
-            const response = await fetch('https://mtc-backend-jn5y.onrender.com/api/guest/login', { 
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/guest/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

@@ -156,9 +156,9 @@ const CenterManagement = () => {
       // Define URL based on whether we're editing or creating
       let url;
       if (editingCenter) {
-        url = `https://mtc-backend-jn5y.onrender.com/api/centers/${editingCenter._id}`;
+        url = `${import.meta.env.VITE_API_URL}/centers/${editingCenter._id}`;
       } else {
-        url = 'https://mtc-backend-jn5y.onrender.com/api/centers';
+        url = `${import.meta.env.VITE_API_URL}/centers`;
       }
 
       const response = await fetch(url, {
@@ -210,10 +210,11 @@ const CenterManagement = () => {
       if (!token) {
         throw new Error('No token found in local storage');
       }
-      const response = await fetch(`https://mtc-backend-jn5y.onrender.com/api/centers/${deletingCenter._id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/centers/${deletingCenter._id}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       });
 

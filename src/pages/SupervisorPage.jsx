@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { FiUser, FiLock, FiMail, FiPhone, FiUserPlus, FiEye, FiEyeOff } from 'react-icons/fi'
 import { useNavigate } from 'react-router-dom'
-import SupervisorDashboard from '../components/supervisor/SupervisorDashboard'
+import SupervisorDashboard from '../components/supervisor2/SupervisorDashboard'
 import Footer from '../components/Footer'
 
 const SupervisorPage = () => {
@@ -48,7 +48,7 @@ const SupervisorPage = () => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/supervisor/login', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/supervisor/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -71,7 +71,7 @@ const SupervisorPage = () => {
           token: data.token
         }));
         setIsLoggedIn(true);
-        navigate('/supervisor-dashboard');
+        navigate('/supervisor-dashboard', { replace: true });
       } else {
         setError(data.message || 'Login failed');
       }

@@ -30,11 +30,11 @@ const SupervisorManagement = () => {
   const [showSuccessPopover, setShowSuccessPopover] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
 
-  const { data: supervisors, loading, error: fetchError, refetch } = useGet('/supervisor');
+  const { data: supervisors, loading, error: fetchError, refetch } = useGet(`${import.meta.env.VITE_API_URL}/supervisor`);
 
   // Handle click on Add Supervisor button
   const handleAddClick = () => {
-    setFormData({ name: '', email: '', password: '', confirmPassword: '', phone: '', assignedCenters: []});
+    setFormData({ name: '', email: '', phone: '', assignedCenters: []});
     setEditingSupervisor(null);
     setShowFormPopover(true);
   };
@@ -43,8 +43,6 @@ const SupervisorManagement = () => {
     setFormData({
       name: supervisor.name || '',
       email: supervisor.email || '',
-      password: '',
-      confirmPassword: '',
       phone: supervisor.phone || '',
       assignedCenters: Array.isArray(supervisor.assignedCenters) ? supervisor.assignedCenters : (supervisor.assignedCenters ? [supervisor.assignedCenters] : [])
   });
@@ -65,12 +63,12 @@ const SupervisorManagement = () => {
     }
 
     // Only check password match if password is being changed
-    if (formData.password && formData.password !== formData.confirmPassword) {
-      setErrorMessage('Passwords do not match');
-      setShowErrorPopover(true);
-      setIsLoading(false);
-      return;
-    }
+    // if (formData.password && formData.password !== formData.confirmPassword) {
+    //   setErrorMessage('Passwords do not match');
+    //   setShowErrorPopover(true);
+    //   setIsLoading(false);
+    //   return;
+    // }
 
     try {
       const url = editingSupervisor
@@ -81,19 +79,6 @@ const SupervisorManagement = () => {
       let requestBody = {};
       
       if (editingSupervisor) {
-        // For updates, only include fields that have changed
-        if (formData.name !== editingSupervisor.name) {
-          requestBody.name = formData.name;
-        }
-        if (formData.email !== editingSupervisor.email) {
-          requestBody.email = formData.email;
-        }
-        if (formData.phone !== editingSupervisor.phone) {
-          requestBody.phone = formData.phone;
-        }
-        if (formData.password) {
-          requestBody.password = formData.password;
-        }
         if(formData.assignedCenters && Array.isArray(formData.assignedCenters)) {
           requestBody.assignedCenters = formData.assignedCenters;
         }
@@ -104,7 +89,6 @@ const SupervisorManagement = () => {
           email: formData.email.trim(),
           phone: formData.phone.trim(),
           assignedCenters: formData.assignedCenters,
-          password: formData.password
         };
       }
 
@@ -184,7 +168,7 @@ const SupervisorManagement = () => {
     try {
       setIsLoading(true);
       const response = await fetch(
-        `https://mtc-backend-jn5y.onrender.com/api/supervisor/${supervisorToDelete._id}`,
+        `${import.meta.env.VITE_API_URL}/supervisor/${supervisorToDelete._id}`,
         {
           method: 'DELETE',
           headers: {
@@ -228,12 +212,12 @@ const SupervisorManagement = () => {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
         <h1 className="text-3xl font-bold text-primary-700">Supervisor Management</h1>
         <div className="flex gap-2">
-          <button
+          {/* <button
             onClick={handleAddClick}
             className="flex items-center bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
           >
             <FiPlus className="mr-2" /> Add New Supervisor
-          </button>
+          </button> */}
         </div>
       </div>
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-4">
