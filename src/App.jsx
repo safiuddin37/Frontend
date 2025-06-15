@@ -50,59 +50,35 @@ const ProtectedSupervisorRoute = ({ children }) => {
 function App() {
   return (
     <CenterRefetchProvider>
-      <div className="flex flex-col min-h-screen">
-        <Navbar />
-        <main className="flex-grow">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/admin" element={<AdminPage />} />
-            <Route path="/tutor" element={<TutorPage />} />
-            <Route path="/supervisor" element={<SupervisorPage />} />
-            <Route path="/guest-login" element={<GuestLoginPage />} />
-            <Route 
-              path="/admin-dashboard" 
-              element={
-                <ProtectedRoute role="admin">
-                  <AdminDashboard />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/supervisor-dashboard" 
-              element={
-                <ProtectedSupervisorRoute>
-                  <SupervisorDashboard />
-                </ProtectedSupervisorRoute>
-              } 
-            />
-            <Route 
-              path="/guest-requests" 
-              element={
-                <ProtectedRoute role="admin">
-                  <AdminGuestPage />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/tutor/guest-tutor" 
-              element={
-                <ProtectedTutorRoute>
-                  <GuestTutorPage />
-                </ProtectedTutorRoute>
-              } 
-            />
-            <Route 
-              path="/tutor-dashboard" 
-              element={
-                <ProtectedTutorRoute>
-                  <TutorDashboard />
-                </ProtectedTutorRoute>
-              } 
-            />
-          </Routes>
-        </main>
-        <ToastContainer />
-      </div>
+    <div className="flex flex-col min-h-screen">
+      <Navbar />
+      <main className="flex-grow">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/admin" element={<AdminPage />} />
+          <Route path="/tutor" element={<TutorPage />} />
+          <Route path="/supervisor" element={<SupervisorPage />} />
+          <Route path="/guest-login" element={<GuestLoginPage />} />
+          <Route 
+            path="/admin-dashboard" 
+            element={
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route path="/supervisor-dashboard" 
+            element={
+            <ProtectedRoute>
+            <SupervisorDashboard />
+              </ProtectedRoute>
+            } />
+          <Route path="/tutor-dashboard" element={<ProtectedTutorRoute><TutorDashboard /></ProtectedTutorRoute>} />
+        </Routes>
+      </main>
+      <ToastContainer />
+      {/* <Footer /> */}
+    </div>
     </CenterRefetchProvider>
   )
 }

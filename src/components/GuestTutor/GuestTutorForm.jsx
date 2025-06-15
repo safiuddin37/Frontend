@@ -2,24 +2,44 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import DatePicker from 'react-datepicker';
-import "react-datepicker/dist/react-datepicker.css";
+import 'react-datepicker/dist/react-datepicker.css';
+import { FiUser, FiPhone, FiAward, FiCalendar, FiSend, FiLoader, FiUserPlus } from 'react-icons/fi';
+import { motion } from 'framer-motion';
 
 const GuestTutorForm = () => {
     const { register, handleSubmit, formState: { errors }, reset } = useForm();
     const [dateRange, setDateRange] = useState([null, null]);
+    const [loading, setLoading] = useState(false);
     const [startDate, endDate] = dateRange;
 
+    const handleDateChange = (update) => {
+        const [start, end] = update;
+        // If a start date is selected but no end date, it's a single-day selection.
+        // We now allow the user to click a second time to select an end date.
+        // The logic in onSubmit will handle the case where endDate is null.
+        setDateRange(update);
+    };
+
     const onSubmit = async (data) => {
+        if (!startDate) {
+            toast.error('Please select a date for your absence.');
+            return;
+        }
+
+        setLoading(true);
         try {
+            // If endDate is not selected, use startDate as the endDate for a single-day request.
+            const finalEndDate = endDate || startDate;
+
             const requestData = {
                 ...data,
                 dateRange: {
                     startDate: startDate.toISOString(),
-                    endDate: endDate.toISOString()
+                    endDate: finalEndDate.toISOString()
                 }
             };
 
-            const response = await fetch('/api/guest/request', {
+            const response = await fetch('https://mtc-backend-jn5y.onrender.com/api/guest/request', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -28,6 +48,12 @@ const GuestTutorForm = () => {
                 body: JSON.stringify(requestData)
             });
 
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Error Response:', errorText);
+                throw new Error(errorText);
+            }
+
             const result = await response.json();
 
             if (response.ok) {
@@ -35,72 +61,125 @@ const GuestTutorForm = () => {
                 reset();
                 setDateRange([null, null]);
             } else {
-                toast.error(result.error || 'Failed to submit request');
+                toast.error(result.message || 'Failed to submit request');
             }
         } catch (error) {
-            toast.error('Failed to submit request');
-            console.error('Error:', error);
+            toast.error('An unexpected error occurred. Please try again.');
+            console.error('Submission Error:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800">Request Guest Tutor</h2>
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="bg-white rounded-2xl shadow-lg p-8 max-w-lg mx-auto"
+        >
+            <div className="text-center mb-8">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-100 text-primary-600 mb-4">
+                    <FiUserPlus size={32} />
+                </div>
+                <h2 className="text-3xl font-bold text-gray-800">Request a Substitute</h2>
+                <p className="text-gray-500 mt-2">Fill out the form to request a guest tutor for your absence.</p>
+            </div>
             
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                <div className="space-y-6">
-                    <div>
-                        <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
+                <div>
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Guest's Full Name</label>
+                    <div className="relative">
+                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                            <FiUser className="text-gray-400" />
+                        </div>
                         <input
                             type="text"
                             id="name"
-                            {...register('name', { required: true })}
-                            className="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                            {...register('name', { required: 'Full name is required' })}
+                            className="block w-full rounded-lg border-gray-300 pl-10 py-2.5 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm transition"
+                            placeholder="e.g., Jane Doe"
                         />
-                        {errors.name && <span className="text-red-600">Name is required</span>}
                     </div>
-                    <div>
-                        <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone Number</label>
+                    {errors.name && <span className="text-red-500 text-xs mt-1">{errors.name.message}</span>}
+                </div>
+
+                <div>
+                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">Guest's Phone Number</label>
+                    <div className="relative">
+                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                            <FiPhone className="text-gray-400" />
+                        </div>
                         <input
-                            type="text"
+                            type="tel"
                             id="phone"
-                            {...register('phone', { required: true })}
-                            className="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                            {...register('phone', { 
+                                required: 'Phone number is required',
+                                pattern: { value: /^\d{10}$/, message: 'Enter a valid 10-digit phone number' }
+                            })}
+                            className="block w-full rounded-lg border-gray-300 pl-10 py-2.5 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm transition"
+                            placeholder="e.g., 9876543210"
                         />
-                        {errors.phone && <span className="text-red-600">Phone number is required</span>}
                     </div>
-                    <div>
-                        <label htmlFor="qualification" className="block text-sm font-medium text-gray-700">Qualification</label>
+                    {errors.phone && <span className="text-red-500 text-xs mt-1">{errors.phone.message}</span>}
+                </div>
+
+                <div>
+                    <label htmlFor="qualification" className="block text-sm font-medium text-gray-700 mb-1">Guest's Qualification</label>
+                    <div className="relative">
+                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                            <FiAward className="text-gray-400" />
+                        </div>
                         <input
                             type="text"
                             id="qualification"
-                            {...register('qualification', { required: true })}
-                            className="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                            {...register('qualification', { required: 'Qualification is required' })}
+                            className="block w-full rounded-lg border-gray-300 pl-10 py-2.5 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm transition"
+                            placeholder="e.g., B.Sc. in Physics"
                         />
-                        {errors.qualification && <span className="text-red-600">Qualification is required</span>}
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Absence Duration</label>
+                    {errors.qualification && <span className="text-red-500 text-xs mt-1">{errors.qualification.message}</span>}
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Absence Duration</label>
+                    <div className="relative">
+                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                            <FiCalendar className="text-gray-400" />
+                        </div>
                         <DatePicker
                             selectsRange={true}
                             startDate={startDate}
                             endDate={endDate}
-                            onChange={(update) => setDateRange(update)}
+                            onChange={handleDateChange}
                             isClearable={true}
-                            className="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                            placeholderText="Select leave start and end date"
+                            className="block w-full rounded-lg border-gray-300 pl-10 py-2.5 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm transition"
+                            wrapperClassName="w-full"
+                            minDate={new Date()}
                         />
                     </div>
                 </div>
 
                 <button
                     type="submit"
-                    disabled={!startDate || !endDate}
-                    className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    disabled={!startDate || loading}
+                    className="w-full flex justify-center items-center gap-2 bg-primary-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
-                    Submit Request
+                    {loading ? (
+                        <>
+                            <FiLoader className="animate-spin mr-2" />
+                            Submitting...
+                        </>
+                    ) : (
+                        <>
+                            <FiSend />
+                            Submit Request
+                        </>
+                    )}
                 </button>
             </form>
-        </div>
+        </motion.div>
     );
 };
 

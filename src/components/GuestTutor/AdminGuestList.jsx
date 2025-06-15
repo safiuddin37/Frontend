@@ -65,12 +65,12 @@ const AdminGuestList = () => {
     }
 
     return (
-        <div className="max-w-4xl mx-auto p-6">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800">Pending Guest Tutor Requests</h2>
+        <div className="p-6">
+            <h2 className="text-2xl font-bold mb-6 text-gray-700">Pending Guest Tutor Requests</h2>
             
             {requests.length === 0 ? (
-                <div className="text-center py-8 bg-gray-50 rounded-lg">
-                    <p className="text-gray-600">No pending requests found</p>
+                <div className="text-left py-8 bg-gray-50 rounded-lg px-6">
+                    <p className="text-gray-500">No pending requests found</p>
                 </div>
             ) : (
                 <div className="overflow-x-auto">
