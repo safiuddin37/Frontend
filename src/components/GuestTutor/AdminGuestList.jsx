@@ -20,7 +20,8 @@ const AdminGuestList = () => {
             const data = await response.json();
 
             if (response.ok) {
-                setRequests(data);
+                const list = Array.isArray(data) ? data : (data.data || []);
+                setRequests(list);
             } else {
                 toast.error(data.error || 'Failed to fetch requests');
             }
