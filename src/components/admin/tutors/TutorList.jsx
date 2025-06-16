@@ -384,7 +384,7 @@ const TutorList = ({ onEdit, onDelete, onProfile }) => {
                       </button>
                     </div>
                   </td>
-                  <td style={{ padding: '14px 16px', color: '#4b5563', color: tutor.status==="inactive"?"red":"green"}}>{tutor.status==="inactive"?"Inactive":"Active"}</td>
+                  <td style={{ padding: '14px 16px', color: tutor.status ==="inactive"?"red":"green"}}>{tutor.status==="inactive"?"Inactive":"Active"}</td>
                 </tr>
               ))
             )}

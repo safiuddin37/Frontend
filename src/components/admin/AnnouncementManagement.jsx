@@ -96,20 +96,23 @@ const AnnouncementManagement = () => {
         />
         <div className="flex space-x-4">
           <div className="w-full">
-          <DatePicker
-            selected={form.startDate}
-            onChange={(date) => setForm((p) => ({ ...p, startDate: date }))}
-            placeholderText="Start Date"
-            className="border p-2 rounded w-full"
-          />
+            <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+            <DatePicker
+              selected={form.startDate}
+              onChange={(date) => setForm((p) => ({ ...p, startDate: date }))}
+              placeholderText="Start Date"
+              className="border p-2 rounded w-full"
+            />
+          </div>
           <div className="w-full">
             <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
             <DatePicker
               selected={form.endDate}
-            onChange={(date) => setForm((p) => ({ ...p, endDate: date }))}
-            placeholderText="End Date"
-            className="border p-2 rounded w-full"
-          />
+              onChange={(date) => setForm((p) => ({ ...p, endDate: date }))}
+              placeholderText="End Date"
+              className="border p-2 rounded w-full"
+            />
+          </div>
         </div>
         <label className="block text-sm font-medium text-gray-700">Priority (higher number shows first)</label>
         <input
