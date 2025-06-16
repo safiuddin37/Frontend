@@ -64,15 +64,15 @@ function App() {
           <Route 
             path="/admin-dashboard" 
             element={
-              <ProtectedRoute>
+              <ProtectedRoute role="admin">
                 <AdminDashboard />
               </ProtectedRoute>
             } 
           />
           <Route path="/supervisor-dashboard" 
             element={
-            <ProtectedRoute>
-            <SupervisorDashboard />
+              <ProtectedRoute role="supervisor">
+                <SupervisorDashboard />
               </ProtectedRoute>
             } />
           <Route path="/tutor-dashboard" element={<ProtectedTutorRoute><TutorDashboard /></ProtectedTutorRoute>} />
