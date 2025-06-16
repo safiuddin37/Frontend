@@ -68,7 +68,7 @@ const StudentManagement = () => {
           'Aadhar Number': student.aadharNumber || '',
           'Assigned Center': centerName,
           'Remarks': student.remarks || '',
-          'Created Date': student.createdAt ? new Date(student.createdAt).toLocaleString() : ''
+          'Created Date': student.createdAt ? new Date(student.createdAt).toLocaleString('en-GB') : ''
         };
       });
       
@@ -364,7 +364,7 @@ const StudentManagement = () => {
               {/* Registration Date */}
               <div className="bg-gray-50 p-4 rounded-lg">
                 <p className="text-sm text-gray-500 flex items-center"><FiCalendar className="mr-1" /> Registration Date</p>
-                <p className="font-medium">{student.createdAt ? new Date(student.createdAt).toLocaleDateString() : 'Unknown'}</p>
+                <p className="font-medium">{student.createdAt ? new Date(student.createdAt).toLocaleDateString('en-GB') : 'Unknown'}</p>
               </div>
               
               {/* Remarks */}

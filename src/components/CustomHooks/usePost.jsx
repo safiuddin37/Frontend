@@ -1,6 +1,9 @@
 import { useState } from "react";
 import axios from "axios";
 import { notifyError } from "../admin/toastConfig";
+import { getErrorMessage } from "../../utils/errorUtils";
+
+
 
 const usePost = () => {
   const [response, setResponse] = useState(null);
@@ -49,8 +52,9 @@ const usePost = () => {
         payload,
         url
       });
-      notifyError(err.response?.data?.message || "Something went wrong");
-      return { error: err.response?.data?.message || "Request failed" };
+      const message = getErrorMessage(err, 'Request failed');
+      notifyError(message);
+      return { error: message };
     } finally {
       setLoading(false);
     }
@@ -73,6 +77,8 @@ export default usePost;
 // import { useState, useEffect } from "react";
 // import axios from "axios";
 // import { notifyError } from "../admin/toastConfig";
+
+
 
 // const usePost = (url, payload) => {
 //   const [response, setResponse] = useState([]);

@@ -108,7 +108,7 @@ const GuestTutorList = () => {
                                         <div>
                                             <p className="text-sm text-gray-500">Duration</p>
                                             <p className="font-medium text-gray-800">
-                                                {new Date(request.dateRange.startDate).toLocaleDateString()} - {new Date(request.dateRange.endDate).toLocaleDateString()}
+                                                {new Date(request.dateRange.startDate).toLocaleDateString('en-GB')} - {new Date(request.dateRange.endDate).toLocaleDateString('en-GB')}
                                             </p>
                                         </div>
                                     </div>

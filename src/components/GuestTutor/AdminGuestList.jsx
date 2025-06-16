@@ -102,7 +102,7 @@ const AdminGuestList = () => {
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{request.guest.phone}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{request.guest.qualification}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {new Date(request.dateRange.startDate).toLocaleDateString()} - {new Date(request.dateRange.endDate).toLocaleDateString()}
+                                        {new Date(request.dateRange.startDate).toLocaleDateString('en-GB')} - {new Date(request.dateRange.endDate).toLocaleDateString('en-GB')}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <button
