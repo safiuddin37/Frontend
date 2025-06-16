@@ -13,6 +13,7 @@ import TutorDashboard from './components/tutor/TutorDashboard'
 import GuestTutorPage from './pages/GuestTutorPage'
 import AdminGuestPage from './pages/AdminGuestPage'
 import GuestLoginPage from './pages/GuestLoginPage'
+import GuestDashboard from './pages/GuestDashboard'
 import { CenterRefetchProvider } from './context/CenterRefetchContext';
 
 // Protected Route Component
@@ -59,6 +60,7 @@ function App() {
           <Route path="/tutor" element={<TutorPage />} />
           <Route path="/supervisor" element={<SupervisorPage />} />
           <Route path="/guest-login" element={<GuestLoginPage />} />
+          <Route path="/guest-dashboard" element={<GuestDashboard />} />
           <Route 
             path="/admin-dashboard" 
             element={
