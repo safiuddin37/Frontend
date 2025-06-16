@@ -11,9 +11,9 @@ const AdminGuestList = () => {
 
     const fetchPendingRequests = async () => {
         try {
-            const response = await fetch('/api/guest/pending', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/guest/pending`, {
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${localStorage.getItem('token') || JSON.parse(localStorage.getItem('userData')||'{}').token}`
                 }
             });
 
@@ -34,10 +34,10 @@ const AdminGuestList = () => {
 
     const handleApprove = async (requestId) => {
         try {
-            const response = await fetch(`/api/guest/approve/${requestId}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/guest/approve/${requestId}`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${localStorage.getItem('token') || JSON.parse(localStorage.getItem('userData')||'{}').token}`
                 }
             });
 

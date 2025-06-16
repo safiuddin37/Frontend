@@ -13,9 +13,9 @@ const GuestTutorList = () => {
 
     const fetchRequests = async () => {
         try {
-            const response = await fetch('/api/guest/my-requests', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/guest/my-requests`, {
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${localStorage.getItem('token') || JSON.parse(localStorage.getItem('userData')||'{}').token}`
                 }
             });
 
