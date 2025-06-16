@@ -68,8 +68,8 @@ const SupervisorPage = () => {
           name: data.name,
           email: data.email,
           role: data.role,
-          assignedCenters: data.assignedCenters,
           token: data.token
+          
         }));
         setIsLoggedIn(true);
         navigate('/supervisor-dashboard', { replace: true });

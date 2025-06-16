@@ -289,8 +289,18 @@ const [selectedSupervisor, setSelectedSupervisor] = useState(null);
             ) : paginatedSupervisors.length === 0 ? (
               <tr><td colSpan={4} className="text-center py-8 text-gray-500">No supervisors found.</td></tr>
             ) : paginatedSupervisors.map((supervisor) => (
-              <tr key={supervisor._id} className="hover:bg-gray-50" >
-                 
+              <tr
+                key={supervisor._id}
+                className="hover:bg-gray-50 cursor-pointer"
+                onClick={e => {
+                  // Prevent modal if clicking on action buttons
+                  if (
+                    e.target.closest('button') ||
+                    e.target.closest('svg')
+                  ) return;
+                  setSelectedSupervisor(supervisor);
+                }}
+              >
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white text-lg font-bold">
@@ -315,14 +325,14 @@ const [selectedSupervisor, setSelectedSupervisor] = useState(null);
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                   <button
-                    onClick={() => handleEditClick(supervisor)}
+                    onClick={e => { e.stopPropagation(); handleEditClick(supervisor); }}
                     className="text-blue-600 hover:text-blue-900"
                     title="Edit"
                   >
                     <FiEdit2 className="inline-block" />
                   </button>
                   <button
-                    onClick={() => handleDeleteClick(supervisor)}
+                    onClick={e => { e.stopPropagation(); handleDeleteClick(supervisor); }}
                     className="text-red-600 hover:text-red-900"
                     title="Delete"
                   >
@@ -540,6 +550,71 @@ const [selectedSupervisor, setSelectedSupervisor] = useState(null);
         confirmText="Delete"
         cancelText="Cancel"
       />
+      <AnimatePresence>
+  {selectedSupervisor && typeof selectedSupervisor === 'object' && (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+    >
+      <motion.div
+        initial={{ scale: 0.95 }}
+        animate={{ scale: 1 }}
+        exit={{ scale: 0.95 }}
+        className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto"
+      >
+        <div className="flex justify-between items-start mb-6">
+          <div>
+            <h2 className="text-2xl font-bold text-primary-700">Supervisor Details</h2>
+            <p className="text-sm text-gray-500 mt-1">ID: {selectedSupervisor._id || 'N/A'}</p>
+          </div>
+          <button
+            onClick={() => setSelectedSupervisor(null)}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <FiX size={20} />
+          </button>
+        </div>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Name</label>
+            <p className="mt-1 text-gray-900">{selectedSupervisor.name || 'N/A'}</p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <p className="mt-1 text-gray-900">{selectedSupervisor.email || 'N/A'}</p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Phone</label>
+            <p className="mt-1 text-gray-900">{selectedSupervisor.phone || 'N/A'}</p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Assigned Centers</label>
+            <ul className="list-disc ml-5">
+              {(selectedSupervisor.assignedCenters && Array.isArray(selectedSupervisor.assignedCenters) && selectedSupervisor.assignedCenters.length > 0)
+                ? selectedSupervisor.assignedCenters.map(center => (
+                  <li key={typeof center === 'object' ? center._id : center}>
+                    {typeof center === 'object' ? center.name : String(center)}
+                  </li>
+                ))
+                : <li>No centers assigned</li>
+              }
+            </ul>
+          </div>
+        </div>
+        <div className="mt-6 flex justify-end">
+          <button
+            onClick={() => setSelectedSupervisor(null)}
+            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            Close
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>
+  )}
+</AnimatePresence>
     </div>
   );
 };

@@ -6,15 +6,7 @@ const Overview = () => {
   const { response: centers, loading: centersLoading } = useGet('/centers');
   const { response: tutors, loading: tutorsLoading } = useGet('/tutors');
   const { response: students, loading: studentsLoading } = useGet('/students');
-//   const {response: supervisors, loading: supervisorsLoading} = useGet('/supervisor');
-
-//   const userData = JSON.parse(localStorage.getItem('userData'));
-// const userId = userData?._id;
-//   const user = supervisors?.find(
-//   (supervisor) => supervisor._id.toString() === userId
-// );
-
-//   console.log(user)
+  const {response: user}
 
   const stats = [
     {

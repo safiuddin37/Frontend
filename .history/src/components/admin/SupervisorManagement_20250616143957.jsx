@@ -6,6 +6,7 @@ import { toast } from 'react-hot-toast';
 import Popover from '../common/Popover';
 
 const SupervisorManagement = () => {
+  // ...existing state...
 const [selectedSupervisor, setSelectedSupervisor] = useState(null); 
   const [editingSupervisor, setEditingSupervisor] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -289,8 +290,8 @@ const [selectedSupervisor, setSelectedSupervisor] = useState(null);
             ) : paginatedSupervisors.length === 0 ? (
               <tr><td colSpan={4} className="text-center py-8 text-gray-500">No supervisors found.</td></tr>
             ) : paginatedSupervisors.map((supervisor) => (
-              <tr key={supervisor._id} className="hover:bg-gray-50" >
-                 
+              <tr key={supervisor._id} className="hover:bg-gray-50">
+                 onClick={() => setSelectedSupervisor(supervisor)}
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white text-lg font-bold">

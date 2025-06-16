@@ -68,7 +68,7 @@ const SupervisorPage = () => {
           name: data.name,
           email: data.email,
           role: data.role,
-          assignedCenters: data.assignedCenters,
+          assig
           token: data.token
         }));
         setIsLoggedIn(true);

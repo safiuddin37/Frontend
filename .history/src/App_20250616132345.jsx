@@ -8,7 +8,7 @@ import AdminPage from './pages/AdminPage'
 import SupervisorPage from './pages/SupervisorPage'
 import TutorPage from './pages/TutorPage'
 import AdminDashboard from './components/admin/AdminDashboard'
-import SupervisorDashboard from './components/supervisor2/SupervisorDashboard'
+import SupervisorDashboard from './components/supervisor/SupervisorDashboard'
 import TutorDashboard from './components/tutor/TutorDashboard'
 import GuestTutorPage from './pages/GuestTutorPage'
 import AdminGuestPage from './pages/AdminGuestPage'
@@ -42,9 +42,7 @@ const ProtectedTutorRoute = ({ children }) => {
   return <ProtectedRoute role="tutor">{children}</ProtectedRoute>;
 };
 
-const ProtectedAdminRoute = ({ children }) => {
-  return <ProtectedRoute role="admin">{children}</ProtectedRoute>;
-};
+
 
 // Protected Supervisor Route Component
 const ProtectedSupervisorRoute = ({ children }) => {
@@ -73,7 +71,7 @@ function App() {
           />
           <Route path="/supervisor-dashboard" 
             element={
-            <ProtectedRoute role="supervisor">
+            <ProtectedRoute>
             <SupervisorDashboard />
               </ProtectedRoute>
             } />

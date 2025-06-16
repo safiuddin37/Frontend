@@ -289,8 +289,7 @@ const [selectedSupervisor, setSelectedSupervisor] = useState(null);
             ) : paginatedSupervisors.length === 0 ? (
               <tr><td colSpan={4} className="text-center py-8 text-gray-500">No supervisors found.</td></tr>
             ) : paginatedSupervisors.map((supervisor) => (
-              <tr key={supervisor._id} className="hover:bg-gray-50" >
-                 
+              <tr key={supervisor._id} className="hover:bg-gray-50" onClick={() => setSelectedSupervisor(supervisor)}>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white text-lg font-bold">
@@ -540,7 +539,69 @@ const [selectedSupervisor, setSelectedSupervisor] = useState(null);
         confirmText="Delete"
         cancelText="Cancel"
       />
-    </div>
+
+    <<AnimatePresence>
+  {selectedSupervisor && (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+    >
+      <motion.div
+        initial={{ scale: 0.95 }}
+        animate={{ scale: 1 }}
+        exit={{ scale: 0.95 }}
+        className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto"
+      >
+        <div className="flex justify-between items-start mb-6">
+          <div>
+            <h2 className="text-2xl font-bold text-primary-700">Supervisor Details</h2>
+            <p className="text-sm text-gray-500 mt-1">ID: {selectedSupervisor._id}</p>
+          </div>
+          <button
+            onClick={() => setSelectedSupervisor(null)}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <FiX size={20} />
+          </button>
+        </div>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Name</label>
+            <p className="mt-1 text-gray-900">{selectedSupervisor.name}</p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <p className="mt-1 text-gray-900">{selectedSupervisor.email}</p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Phone</label>
+            <p className="mt-1 text-gray-900">{selectedSupervisor.phone}</p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Assigned Centers</label>
+            <ul className="list-disc ml-5">
+              {(selectedSupervisor.assignedCenters || []).map(center =>
+                <li key={typeof center === 'object' ? center._id : center}>
+                  {typeof center === 'object' ? center.name : center}
+                </li>
+              )}
+            </ul>
+          </div>
+        </div>
+        <div className="mt-6 flex justify-end">
+          <button
+            onClick={() => setSelectedSupervisor(null)}
+            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            Close
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>
+  )}
+</AnimatePresence>/div>
   );
 };
 

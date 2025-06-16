@@ -289,7 +289,7 @@ const [selectedSupervisor, setSelectedSupervisor] = useState(null);
             ) : paginatedSupervisors.length === 0 ? (
               <tr><td colSpan={4} className="text-center py-8 text-gray-500">No supervisors found.</td></tr>
             ) : paginatedSupervisors.map((supervisor) => (
-              <tr key={supervisor._id} className="hover:bg-gray-50" >
+              <tr key={supervisor._id} className="hover:bg-gray-50" onClick={() => setSelectedSupervisor(supervisor)}>
                  
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center gap-3">
