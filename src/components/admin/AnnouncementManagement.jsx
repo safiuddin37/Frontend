@@ -78,6 +78,7 @@ const AnnouncementManagement = () => {
     <div className="p-6 space-y-10">
       <h2 className="text-2xl font-bold text-gray-800">Announcement Management</h2>
       <form onSubmit={submit} className="space-y-4 max-w-xl">
+        <label className="block text-sm font-medium text-gray-700">Title</label>
         <input
           name="title"
           placeholder="Title"
@@ -85,6 +86,7 @@ const AnnouncementManagement = () => {
           value={form.title}
           onChange={handleChange}
         />
+        <label className="block text-sm font-medium text-gray-700">Body</label>
         <textarea
           name="body"
           placeholder="Body"
@@ -93,19 +95,23 @@ const AnnouncementManagement = () => {
           onChange={handleChange}
         />
         <div className="flex space-x-4">
+          <div className="w-full">
           <DatePicker
             selected={form.startDate}
             onChange={(date) => setForm((p) => ({ ...p, startDate: date }))}
             placeholderText="Start Date"
             className="border p-2 rounded w-full"
           />
-          <DatePicker
-            selected={form.endDate}
+          <div className="w-full">
+            <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+            <DatePicker
+              selected={form.endDate}
             onChange={(date) => setForm((p) => ({ ...p, endDate: date }))}
             placeholderText="End Date"
             className="border p-2 rounded w-full"
           />
         </div>
+        <label className="block text-sm font-medium text-gray-700">Priority (higher number shows first)</label>
         <input
           name="priority"
           type="number"
