@@ -32,7 +32,8 @@ const GuestLogin = () => {
                     centerCoordinates: result.centerCoordinates,
                     centerId: result.centerId
                 };
-                localStorage.setItem('guestData', JSON.stringify(guestData)); 
+                localStorage.setItem('guestData', JSON.stringify(guestData));
+                localStorage.setItem('token', result.token); 
                 toast.success(result.message || 'Login successful');
                 navigate('/guest-dashboard'); 
             } else {

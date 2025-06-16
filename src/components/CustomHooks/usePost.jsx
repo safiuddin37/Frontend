@@ -10,7 +10,28 @@ const usePost = () => {
     setLoading(true);
     try {
       // Get token from localStorage
-      const token = localStorage.getItem('token');
+      let token = localStorage.getItem('token');
+      // Fallback to token inside stored user/guest objects
+      if (!token) {
+        const userDataStr = localStorage.getItem('userData');
+        if (userDataStr) {
+          try {
+            token = JSON.parse(userDataStr)?.token;
+          } catch (err) {
+            console.error('Failed to parse userData from localStorage', err);
+          }
+        }
+      }
+      if (!token) {
+        const guestDataStr = localStorage.getItem('guestData');
+        if (guestDataStr) {
+          try {
+            token = JSON.parse(guestDataStr)?.token;
+          } catch (err) {
+            console.error('Failed to parse guestData from localStorage', err);
+          }
+        }
+      }
       
       // Create headers with authorization
       const headers = {

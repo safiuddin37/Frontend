@@ -156,6 +156,7 @@ const TutorPage = () => {
         return;
       }
       localStorage.setItem("userData", JSON.stringify(result.data));
+    localStorage.setItem("token", result.data.token);
       setIsLoggedIn(true);
       
       // Clear any existing timeout before setting a new one
