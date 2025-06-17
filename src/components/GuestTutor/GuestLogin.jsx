@@ -25,10 +25,17 @@ const GuestLogin = () => {
             const result = await response.json();
 
             if (response.ok) {
-                localStorage.setItem('guestToken', result.token);
-                localStorage.setItem('guestName', result.name); 
+                const guestData = {
+                    token: result.token,
+                    name: result.name,
+                    tutorId: result.tutorId,
+                    centerCoordinates: result.centerCoordinates,
+                    centerId: result.centerId
+                };
+                localStorage.setItem('guestData', JSON.stringify(guestData));
+                localStorage.setItem('token', result.token); 
                 toast.success(result.message || 'Login successful');
-                navigate('/tutor/guest-tutor'); 
+                navigate('/guest-dashboard'); 
             } else {
                 toast.error(result.message || result.error || 'Invalid credentials or login failed');
             }

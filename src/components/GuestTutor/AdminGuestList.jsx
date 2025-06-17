@@ -11,16 +11,17 @@ const AdminGuestList = () => {
 
     const fetchPendingRequests = async () => {
         try {
-            const response = await fetch('/api/guest/pending', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/guest/pending`, {
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${localStorage.getItem('token') || JSON.parse(localStorage.getItem('userData')||'{}').token}`
                 }
             });
 
             const data = await response.json();
 
             if (response.ok) {
-                setRequests(data);
+                const list = Array.isArray(data) ? data : (data.data || []);
+                setRequests(list);
             } else {
                 toast.error(data.error || 'Failed to fetch requests');
             }
@@ -34,10 +35,10 @@ const AdminGuestList = () => {
 
     const handleApprove = async (requestId) => {
         try {
-            const response = await fetch(`/api/guest/approve/${requestId}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/guest/approve/${requestId}`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${localStorage.getItem('token') || JSON.parse(localStorage.getItem('userData')||'{}').token}`
                 }
             });
 
@@ -101,7 +102,7 @@ const AdminGuestList = () => {
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{request.guest.phone}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{request.guest.qualification}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {new Date(request.dateRange.startDate).toLocaleDateString()} - {new Date(request.dateRange.endDate).toLocaleDateString()}
+                                        {new Date(request.dateRange.startDate).toLocaleDateString('en-GB')} - {new Date(request.dateRange.endDate).toLocaleDateString('en-GB')}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <button

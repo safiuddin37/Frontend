@@ -148,7 +148,7 @@ const Overview = () => {
   // Format date for recent activity
   const formatDate = (dateString) => {
     const date = new Date(dateString)
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleString('en-GB', {
       month: 'short',
       day: 'numeric',
       hour: '2-digit',

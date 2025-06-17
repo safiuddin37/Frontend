@@ -47,6 +47,7 @@ const Sidebar = ({ activeTab, onTabChange, className }) => {
     { id: 'tutors', label: 'Tutors', icon: FiUsers },
     { id: 'hadiya', label: 'Hadiya', icon: FiDollarSign },
     { id: 'guest-tutors', label: 'Guest Tutors', icon: FiUserPlus },
+    { id: 'announcements', label: 'Announcements', icon: FiFileText },
     { id: 'centers', label: 'Centers', icon: FiMapPin },
     { id: 'reports', label: 'Reports', icon: FiFileText },
     { id: 'students', label: 'Students', icon: FiUser },

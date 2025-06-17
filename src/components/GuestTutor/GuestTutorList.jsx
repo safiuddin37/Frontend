@@ -13,16 +13,18 @@ const GuestTutorList = () => {
 
     const fetchRequests = async () => {
         try {
-            const response = await fetch('/api/guest/my-requests', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/guest/my-requests`, {
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${localStorage.getItem('token') || JSON.parse(localStorage.getItem('userData')||'{}').token}`
                 }
             });
 
             const data = await response.json();
 
             if (response.ok) {
-                setRequests(data);
+                // Backend returns { success, data: [...] }
+                const list = Array.isArray(data) ? data : (data.data || []);
+                setRequests(list);
             } else {
                 toast.error(data.error || 'Failed to fetch requests');
             }
@@ -106,7 +108,7 @@ const GuestTutorList = () => {
                                         <div>
                                             <p className="text-sm text-gray-500">Duration</p>
                                             <p className="font-medium text-gray-800">
-                                                {new Date(request.dateRange.startDate).toLocaleDateString()} - {new Date(request.dateRange.endDate).toLocaleDateString()}
+                                                {new Date(request.dateRange.startDate).toLocaleDateString('en-GB')} - {new Date(request.dateRange.endDate).toLocaleDateString('en-GB')}
                                             </p>
                                         </div>
                                     </div>

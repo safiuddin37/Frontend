@@ -69,6 +69,8 @@ const AdminPage = () => {
           role: data.role,
           token: data.token
         }));
+      // Store token separately for legacy components
+      localStorage.setItem('token', data.token);
         setIsLoggedIn(true);
         navigate('/admin-dashboard');
       } else {

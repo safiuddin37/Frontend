@@ -10,6 +10,7 @@ import AdminManagement from './AdminManagement';
 import SupervisorManagement from './SupervisorManagement';
 import HadiyaManagement from './HadiyaManagement';
 import AdminGuestPage from '../../pages/AdminGuestPage';
+import AnnouncementManagement from './AnnouncementManagement';
 import { FiMenu, FiX } from 'react-icons/fi'; // Icons for mobile menu toggle
 
 const AdminDashboard = () => {
@@ -75,6 +76,8 @@ const AdminDashboard = () => {
         return <SupervisorManagement />;
       case 'guest-tutors':
         return <AdminGuestPage />;
+      case 'announcements':
+        return <AnnouncementManagement />;
       default:
         return (
           <div className="p-6">
