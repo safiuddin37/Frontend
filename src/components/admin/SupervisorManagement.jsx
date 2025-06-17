@@ -6,7 +6,11 @@ import { toast } from 'react-hot-toast';
 import Popover from '../common/Popover';
 
 const SupervisorManagement = () => {
-const [selectedSupervisor, setSelectedSupervisor] = useState(null); 
+  console.log('SupervisorManagement component mounted');
+  console.log('Environment:', import.meta.env.MODE);
+  console.log('API URL:', import.meta.env.VITE_API_URL);
+  
+  const [selectedSupervisor, setSelectedSupervisor] = useState(null); 
   const [editingSupervisor, setEditingSupervisor] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
@@ -76,6 +80,10 @@ const [selectedSupervisor, setSelectedSupervisor] = useState(null);
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    
+    // Add debug logging
+    console.log('API URL:', import.meta.env.VITE_API_URL);
+    console.log('Environment:', import.meta.env.MODE);
     
     // Validate password length before submitting
     if (!editingSupervisor && formData.password.length < 6) {
