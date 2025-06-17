@@ -1,24 +1,13 @@
 import { useState, useEffect } from 'react';
-import { FiUsers, FiMapPin, FiX } from 'react-icons/fi';
+import { FiUsers, FiMapPin } from 'react-icons/fi';
 import useGet from '../CustomHooks/useGet';
-import { AnimatePresence, motion } from 'framer-motion';
-import { MapContainer, TileLayer, Marker } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
 
 const Overview = () => {
   const { response: centers, loading: centersLoading } = useGet('/centers');
   const { response: tutors, loading: tutorsLoading } = useGet('/tutors');
   const { response: students, loading: studentsLoading } = useGet('/students');
-  const [filters, setFilters] = useState({
-    centerName: '',
-    area: '',
-    sadarName: '',
-    tutorName: '',
-    status: 'active' // 'active', 'inactive', 'all'
-  });
-  const [showDetails, setShowDetails] = useState(null);
 
-  if (centersLoading || tutorsLoading || studentsLoading) {
+    if (centersLoading || tutorsLoading || studentsLoading) {
     return (
       <div className="flex justify-center items-center h-full">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -26,21 +15,10 @@ const Overview = () => {
     );
   }
 
-  const assignedCentersIds = JSON.parse(localStorage.getItem('userData'))?.assignedCenters || [];
+  const assignedCentersIds=JSON.parse(localStorage.getItem('userData'))?.assignedCenters || [];
   const assignedCenters = centers?.filter(center => assignedCentersIds.includes(center._id));
-  const assignedTutors = tutors?.filter(tutor => assignedCentersIds.includes(tutor.assignedCenter._id));
-  const assignedStudents = students?.filter(students => assignedCentersIds.includes(students.assignedCenter._id));
-
-  // Filter assigned centers based on filters
-  const filteredCenters = assignedCenters?.filter(center => {
-    const matchesCenterName = center.name.toLowerCase().includes(filters.centerName.toLowerCase());
-    const matchesArea = center.area.toLowerCase().includes(filters.area.toLowerCase());
-    const matchesSadarName = center.sadarName.toLowerCase().includes(filters.sadarName.toLowerCase());
-    const matchesStatus = filters.status === 'all' || center.status === filters.status;
-    
-    return matchesCenterName && matchesArea && matchesSadarName && matchesStatus;
-  });
-
+  const assignedTutors=tutors?.filter(tutor => assignedCentersIds.includes(tutor.assignedCenter._id));
+  const assignedStudents=students?.filter(students=> assignedCentersIds.includes(students.assignedCenter._id));
   const stats = [
     {
       label: 'Total Centers Assigned',
@@ -61,6 +39,8 @@ const Overview = () => {
       color: 'from-green-600 to-green-400'
     }
   ];
+
+
 
   return (
     <div className="space-y-6">
@@ -89,16 +69,16 @@ const Overview = () => {
         })}
       </div>
 
-      <div>
+      
         {/* Filter Panel - Always Visible */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 p-4 bg-gray-50 rounded-lg mb-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Center Name</label>
             <input
               type="text"
               name="centerName"
               value={filters.centerName}
-              onChange={(e) => setFilters({ ...filters, centerName: e.target.value })}
+              onChange={handleFilterChange}
               placeholder="Search center name..."
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
             />
@@ -109,7 +89,7 @@ const Overview = () => {
               type="text"
               name="area"
               value={filters.area}
-              onChange={(e) => setFilters({ ...filters, area: e.target.value })}
+              onChange={handleFilterChange}
               placeholder="Search area..."
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
             />
@@ -120,8 +100,19 @@ const Overview = () => {
               type="text"
               name="sadarName"
               value={filters.sadarName}
-              onChange={(e) => setFilters({ ...filters, sadarName: e.target.value })}
+              onChange={handleFilterChange}
               placeholder="Search sadar name..."
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Tutor Name</label>
+            <input
+              type="text"
+              name="tutorName"
+              value={filters.tutorName}
+              onChange={handleFilterChange}
+              placeholder="Search tutor name..."
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
             />
           </div>
@@ -130,7 +121,7 @@ const Overview = () => {
             <select
               name="status"
               value={filters.status}
-              onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+              onChange={handleFilterChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
             >
               <option value="all">All Status</option>
@@ -165,10 +156,13 @@ const Overview = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredCenters?.map((center) => {
+              {filteredCenters.map((center) => {
                 const isInactive = center.status === 'inactive';
                 return (
                   <tr
@@ -206,6 +200,28 @@ const Overview = () => {
                       }`}>
                         {center.status === 'inactive' ? 'Inactive' : 'Active'}
                       </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <div className="flex space-x-3" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEdit(center);
+                          }}
+                          className="text-blue-600 hover:text-blue-800 transition-colors"
+                        >
+                          <FiEdit2 size={18} />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(center);
+                          }}
+                          className="text-red-600 hover:text-red-800 transition-colors"
+                        >
+                          <FiTrash2 size={18} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -319,6 +335,63 @@ const Overview = () => {
                     </div>
                   </div>
                 )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {deletingCenter && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+          >
+            <motion.div
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.95 }}
+              className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md"
+            >
+              <div className="flex items-center mb-4">
+                <div className="bg-red-100 p-3 rounded-full text-red-600 mr-4">
+                  <FiAlertTriangle size={24} />
+                </div>
+                <h2 className="text-xl font-bold">Delete Center</h2>
+              </div>
+
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to delete the center "{deletingCenter.name}"? This action cannot be undone.
+              </p>
+
+              <div className="flex justify-end space-x-4">
+                <button
+                  onClick={() => setDeletingCenter(null)}
+                  disabled={isDeleting}
+                  className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  disabled={isDeleting}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 flex items-center"
+                >
+                  {isDeleting ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></path>
+                      </svg>
+                      Deleting...
+                    </>
+                  ) : (
+                    'Delete Center'
+                  )}
+                </button>
               </div>
             </motion.div>
           </motion.div>
