@@ -11,9 +11,9 @@ const Sidebar = ({ activeSection, setActiveSection }) => {
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: FiHome },
-    // { id: 'centers', label: 'Centers', icon: FiMapPin },
-    // { id: 'tutors', label: 'Tutors', icon: FiUsers },
-    // { id: 'students', label: 'Students', icon: FiUsers }
+    { id: 'centers', label: 'Centers', icon: FiMapPin },
+    { id: 'tutors', label: 'Tutors', icon: FiUsers },
+    { id: 'students', label: 'Students', icon: FiUsers }
   ];
 
   return (

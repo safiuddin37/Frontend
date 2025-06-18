@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
-import { FiUsers, FiMapPin, FiX, FiMessageSquare } from 'react-icons/fi';
+import { FiUsers, FiMapPin, FiX } from 'react-icons/fi';
 import useGet from '../CustomHooks/useGet';
 import { AnimatePresence, motion } from 'framer-motion';
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import axios from 'axios';
 
 const Overview = () => {
   const { response: centers, loading: centersLoading } = useGet('/centers');
@@ -18,9 +17,6 @@ const Overview = () => {
     status: 'active' // 'active', 'inactive', 'all'
   });
   const [showDetails, setShowDetails] = useState(null);
-  const [showCommentModal, setShowCommentModal] = useState(null);
-  const [commentText, setCommentText] = useState('');
-  const [showConfirmation, setShowConfirmation] = useState(null);
 
   if (centersLoading || tutorsLoading || studentsLoading) {
     return (
@@ -129,7 +125,7 @@ const Overview = () => {
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
             />
           </div>
-          {/* <div>
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
             <select
               name="status"
@@ -141,7 +137,7 @@ const Overview = () => {
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
             </select>
-          </div> */}
+          </div>
         </div>
 
         <div className="overflow-x-auto">
@@ -167,7 +163,7 @@ const Overview = () => {
                   Students
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Comment
+                  Status
                 </th>
               </tr>
             </thead>
@@ -177,11 +173,12 @@ const Overview = () => {
                 return (
                   <tr
                     key={center._id}
-                    className={`transition-all duration-200 ${
+                    className={`transition-all duration-200 cursor-pointer ${
                       isInactive 
                         ? 'bg-gray-100 hover:bg-gray-200' 
                         : 'hover:bg-gray-50'
                     }`}
+                    onClick={() => setShowDetails(center)}
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">{center.name}</div>
@@ -202,16 +199,13 @@ const Overview = () => {
                       <div className="text-sm text-gray-900">{center.students?.length || 0}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setShowCommentModal(center);
-                          setCommentText(center.comment || '');
-                        }}
-                        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                      >
-                        <FiMessageSquare className="text-blue-500 hover:text-blue-600" />
-                      </button>
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        center.status === 'inactive' 
+                          ? 'bg-red-100 text-red-800' 
+                          : 'bg-green-100 text-green-800'
+                      }`}>
+                        {center.status === 'inactive' ? 'Inactive' : 'Active'}
+                      </span>
                     </td>
                   </tr>
                 );
@@ -220,150 +214,6 @@ const Overview = () => {
           </table>
         </div>
       </div>
-
-      {/* Comment Modal */}
-      <AnimatePresence>
-        {showCommentModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
-          >
-            <motion.div
-              initial={{ scale: 0.95 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.95 }}
-              className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col"
-            >
-              <div className="flex justify-between items-start p-6 border-b">
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  Add Comment for {showCommentModal.name}
-                </h2>
-                <button
-                  onClick={() => setShowCommentModal(null)}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                >
-                  <FiX size={20} />
-                </button>
-              </div>
-
-              <div className="p-6">
-                <textarea
-                  value={commentText}
-                  onChange={(e) => setCommentText(e.target.value)}
-                  className="w-full h-48 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
-                  placeholder="Enter your comment here..."
-                />
-                <div className="flex justify-end space-x-4 mt-4">
-                  <button
-                    onClick={() => setShowConfirmation('discard')}
-                    className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                  >
-                    Discard
-                  </button>
-                  <button
-                    onClick={() => setShowConfirmation('submit')}
-                    className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors"
-                  >
-                    Submit
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Confirmation Dialog */}
-      <AnimatePresence>
-        {showConfirmation && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[60]"
-          >
-            <motion.div
-              initial={{ scale: 0.95 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.95 }}
-              className="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full"
-            >
-              <h3 className="text-xl font-bold mb-4">
-                {showConfirmation === 'discard' ? 'Discard Changes?' : 'Submit Comment?'}
-              </h3>
-              <p className="text-gray-600 mb-6">
-                {showConfirmation === 'discard'
-                  ? 'Are you sure you want to discard your changes?'
-                  : 'Are you sure you want to submit this comment?'}
-              </p>
-              <div className="flex justify-end space-x-4">
-                <button
-                  onClick={() => setShowConfirmation(null)}
-                  className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={async () => {
-                    if (showConfirmation === 'submit') {
-                      try {
-                        const token = localStorage.getItem('token');
-                        console.log('Submitting comment:', {
-                          centerId: showCommentModal._id,
-                          comment: commentText,
-                          apiUrl: `${import.meta.env.VITE_API_URL}/centers/comment`
-                        });
-                        
-                        const response = await axios.post(
-                          `${import.meta.env.VITE_API_URL}/centers/comment`,
-                          {
-                            centerId: showCommentModal._id,
-                            comment: commentText
-                          },
-                          {
-                            headers: {
-                              'Content-Type': 'application/json',
-                              'Authorization': `Bearer ${token}`
-                            }
-                          }
-                        );
-
-                        console.log('Comment submission response:', response.data);
-                        
-                        if (response.data.success) {
-                          // Refresh the centers data
-                          window.location.reload();
-                        } else {
-                          throw new Error(response.data.message || 'Failed to submit comment');
-                        }
-                      } catch (error) {
-                        console.error('Error submitting comment:', error.response || error);
-                        alert(
-                          error.response?.data?.message || 
-                          error.message || 
-                          'Failed to submit comment. Please try again.'
-                        );
-                      }
-                    }
-                    setShowCommentModal(null);
-                    setShowConfirmation(null);
-                    setCommentText('');
-                  }}
-                  className={`px-4 py-2 rounded-lg transition-colors ${
-                    showConfirmation === 'discard'
-                      ? 'bg-red-600 text-white hover:bg-red-700'
-                      : 'bg-blue-600 text-white hover:bg-blue-700'
-                  }`}
-                >
-                  {showConfirmation === 'discard' ? 'Discard' : 'Submit'}
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Details Modal */}
       <AnimatePresence>
@@ -433,18 +283,7 @@ const Overview = () => {
                     <p className="font-medium">{showDetails.students?.length || 0}</p>
                   </div>
                 </div>
-                {/* Tutors List */}
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">Tutors</h3>
-              <div className="space-y-2">
-                {showDetails.tutors?.map((tutor) => (
-                  <div key={tutor._id} className="bg-gray-50 p-3 rounded-lg">
-                    <p className="font-medium">{tutor.name}</p>
-                    <p className="text-sm text-gray-500">{tutor.email}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+                
 
                 {showDetails.coordinates && (
                   <div className="bg-gray-50 p-4 rounded-lg">
