@@ -54,10 +54,12 @@ const ProtectedSupervisorRoute = ({ children }) => {
 };
 
 function App() {
+  const location = useLocation();
+  const hideNavbar = location.pathname.startsWith('/guest-dashboard');
   return (
     <CenterRefetchProvider>
     <div className="flex flex-col min-h-screen">
-      <Navbar />
+      {!hideNavbar && <Navbar />}
       <AnnouncementBanner />
       <main className="flex-grow">
         <Routes>

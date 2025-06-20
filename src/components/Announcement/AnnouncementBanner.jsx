@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import './AnnouncementBanner.css';
 
 
 const BAR_HEIGHT = 40; // Height of banner
-
-import { useLocation } from 'react-router-dom';
 
 const AnnouncementBanner = () => {
   const [announcements, setAnnouncements] = useState([]);
@@ -37,11 +36,9 @@ const AnnouncementBanner = () => {
     fetchAnnouncements();
   }, []);
 
-  // Do not render on non-home pages
-  if (location.pathname !== '/') return null;
-
-  // Hide banner after scrolling beyond hero section
+  // Hide banner after scrolling beyond hero section (only on home page)
   useEffect(() => {
+    if (location.pathname !== '/') return;
     const onScroll = () => {
       const hero = document.getElementById('hero');
       const threshold = hero ? hero.offsetHeight : 500;
@@ -49,7 +46,10 @@ const AnnouncementBanner = () => {
     };
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+  }, [location.pathname]);
+
+  // Do not render on non-home pages
+  if (location.pathname !== '/') return null;
 
   if (!visible || !announcements.length) return null; // Hide when not needed
 

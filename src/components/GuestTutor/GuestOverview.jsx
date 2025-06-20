@@ -91,6 +91,12 @@ const GuestOverview = () => {
       if (res.ok) {
         setAttendanceMarked(true);
         setError(null);
+      } else if (res.status === 409) {
+        // Already marked
+        setAttendanceMarked(true);
+        setError('Attendance already marked for today');
+      } else if (res.status === 400) {
+        setError(data.message || 'You must be near the center to mark attendance');
       } else {
         setError(data.message || 'Failed to mark attendance');
       }
