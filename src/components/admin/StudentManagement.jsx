@@ -161,8 +161,8 @@ const StudentManagement = () => {
       }
 
       const url = editingStudent 
-        ? `https://mtc-backend-jn5y.onrender.com/api/students/${editingStudent._id}`
-        : 'https://mtc-backend-jn5y.onrender.com/api/students';
+        ? `${process.env.REACT_APP_API_URL}/api/students/${editingStudent._id}`
+        : `${process.env.REACT_APP_API_URL}/api/students`;
 
       const response = await fetch(url, {
         method: editingStudent ? 'PUT' : 'POST',
@@ -211,7 +211,7 @@ const StudentManagement = () => {
         return;
       }
 
-      const response = await fetch(`https://mtc-backend-jn5y.onrender.com/api/students/${studentToDelete._id}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/students/${studentToDelete._id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

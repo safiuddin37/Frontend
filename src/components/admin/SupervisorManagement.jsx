@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiEdit2, FiTrash2, FiPlus, FiSearch, FiUser, FiMail, FiPhone, FiEye, FiEyeOff } from 'react-icons/fi';
 import useGet from '../../hooks/useGet';
@@ -6,6 +6,11 @@ import { toast } from 'react-hot-toast';
 import Popover from '../common/Popover';
 
 const SupervisorManagement = () => {
+  console.log('SupervisorManagement component mounted');
+  console.log('Environment:', import.meta.env.MODE);
+  console.log('API URL:', import.meta.env.VITE_API_URL);
+  
+  const [selectedSupervisor, setSelectedSupervisor] = useState(null); 
   const [editingSupervisor, setEditingSupervisor] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
@@ -20,6 +25,7 @@ const SupervisorManagement = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showCenterDropdown, setShowCenterDropdown] = useState(false);
   
   // Popover states
   const [showErrorPopover, setShowErrorPopover] = useState(false);
@@ -30,7 +36,24 @@ const SupervisorManagement = () => {
   const [showSuccessPopover, setShowSuccessPopover] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
 
-  const { data: supervisors, loading, error: fetchError, refetch } = useGet(`${import.meta.env.VITE_API_URL}/supervisor`);
+  const { data: supervisors, loading, error: fetchError, refetch } = useGet(`/supervisor`);
+  const { data: centers } = useGet('/centers');
+
+  // Add click outside handler
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      const dropdown = document.getElementById('center-dropdown');
+      const button = document.getElementById('center-dropdown-button');
+      if (dropdown && button && !dropdown.contains(event.target) && !button.contains(event.target)) {
+        setShowCenterDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   // Handle click on Add Supervisor button
   const handleAddClick = () => {
@@ -44,8 +67,12 @@ const SupervisorManagement = () => {
       name: supervisor.name || '',
       email: supervisor.email || '',
       phone: supervisor.phone || '',
-      assignedCenters: Array.isArray(supervisor.assignedCenters) ? supervisor.assignedCenters : (supervisor.assignedCenters ? [supervisor.assignedCenters] : [])
-  });
+      password: '',
+      confirmPassword: '',
+      assignedCenters: supervisor.assignedCenters?.map(center => 
+        typeof center === 'object' ? center._id : center
+      ) || []
+    });
     setEditingSupervisor(supervisor);
     setShowFormPopover(true);
   };
@@ -54,6 +81,10 @@ const SupervisorManagement = () => {
     e.preventDefault();
     setIsLoading(true);
     
+    // Add debug logging
+    console.log('API URL:', import.meta.env.VITE_API_URL);
+    console.log('Environment:', import.meta.env.MODE);
+    
     // Validate password length before submitting
     if (!editingSupervisor && formData.password.length < 6) {
       setErrorMessage('Password must be at least 6 characters long');
@@ -61,14 +92,6 @@ const SupervisorManagement = () => {
       setIsLoading(false);
       return;
     }
-
-    // Only check password match if password is being changed
-    // if (formData.password && formData.password !== formData.confirmPassword) {
-    //   setErrorMessage('Passwords do not match');
-    //   setShowErrorPopover(true);
-    //   setIsLoading(false);
-    //   return;
-    // }
 
     try {
       const url = editingSupervisor
@@ -79,15 +102,28 @@ const SupervisorManagement = () => {
       let requestBody = {};
       
       if (editingSupervisor) {
-        if(formData.assignedCenters && Array.isArray(formData.assignedCenters)) {
-          requestBody.assignedCenters = formData.assignedCenters;
+        // For editing, only send changed fields
+        if (formData.name !== editingSupervisor.name) {
+          requestBody.name = formData.name.trim();
         }
+        if (formData.email !== editingSupervisor.email) {
+          requestBody.email = formData.email.trim();
+        }
+        if (formData.phone !== editingSupervisor.phone) {
+          requestBody.phone = formData.phone.trim();
+        }
+        if (formData.password) {
+          requestBody.password = formData.password;
+        }
+        // Always send assignedCenters as it's an array that needs to be compared
+        requestBody.assignedCenters = formData.assignedCenters;
       } else {
         // For new supervisor, include all required fields
         requestBody = {
           name: formData.name.trim(),
           email: formData.email.trim(),
           phone: formData.phone.trim(),
+          password: formData.password,
           assignedCenters: formData.assignedCenters,
         };
       }
@@ -195,6 +231,17 @@ const SupervisorManagement = () => {
     }
   };
 
+  // Handle center selection
+  const handleCenterToggle = (centerId) => {
+    setFormData(prev => {
+      const currentCenters = prev.assignedCenters || [];
+      const newCenters = currentCenters.includes(centerId)
+        ? currentCenters.filter(id => id !== centerId)
+        : [...currentCenters, centerId];
+      return { ...prev, assignedCenters: newCenters };
+    });
+  };
+
   const filteredSupervisors = supervisors?.filter(supervisor => 
     supervisor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     supervisor.email.toLowerCase().includes(searchTerm.toLowerCase())
@@ -212,12 +259,12 @@ const SupervisorManagement = () => {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
         <h1 className="text-3xl font-bold text-primary-700">Supervisor Management</h1>
         <div className="flex gap-2">
-          {/* <button
+          <button
             onClick={handleAddClick}
             className="flex items-center bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
           >
             <FiPlus className="mr-2" /> Add New Supervisor
-          </button> */}
+          </button>
         </div>
       </div>
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-4">
@@ -250,7 +297,8 @@ const SupervisorManagement = () => {
             ) : paginatedSupervisors.length === 0 ? (
               <tr><td colSpan={4} className="text-center py-8 text-gray-500">No supervisors found.</td></tr>
             ) : paginatedSupervisors.map((supervisor) => (
-              <tr key={supervisor._id} className="hover:bg-gray-50">
+              <tr key={supervisor._id} className="hover:bg-gray-50" >
+                 
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white text-lg font-bold">
@@ -361,19 +409,40 @@ const SupervisorManagement = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Assigned Centers</label>
-                    <input
-                      type="text"
-                      value={formData.assignedCenters.join(', ')}
-                      onChange={(e) =>
-                        setFormData(prev => ({
-                          ...prev,
-                          assignedCenters: e.target.value.split(',').map(c => c.trim()).filter(Boolean)
-                        }))
-                      }
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                      placeholder="Enter centers separated by commas"
-                      required={!editingSupervisor}
-                    />
+                    <div className="relative">
+                      <button
+                        id="center-dropdown-button"
+                        type="button"
+                        onClick={() => setShowCenterDropdown(!showCenterDropdown)}
+                        className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      >
+                        {formData.assignedCenters.length > 0
+                          ? `${formData.assignedCenters.length} centers selected`
+                          : 'Select centers'}
+                      </button>
+                      {showCenterDropdown && (
+                        <div
+                          id="center-dropdown"
+                          className="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md border border-gray-300 max-h-60 overflow-y-auto"
+                        >
+                          {centers?.map(center => (
+                            <div
+                              key={center._id}
+                              className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                              onClick={() => handleCenterToggle(center._id)}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={formData.assignedCenters.includes(center._id)}
+                                onChange={() => {}}
+                                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                              />
+                              <span className="ml-2 text-sm text-gray-700">{center.name}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
