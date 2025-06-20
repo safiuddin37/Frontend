@@ -44,7 +44,7 @@ const Navbar = () => {
   const showLogoHalo = location.pathname === '/' && !isScrolled && !isLoginPage;
 
   return (
-    <nav className={`fixed w-full z-50 transition-all duration-300 bg-white shadow-md py-3`}>
+    <nav className={`fixed w-full z-50 transition-all duration-300 bg-white shadow-md py-0.3`}>
       <div className="container-custom">
         <div className="flex items-center justify-between">
           {/* Logo */}

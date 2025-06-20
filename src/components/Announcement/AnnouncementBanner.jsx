@@ -1,16 +1,29 @@
-import { useEffect, useState, useRef } from 'react';
-import { FiX, FiBell } from 'react-icons/fi';
-import { AnimatePresence, motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import './AnnouncementBanner.css';
 
-const BAR_HEIGHT = 40; // Reduced height for compact look
-const SLIDE_INTERVAL = 4000; // ms
+
+const BAR_HEIGHT = 40; // Height of banner
+
+import { useLocation } from 'react-router-dom';
 
 const AnnouncementBanner = () => {
   const [announcements, setAnnouncements] = useState([]);
-  const [current, setCurrent] = useState(0);
-  const [dismissed, setDismissed] = useState(false);
-  const intervalRef = useRef(null);
+  const [navHeight, setNavHeight] = useState(0);
+  const [visible, setVisible] = useState(true);
+  const location = useLocation();
 
+  // Get navbar height for positioning
+  useEffect(() => {
+    const updateNavHeight = () => {
+      const nav = document.querySelector('nav');
+      if (nav) setNavHeight(nav.offsetHeight);
+    };
+    updateNavHeight();
+    window.addEventListener('resize', updateNavHeight);
+    return () => window.removeEventListener('resize', updateNavHeight);
+  }, []);
+
+  // Fetch announcements
   useEffect(() => {
     const fetchAnnouncements = async () => {
       try {
@@ -24,49 +37,39 @@ const AnnouncementBanner = () => {
     fetchAnnouncements();
   }, []);
 
-  // Carousel auto-slide
-  useEffect(() => {
-    if (announcements.length <= 1) return;
-    intervalRef.current = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % announcements.length);
-    }, SLIDE_INTERVAL);
-    return () => clearInterval(intervalRef.current);
-  }, [announcements]);
+  // Do not render on non-home pages
+  if (location.pathname !== '/') return null;
 
-  if (!announcements.length || dismissed) return null;
-  const announcement = announcements[current];
+  // Hide banner after scrolling beyond hero section
+  useEffect(() => {
+    const onScroll = () => {
+      const hero = document.getElementById('hero');
+      const threshold = hero ? hero.offsetHeight : 500;
+      setVisible(window.scrollY < threshold);
+    };
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  if (!visible || !announcements.length) return null; // Hide when not needed
+
+
 
   return (
     <div
       className="fixed left-0 right-0 z-40 shadow-lg flex items-center"
-      style={{ top: 96, height: BAR_HEIGHT, minHeight: BAR_HEIGHT, background: 'linear-gradient(90deg, #2563eb 0%, #1e40af 100%)' }}
+      style={{ top: navHeight, height: BAR_HEIGHT, backgroundColor: '#f97316', overflow: 'hidden' }}
     >
-      <div className="flex items-center h-full pl-3 pr-1">
-        <FiBell className="text-base md:text-lg" />
+      <div className="flex-1 h-full overflow-hidden">
+        <div className="marquee-ltr px-4 text-white whitespace-nowrap">
+          {announcements.map((a, idx) => (
+            <span key={idx} className="mr-8 inline-block">
+              <span className="font-semibold text-white mr-1">{a.title}:</span>
+              <span className="text-white/90">{a.body}</span>
+            </span>
+          ))}
+        </div>
       </div>
-      <div className="flex-1 flex items-center h-full px-1 md:px-3 overflow-x-auto" style={{overflow: 'auto'}}>
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={announcement._id}
-            initial={{ x: 100, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: -100, opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 80, damping: 18 }}
-            className="w-full flex items-center"
-            style={{ minHeight: BAR_HEIGHT, lineHeight: '1.2' }}
-          >
-            <span className="font-bold text-xs md:text-sm mr-2 md:mr-3 whitespace-nowrap" style={{flexShrink: 0}}>{announcement.title}:</span>
-            <span className="text-xs md:text-sm font-normal break-words" style={{wordBreak: 'break-word'}}>{announcement.body}</span>
-          </motion.div>
-        </AnimatePresence>
-      </div>
-      <button
-        onClick={() => setDismissed(true)}
-        className="h-full px-2 md:px-3 text-white/80 hover:text-white text-lg md:text-xl flex items-center"
-        aria-label="Dismiss"
-      >
-        <FiX />
-      </button>
     </div>
   );
 };
