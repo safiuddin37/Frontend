@@ -1,17 +1,22 @@
-import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FiX } from 'react-icons/fi';
+import { useEffect, useState, useRef } from 'react';
+import { FiX, FiBell } from 'react-icons/fi';
+import { AnimatePresence, motion } from 'framer-motion';
+
+const BAR_HEIGHT = 40; // Reduced height for compact look
+const SLIDE_INTERVAL = 4000; // ms
 
 const AnnouncementBanner = () => {
   const [announcements, setAnnouncements] = useState([]);
-  const [dismissedIds, setDismissedIds] = useState([]);
+  const [current, setCurrent] = useState(0);
+  const [dismissed, setDismissed] = useState(false);
+  const intervalRef = useRef(null);
 
   useEffect(() => {
     const fetchAnnouncements = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/announcements`);
+        const res = await fetch(`https://mtc-backend-jn5y.onrender.com/api/announcements`);
         const data = await res.json();
-        if (Array.isArray(data)) setAnnouncements(data);
+        if (Array.isArray(data) && data.length) setAnnouncements(data);
       } catch (err) {
         console.error('Failed to load announcements', err);
       }
@@ -19,34 +24,49 @@ const AnnouncementBanner = () => {
     fetchAnnouncements();
   }, []);
 
-  const visible = announcements.filter(a => !dismissedIds.includes(a._id));
+  // Carousel auto-slide
+  useEffect(() => {
+    if (announcements.length <= 1) return;
+    intervalRef.current = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % announcements.length);
+    }, SLIDE_INTERVAL);
+    return () => clearInterval(intervalRef.current);
+  }, [announcements]);
 
-  const handleDismiss = (id) => {
-    setDismissedIds(prev => [...prev, id]);
-  };
+  if (!announcements.length || dismissed) return null;
+  const announcement = announcements[current];
 
   return (
-    <div className="fixed top-0 inset-x-0 z-50">
-      <AnimatePresence>
-        {visible.map((a) => (
+    <div
+      className="fixed left-0 right-0 z-40 shadow-lg flex items-center"
+      style={{ top: 96, height: BAR_HEIGHT, minHeight: BAR_HEIGHT, background: 'linear-gradient(90deg, #2563eb 0%, #1e40af 100%)' }}
+    >
+      <div className="flex items-center h-full pl-3 pr-1">
+        <FiBell className="text-base md:text-lg" />
+      </div>
+      <div className="flex-1 flex items-center h-full px-1 md:px-3 overflow-x-auto" style={{overflow: 'auto'}}>
+        <AnimatePresence mode="wait">
           <motion.div
-            key={a._id}
-            initial={{ y: -50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -50, opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-            className="bg-primary-600 text-white px-4 py-3 flex items-start justify-between shadow-lg"
+            key={announcement._id}
+            initial={{ x: 100, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -100, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 80, damping: 18 }}
+            className="w-full flex items-center"
+            style={{ minHeight: BAR_HEIGHT, lineHeight: '1.2' }}
           >
-            <div>
-              <p className="font-semibold">{a.title}</p>
-              <p className="text-sm leading-snug">{a.body}</p>
-            </div>
-            <button onClick={() => handleDismiss(a._id)} className="ml-4 mt-1 text-white opacity-75 hover:opacity-100">
-              <FiX />
-            </button>
+            <span className="font-bold text-xs md:text-sm mr-2 md:mr-3 whitespace-nowrap" style={{flexShrink: 0}}>{announcement.title}:</span>
+            <span className="text-xs md:text-sm font-normal break-words" style={{wordBreak: 'break-word'}}>{announcement.body}</span>
           </motion.div>
-        ))}
-      </AnimatePresence>
+        </AnimatePresence>
+      </div>
+      <button
+        onClick={() => setDismissed(true)}
+        className="h-full px-2 md:px-3 text-white/80 hover:text-white text-lg md:text-xl flex items-center"
+        aria-label="Dismiss"
+      >
+        <FiX />
+      </button>
     </div>
   );
 };

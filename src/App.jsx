@@ -15,6 +15,7 @@ import AdminGuestPage from './pages/AdminGuestPage'
 import GuestLoginPage from './pages/GuestLoginPage'
 import GuestDashboard from './pages/GuestDashboard'
 import { CenterRefetchProvider } from './context/CenterRefetchContext';
+import AnnouncementBanner from './components/Announcement/AnnouncementBanner';
 
 // Protected Route Component
 const ProtectedRoute = ({ children, role }) => {
@@ -53,6 +54,7 @@ function App() {
     <CenterRefetchProvider>
     <div className="flex flex-col min-h-screen">
       <Navbar />
+      <AnnouncementBanner />
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<HomePage />} />
