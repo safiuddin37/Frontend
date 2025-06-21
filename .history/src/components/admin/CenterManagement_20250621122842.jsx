@@ -284,7 +284,7 @@ const CenterManagement = () => {
       'Supervisor Email': comment.supervisor?.email || 'N/A',
       'Rating': comment.rating,
       'Comment': comment.text,
-      'Date':new Intl.DateTimeFormat('en-GB').format(new Date(comment.createdAt))
+      'Date':new Date(comment.createdAt).toISOString().split('T')[0]
     }));
     console.log(csvData);
     // Convert to CSV
