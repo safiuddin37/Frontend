@@ -34,7 +34,7 @@ const Popover = ({ isOpen, onClose, title, message, type = 'success' }) => {
 
 const Overview = () => {
   // State for clearing activity
-  // const [clearingActivity, setClearingActivity] = useState(false);
+  const [clearingActivity, setClearingActivity] = useState(false);
   const [showPopover, setShowPopover] = useState(false);
   const [popoverMessage, setPopoverMessage] = useState('');
   
@@ -236,13 +236,13 @@ const Overview = () => {
       <div className="bg-white rounded-lg shadow-md p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold">Recent Activity</h2>
-          {/* <button
+          <button
             onClick={handleClearActivity}
             disabled={clearingActivity}
             className={`px-3 py-1 rounded text-sm ${clearingActivity ? 'bg-gray-300 cursor-not-allowed' : 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200'} transition-colors duration-200`}
           >
             {clearingActivity ? 'Clearing...' : 'Clear Activity'}
-          </button> */}
+          </button>
         </div>
         <div className="space-y-4">
           {attendanceLoading ? (

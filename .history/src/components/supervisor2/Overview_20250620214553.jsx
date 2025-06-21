@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FiUsers, FiMapPin, FiX, FiMessageSquare, FiStar } from 'react-icons/fi';
+import { FiUsers, FiMapPin, FiX, FiMessageSquare } from 'react-icons/fi';
 import useGet from '../CustomHooks/useGet';
 import { AnimatePresence, motion } from 'framer-motion';
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
@@ -22,8 +22,6 @@ const Overview = () => {
   const [commentText, setCommentText] = useState('');
   const [showConfirmation, setShowConfirmation] = useState(null);
   const [toast, setToast] = useState({ visible: false, message: '' });
-  const [rating, setRating] = useState(0);
-  const [hoverRating, setHoverRating] = useState(0);
 
   if (centersLoading || tutorsLoading || studentsLoading) {
     return (
@@ -253,31 +251,6 @@ const Overview = () => {
               </div>
 
               <div className="p-6">
-                {/* Star Rating UI */}
-                <div className="flex items-center mb-4">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      className="focus:outline-none"
-                      onMouseEnter={() => setHoverRating(star)}
-                      onMouseLeave={() => setHoverRating(0)}
-                      onClick={() => setRating(star)}
-                      aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
-                    >
-                      <FiStar
-                        size={32}
-                        className={
-                          (hoverRating || rating) >= star
-                            ? 'text-yellow-400 fill-yellow-400'
-                            : 'text-gray-300'
-                        }
-                        fill={(hoverRating || rating) >= star ? '#facc15' : 'none'}
-                      />
-                    </button>
-                  ))}
-                  <span className="ml-2 text-sm text-gray-600">{rating ? `${rating} / 5` : 'No rating'}</span>
-                </div>
                 <textarea
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
@@ -347,8 +320,8 @@ const Overview = () => {
                               'Authorization': `Bearer ${JSON.parse(localStorage.getItem('userData')).token}`
                             },
                             body: JSON.stringify({
-                              comment: commentText,
-                              rating: rating
+                              centerId: showCommentModal._id,
+                              comment: commentText
                             })
                           }
                         );
@@ -369,7 +342,6 @@ const Overview = () => {
                     setShowCommentModal(null);
                     setShowConfirmation(null);
                     setCommentText('');
-                    setRating(0);
                   }}
                   className={`px-4 py-2 rounded-lg transition-colors ${
                     showConfirmation === 'discard'

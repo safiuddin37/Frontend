@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiEdit2, FiTrash2, FiX, FiMapPin, FiAlertTriangle, FiFilter } from 'react-icons/fi';
+import { FiEdit2, FiTrash2, FiX, FiMapPin, FiAlertTriangle, FiFilter, FiUsers, FiMessageSquare, FiStar, FiDownload } from 'react-icons/fi';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import useGet from '../CustomHooks/useGet';
 import { reverseGeocode } from './utils/reverseGeocode';
 import { toast } from 'react-hot-toast';
 import { useCenterRefetch } from '../../context/CenterRefetchContext';
+import Papa from 'papaparse';
 
 // Fix for default marker icon
 delete L.Icon.Default.prototype._getIconUrl;
@@ -59,6 +60,7 @@ const CenterManagement = () => {
 
   // Get centers data with our fixed useGet hook
   const { response: centers, error, loading, refetch } = useGet("/Centers");
+  const { response: comments, loading: commentsLoading } = useGet("/centers/comments");
   const refetchContext = useCenterRefetch();
 
   useEffect(() => {
@@ -268,18 +270,62 @@ const CenterManagement = () => {
     }));
   };
 
+  const downloadCommentsReport = () => {
+    if (!comments || comments.length === 0) {
+      toast.error('No comments data available to download');
+      return;
+    }
+
+    // Prepare data for CSV
+    const csvData = comments.map(comment => ({
+      'Center Name': comment.center?.name || 'N/A',
+      'Center Area': comment.center?.area || 'N/A',
+      'Supervisor Name': comment.supervisor?.name || 'N/A',
+      'Supervisor Email': comment.supervisor?.email || 'N/A',
+      'Rating': comment.rating,
+      'Comment': comment.text,
+      'Date':new Date(comment.createdAt).toISOString().split('T')[0]
+    }));
+    console.log(csvData);
+    // Convert to CSV
+    const csv = Papa.unparse(csvData);
+    
+    // Create and download file
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `center_comments_report_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast.success('Comments report downloaded successfully!');
+  };
+
   return (
     <div className="space-y-6 p-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
           Center Management
         </h1>
-        <button
-          onClick={() => setShowForm(true)}
-          className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-md hover:shadow-lg"
-        >
-          Add New Center
-        </button>
+        <div className="flex space-x-4">
+          <button
+            onClick={downloadCommentsReport}
+            disabled={commentsLoading || !comments || comments.length === 0}
+            className="px-4 py-2 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-lg hover:from-green-700 hover:to-green-600 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+          >
+            <FiDownload className="mr-2" />
+            Download Centers Report
+          </button>
+          <button
+            onClick={() => setShowForm(true)}
+            className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-md hover:shadow-lg"
+          >
+            Add New Center
+          </button>
+        </div>
       </div>
 
       {/* Form Modal */}
@@ -677,6 +723,70 @@ const CenterManagement = () => {
                     <p className="font-medium">{showDetails.students?.length || 0}</p>
                   </div>
                 </div>
+
+                {/* Ratings Section */}
+                {comments && comments.length > 0 && (
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <p className="text-sm text-gray-500 mb-3">Supervisor Ratings</p>
+                    {(() => {
+                      console.log('All comments:', comments);
+                      console.log('Current center ID:', showDetails._id);
+                      
+                      const centerComments = comments.filter(comment => {
+                        console.log('Comment center ID:', comment.center?._id || comment.center);
+                        return comment.center?._id === showDetails._id || comment.center === showDetails._id;
+                      });
+                      
+                      console.log('Filtered center comments:', centerComments);
+                      
+                      if (centerComments.length === 0) {
+                        return <p className="text-sm text-gray-500">No ratings available for this center.</p>;
+                      }
+                      
+                      const latestRatings = centerComments.reduce((acc, comment) => {
+                        const existingIndex = acc.findIndex(item => 
+                          item.supervisor?._id === comment.supervisor?._id || 
+                          item.supervisor === comment.supervisor
+                        );
+                        if (existingIndex === -1) {
+                          acc.push(comment);
+                        } else if (new Date(comment.createdAt) > new Date(acc[existingIndex].createdAt)) {
+                          acc[existingIndex] = comment;
+                        }
+                        return acc;
+                      }, []);
+                      
+                      console.log('Latest ratings:', latestRatings);
+                      
+                      return (
+                        <div className="space-y-2">
+                          {latestRatings.map((comment, index) => (
+                            <div key={index} className="flex justify-between items-center py-2 border-b border-gray-200 last:border-b-0">
+                              <span className="text-sm font-medium text-gray-900">
+                                {comment.supervisor?.name || comment.supervisor || 'Unknown Supervisor'}
+                              </span>
+                              <div className="flex items-center">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                  <FiStar
+                                    key={star}
+                                    size={16}
+                                    className={
+                                      star <= comment.rating
+                                        ? 'text-yellow-400 fill-yellow-400'
+                                        : 'text-gray-300'
+                                    }
+                                    fill={star <= comment.rating ? '#facc15' : 'none'}
+                                  />
+                                ))}
+                                
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      );
+                    })()}
+                  </div>
+                )}
 
                 {showDetails.coordinates && (
                   <div className="bg-gray-50 p-4 rounded-lg">

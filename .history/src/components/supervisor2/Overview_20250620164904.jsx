@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FiUsers, FiMapPin, FiX, FiMessageSquare, FiStar } from 'react-icons/fi';
+import { FiUsers, FiMapPin, FiX, FiMessageSquare } from 'react-icons/fi';
 import useGet from '../CustomHooks/useGet';
 import { AnimatePresence, motion } from 'framer-motion';
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
@@ -21,9 +21,6 @@ const Overview = () => {
   const [showCommentModal, setShowCommentModal] = useState(null);
   const [commentText, setCommentText] = useState('');
   const [showConfirmation, setShowConfirmation] = useState(null);
-  const [toast, setToast] = useState({ visible: false, message: '' });
-  const [rating, setRating] = useState(0);
-  const [hoverRating, setHoverRating] = useState(0);
 
   if (centersLoading || tutorsLoading || studentsLoading) {
     return (
@@ -253,31 +250,6 @@ const Overview = () => {
               </div>
 
               <div className="p-6">
-                {/* Star Rating UI */}
-                <div className="flex items-center mb-4">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      className="focus:outline-none"
-                      onMouseEnter={() => setHoverRating(star)}
-                      onMouseLeave={() => setHoverRating(0)}
-                      onClick={() => setRating(star)}
-                      aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
-                    >
-                      <FiStar
-                        size={32}
-                        className={
-                          (hoverRating || rating) >= star
-                            ? 'text-yellow-400 fill-yellow-400'
-                            : 'text-gray-300'
-                        }
-                        fill={(hoverRating || rating) >= star ? '#facc15' : 'none'}
-                      />
-                    </button>
-                  ))}
-                  <span className="ml-2 text-sm text-gray-600">{rating ? `${rating} / 5` : 'No rating'}</span>
-                </div>
                 <textarea
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
@@ -338,30 +310,46 @@ const Overview = () => {
                   onClick={async () => {
                     if (showConfirmation === 'submit') {
                       try {
-                        const response = await fetch(
-                          `${import.meta.env.VITE_API_URL}/centers/comment/${showCommentModal._id}`,
+                        console.log('Submitting comment:', {
+                          centerId: showCommentModal._id,
+                          comment: commentText,
+                          apiUrl: `${import.meta.env.VITE_API_URL}/centers/comment`
+                        });
+                        
+                        // const response = await axios.post(
+                        //   `${import.meta.env.VITE_API_URL}/centers/comment`,
+                        //   {
+                        //     centerId: showCommentModal._id,
+                        //     comment: commentText
+                        //   },
+                        //   {
+                        //     headers: {
+                        //       'Authorization': `Bearer ${JSON.parse(localStorage.getItem('userData')).token}`
+                        //     }
+                        //   }
+                        // );
+
+                        const response=await fetch(
+                          `${import.meta.env.VITE_API_URL}/centers/comment`,
                           {
                             method: 'POST',
                             headers: {
-                              'Content-Type': 'application/json',
-                              'Authorization': `Bearer ${JSON.parse(localStorage.getItem('userData')).token}`
-                            },
-                            body: JSON.stringify({
-                              comment: commentText,
-                              rating: rating
-                            })
-                          }
-                        );
-                        const data = await response.json();
-                        if (response.ok) {
-                          setToast({ visible: true, message: 'Comment added successfully!' });
-                          setTimeout(() => setToast({ visible: false, message: '' }), 2000);
+                              'Content-Type': 'application/json', 
+                        )
+
+                        console.log('Comment submission response:', response.data);
+                        
+                        if (response.data.success) {
+                          // Refresh the centers data
+                          window.location.reload();
                         } else {
-                          throw new Error(data.message || 'Failed to submit comment');
+                          throw new Error(response.data.message || 'Failed to submit comment');
                         }
                       } catch (error) {
+                        console.error('Error submitting comment:', error.response || error);
                         alert(
-                          error.message ||
+                          error.response?.data?.message || 
+                          error.message || 
                           'Failed to submit comment. Please try again.'
                         );
                       }
@@ -369,7 +357,6 @@ const Overview = () => {
                     setShowCommentModal(null);
                     setShowConfirmation(null);
                     setCommentText('');
-                    setRating(0);
                   }}
                   className={`px-4 py-2 rounded-lg transition-colors ${
                     showConfirmation === 'discard'
@@ -506,15 +493,8 @@ const Overview = () => {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Toast Notification */}
-      {toast.visible && (
-        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded shadow z-50 text-sm opacity-90 pointer-events-none select-none transition-all">
-          {toast.message}
-        </div>
-      )}
     </div>
   );
 };
 
-export default Overview;
+export default Overview; 
