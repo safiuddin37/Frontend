@@ -257,8 +257,7 @@ const TutorManagement = () => {
       // Password validation
       if ('password' in updatedData && updatedData.password && !isValidPassword(updatedData.password)) {
         setErrorMessage(
-            'Password must be at least 8 characters, contain no spaces, and not include quotes (" or \').'
-          );
+          'Password must be at least 8 characters, contain no spaces, and not include quotes (\" or \\'').');
         setShowErrorPopover(true);
         setIsSubmitting(false);
         return;
