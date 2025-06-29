@@ -191,7 +191,7 @@ const TutorOverview = () => {
             ) : centerStudents}
           </div>
           <div className="text-sm font-medium tracking-wide opacity-90">Center Students</div>
-        </div>
+        </div>cle
 
         {/* Time Card */}
         <div className="rounded-xl shadow-lg bg-gradient-to-tr from-blue-600 to-blue-400 text-white p-4 flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-blue-500/20">
@@ -301,7 +301,7 @@ const TutorOverview = () => {
                 />
                 <Circle
                   center={[centerLocation.lat, centerLocation.lng]}
-                  radius={100}
+                  radius={1300}
                   pathOptions={{ color: '#4F46E5', fillColor: '#4F46E5', fillOpacity: 0.1 }}
                 />
               </MapContainer>

@@ -301,7 +301,7 @@ const TutorOverview = () => {
                 />
                 <Circle
                   center={[centerLocation.lat, centerLocation.lng]}
-                  radius={100}
+                  radius={1300}
                   pathOptions={{ color: '#4F46E5', fillColor: '#4F46E5', fillOpacity: 0.1 }}
                 />
               </MapContainer>
