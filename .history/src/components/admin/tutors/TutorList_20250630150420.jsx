@@ -117,7 +117,7 @@ const TutorList = ({ onEdit, onDelete, onProfile }) => {
         return;
       }
 
-      const apiUrl = `${import.meta.env.VITE_API_URL}/tutors/${tutorId}`;
+      const apiUrl = `${import.meta.env.VITE_API_URL}/api/tutors/${tutorId}`;
       const response = await fetch(apiUrl, {
         method: 'DELETE',
         headers: {

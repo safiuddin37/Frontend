@@ -210,7 +210,7 @@ const Overview = () => {
       </div>
     );
   }
-  console.log(recentAttendance)
+  console.log(localAttendance)
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Dashboard Overview</h1>
