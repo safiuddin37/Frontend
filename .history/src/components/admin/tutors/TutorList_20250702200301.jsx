@@ -392,7 +392,7 @@ const TutorList = ({ onEdit, onDelete, onProfile }) => {
                       </button>
                     </div>
                   </td>
-                  <button onClick={statusaction} style={{ padding: '14px 16px', color: tutor.status ==="inactive"?"red":"green"}}>{tutor.status==="inactive"?"Inactive":"Active"}</button>
+                  <button onClick={statusaction} style={{ padding: '14px 16px', color: tutor.status ==="inactive"?"red":"green"}}>{tutor.status==="inactive"?"Inactive":"Active"}</butt>
                 </tr>
               ))
             )}

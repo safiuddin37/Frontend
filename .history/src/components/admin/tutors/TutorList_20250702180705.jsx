@@ -98,7 +98,7 @@ const TutorList = ({ onEdit, onDelete, onProfile }) => {
   };
 
   const statusaction = (e) => {
-    console.log(e);
+    console
   }
   
   // Handle delete tutor after confirmation
@@ -392,7 +392,7 @@ const TutorList = ({ onEdit, onDelete, onProfile }) => {
                       </button>
                     </div>
                   </td>
-                  <button onClick={statusaction} style={{ padding: '14px 16px', color: tutor.status ==="inactive"?"red":"green"}}>{tutor.status==="inactive"?"Inactive":"Active"}</button>
+                  <td onClick={statusaction} style={{ padding: '14px 16px', color: tutor.status ==="inactive"?"red":"green"}}>{tutor.status==="inactive"?"Inactive":"Active"}</td>
                 </tr>
               ))
             )}

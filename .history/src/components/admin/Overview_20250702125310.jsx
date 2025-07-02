@@ -54,7 +54,7 @@ const Overview = () => {
     return centers.filter(center => center.status === 'active');
   }, [centers]);
   // Fetch recent attendance directly from Attendance collection
-  const { response: recentAttendance, loading: attendanceLoading, refetch: refetchAttendance } = useGet('/attendance/today');
+  const { response: recentAttendance, loading: attendanceLoading, refetch: refetchAttendance } = useGet('/attendance/to');
   
   // Local state to manage attendance display
   const [localAttendance, setLocalAttendance] = useState([]);
