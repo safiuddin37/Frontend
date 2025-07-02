@@ -97,9 +97,7 @@ const TutorList = ({ onEdit, onDelete, onProfile }) => {
     setShowDeletePopover(true);
   };
 
-  const statusaction = (e) => {
-    console.log(e);
-  }
+  statusaction = (e) => {}
   
   // Handle delete tutor after confirmation
   const handleDeleteTutor = async () => {
@@ -392,7 +390,7 @@ const TutorList = ({ onEdit, onDelete, onProfile }) => {
                       </button>
                     </div>
                   </td>
-                  <button onClick={statusaction} style={{ padding: '14px 16px', color: tutor.status ==="inactive"?"red":"green"}}>{tutor.status==="inactive"?"Inactive":"Active"}</button>
+                  <td onClick={statusaction} style={{ padding: '14px 16px', color: tutor.status ==="inactive"?"red":"green"}}>{tutor.status==="inactive"?"Inactive":"Active"}</td>
                 </tr>
               ))
             )}

@@ -54,7 +54,7 @@ const Overview = () => {
     return centers.filter(center => center.status === 'active');
   }, [centers]);
   // Fetch recent attendance directly from Attendance collection
-  const { response: recentAttendance, loading: attendanceLoading, refetch: refetchAttendance } = useGet('/attendance/today');
+  const { response: recentAttendance, loading: attendanceLoading, refetch: refetchAttendance } = useGet('/attendance/recent');
   
   // Local state to manage attendance display
   const [localAttendance, setLocalAttendance] = useState([]);
@@ -210,7 +210,7 @@ const Overview = () => {
       </div>
     );
   }
-  console.log(recentAttendance)
+  console.log(localAttendance)
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Dashboard Overview</h1>
@@ -252,7 +252,7 @@ const Overview = () => {
           {attendanceLoading ? (
             <p>Loading recent activity...</p>
           ) : localAttendance && localAttendance.length > 0 ? (
-            localAttendance.slice(0, localAttendance.length).map((record, index) => (
+            localAttendance.slice(0, 5).map((record, index) => (
               <motion.div
                 key={record._id}
                 initial={{ opacity: 0, x: -20 }}

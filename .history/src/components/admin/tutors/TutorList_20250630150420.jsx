@@ -96,10 +96,6 @@ const TutorList = ({ onEdit, onDelete, onProfile }) => {
     setTutorToDelete(tutor);
     setShowDeletePopover(true);
   };
-
-  const statusaction = (e) => {
-    console.log(e);
-  }
   
   // Handle delete tutor after confirmation
   const handleDeleteTutor = async () => {
@@ -121,7 +117,7 @@ const TutorList = ({ onEdit, onDelete, onProfile }) => {
         return;
       }
 
-      const apiUrl = `${import.meta.env.VITE_API_URL}/tutors/${tutorId}`;
+      const apiUrl = `${import.meta.env.VITE_API_URL}/api/tutors/${tutorId}`;
       const response = await fetch(apiUrl, {
         method: 'DELETE',
         headers: {
@@ -392,7 +388,7 @@ const TutorList = ({ onEdit, onDelete, onProfile }) => {
                       </button>
                     </div>
                   </td>
-                  <button onClick={statusaction} style={{ padding: '14px 16px', color: tutor.status ==="inactive"?"red":"green"}}>{tutor.status==="inactive"?"Inactive":"Active"}</button>
+                  <td style={{ padding: '14px 16px', color: tutor.status ==="inactive"?"red":"green"}}>{tutor.status==="inactive"?"Inactive":"Active"}</td>
                 </tr>
               ))
             )}
