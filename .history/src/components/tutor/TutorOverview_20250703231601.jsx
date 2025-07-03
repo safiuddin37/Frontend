@@ -43,13 +43,7 @@ const LocationMarker = ({ onLocationUpdate, onError }) => {
       return;
     }
 
-    const handleSuccess = ({ latitude, longitude, accuracy }) => {
-      if (accuracy > 50) {
-        onError('Low location accuracy. Try moving to an open area.');
-        setLocating(false);
-        return;
-      }
-      const latlng = { lat: latitude, lng: longitude };
+    const handleSuccess = (latlng) => {
       onError(null);
       setPosition(latlng);
       map.flyTo(latlng, map.getZoom());
@@ -67,24 +61,13 @@ const LocationMarker = ({ onLocationUpdate, onError }) => {
     };
 
     navigator.geolocation.getCurrentPosition(
-      pos => handleSuccess({
-        latitude: pos.coords.latitude,
-        longitude: pos.coords.longitude,
-        accuracy: pos.coords.accuracy
-      }),
+      pos => handleSuccess({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
       handleError,
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      { enableHighAccuracy: true, timeout: 10000 }
     );
 
     map.locate({ enableHighAccuracy: true, timeout: 5000 })
-      .on('locationfound', e => {
-        if (e.accuracy > 50) {
-          onError('Low map accuracy. Try again in open space.');
-          setLocating(false);
-          return;
-        }
-        handleSuccess({ latitude: e.latitude, longitude: e.longitude, accuracy: e.accuracy });
-      })
+      .on('locationfound', e => handleSuccess(e.latlng))
       .on('locationerror', handleError);
   }, [map]);
 
