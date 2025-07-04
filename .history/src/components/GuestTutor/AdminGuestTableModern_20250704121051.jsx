@@ -97,7 +97,7 @@ const AdminGuestTableModern = () => {
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-console.log(paginated)
+
   const approveRequest = async id => {
     setProcessingId(id);
     try {
@@ -119,7 +119,7 @@ console.log(paginated)
       setProcessingId(null);
     }
   };
-  
+
   return (
     <div className="p-6 space-y-4 flex flex-col h-full">
       <h2 className="text-2xl font-bold text-gray-800">Guest Tutor Requests</h2>
@@ -202,7 +202,7 @@ console.log(paginated)
                 >
                   <td className="px-4 py-3 font-medium text-gray-900">{req.guest.name}</td>
                   <td className="px-4 py-3 text-gray-800">{req.guest.qualification}</td>
-                  <td className="px-4 py-3 text-gray-800">{req.tutor?.name}</td>
+                  <td className="px-4 py-3 text-gray-800">{req.tutor.name}</td>
                   <td className="px-4 py-3 text-gray-800">{req.tutor?.assignedCenter?.name || '-'}</td>
                   <td className="px-4 py-3">
                     <span
@@ -303,7 +303,7 @@ console.log(paginated)
             <h3 className="text-xl font-semibold mb-3">{selected.guest.name}</h3>
             <div className="text-sm space-y-1">
               <p>
-                <strong>Center:</strong> {selected.tutor?.assignedCenter?.name || '-'}
+                <strong>Center:</strong> {selected.tutor?.assignedCenter?.name? || '-'}
               </p>
               <p>
                 <strong>Guest Phone:</strong> {selected.guest.phone}

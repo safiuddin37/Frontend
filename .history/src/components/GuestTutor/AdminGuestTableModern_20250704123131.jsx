@@ -97,7 +97,7 @@ const AdminGuestTableModern = () => {
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-console.log(paginated)
+
   const approveRequest = async id => {
     setProcessingId(id);
     try {
@@ -119,7 +119,7 @@ console.log(paginated)
       setProcessingId(null);
     }
   };
-  
+
   return (
     <div className="p-6 space-y-4 flex flex-col h-full">
       <h2 className="text-2xl font-bold text-gray-800">Guest Tutor Requests</h2>
@@ -200,9 +200,9 @@ console.log(paginated)
                   className="border-b hover:bg-indigo-50 transition cursor-pointer"
                   onClick={() => setSelected(req)}
                 >
-                  <td className="px-4 py-3 font-medium text-gray-900">{req.guest.name}</td>
+                  <td className="px-4 py-3 font-medium text-gray-900">{}</td>
                   <td className="px-4 py-3 text-gray-800">{req.guest.qualification}</td>
-                  <td className="px-4 py-3 text-gray-800">{req.tutor?.name}</td>
+                  <td className="px-4 py-3 text-gray-800">{}</td>
                   <td className="px-4 py-3 text-gray-800">{req.tutor?.assignedCenter?.name || '-'}</td>
                   <td className="px-4 py-3">
                     <span

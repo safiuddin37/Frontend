@@ -202,7 +202,7 @@ console.log(paginated)
                 >
                   <td className="px-4 py-3 font-medium text-gray-900">{req.guest.name}</td>
                   <td className="px-4 py-3 text-gray-800">{req.guest.qualification}</td>
-                  <td className="px-4 py-3 text-gray-800">{req.tutor?.name}</td>
+                  <td className="px-4 py-3 text-gray-800">{req.tutor.name}</td>
                   <td className="px-4 py-3 text-gray-800">{req.tutor?.assignedCenter?.name || '-'}</td>
                   <td className="px-4 py-3">
                     <span

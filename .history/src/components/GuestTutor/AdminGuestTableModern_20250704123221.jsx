@@ -97,7 +97,7 @@ const AdminGuestTableModern = () => {
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-console.log(paginated)
+
   const approveRequest = async id => {
     setProcessingId(id);
     try {
@@ -202,7 +202,7 @@ console.log(paginated)
                 >
                   <td className="px-4 py-3 font-medium text-gray-900">{req.guest.name}</td>
                   <td className="px-4 py-3 text-gray-800">{req.guest.qualification}</td>
-                  <td className="px-4 py-3 text-gray-800">{req.tutor?.name}</td>
+                  <td className="px-4 py-3 text-gray-800">{req.tutor.name}</td>
                   <td className="px-4 py-3 text-gray-800">{req.tutor?.assignedCenter?.name || '-'}</td>
                   <td className="px-4 py-3">
                     <span
