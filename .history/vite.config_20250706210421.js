@@ -14,7 +14,7 @@ export default defineConfig({
       includeAssets: ['favicon-logo.png'],
       manifest: {
         name: 'Mohalla Tuition Center',
-        short_name: 'MTC',
+        short_name: 'Mohalla MTC',
         description: 'Mohalla Tuition Centers by The Quran Foundation - Transforming the lives of marginalized communities through education and empowerment.',
         theme_color: '#2563eb',
         background_color: '#ffffff',
