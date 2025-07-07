@@ -44,7 +44,7 @@ const LocationMarker = ({ onLocationUpdate, onError }) => {
     }
 
     const handleSuccess = ({ latitude, longitude, accuracy }) => {
-      if (accuracy > 150) {
+      if (accuracy > 1) {
         onError('Low location accuracy. Try moving to an open area.');
         setLocating(false);
         return;
