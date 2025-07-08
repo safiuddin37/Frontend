@@ -44,7 +44,7 @@ const LocationMarker = ({ onLocationUpdate, onError }) => {
     }
 
     const handleSuccess = ({ latitude, longitude, accuracy }) => {
-      if (accuracy > 500) {
+      if (accuracy > 50) {
         onError('Low location accuracy. Try moving to an open area.');
         setLocating(false);
         return;
@@ -78,7 +78,7 @@ const LocationMarker = ({ onLocationUpdate, onError }) => {
 
     map.locate({ enableHighAccuracy: true, timeout: 5000 })
       .on('locationfound', e => {
-        if (e.accuracy > 500) {
+        if (e.accuracy > 150) {
           onError('Low map accuracy. Try again in open space.');
           setLocating(false);
           return;
