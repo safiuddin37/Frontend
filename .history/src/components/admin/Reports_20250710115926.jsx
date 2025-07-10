@@ -21,7 +21,7 @@ const Reports = () => {
   useEffect(() => {
     const fetchCenters = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/centers`, {
+wtf        const response = await fetch('https://mtc-backend-jn5y.onrender.com/api/centers', {
           headers: {
             'Authorization': `Bearer ${JSON.parse(localStorage.getItem('userData')).token}`
           }
@@ -49,7 +49,7 @@ const Reports = () => {
         const centerId = selectedCenter || ''
         
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/attendance/report?month=${month}&year=${year}&centerId=${centerId}`,
+          `https://mtc-backend-jn5y.onrender.com/api/attendance/report?month=${month}&year=${year}&centerId=${centerId}`,
           {
             headers: {
               'Authorization': `Bearer ${JSON.parse(localStorage.getItem('userData')).token}`
@@ -166,7 +166,7 @@ const Reports = () => {
 
   const handleMarkAttendance = async (tutorId, date, status) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/attendance/mark`, {
+      const response = await fetch('https://mtc-backend-jn5y.onrender.com/api/attendance/mark', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -191,7 +191,7 @@ const Reports = () => {
       const centerId = selectedCenter || ''
       
       const attendanceResponse = await fetch(
-        `${import.meta.env.VITE_API_URL}/attendance/report?month=${month}&year=${year}&centerId=${centerId}`,
+        `https://mtc-backend-jn5y.onrender.com/api/attendance/report?month=${month}&year=${year}&centerId=${centerId}`,
         {
           headers: {
             'Authorization': `Bearer ${JSON.parse(localStorage.getItem('userData')).token}`

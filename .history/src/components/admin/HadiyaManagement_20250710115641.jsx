@@ -19,7 +19,7 @@ const fetchHadiyaReportAPI = async (params) => {
 // API function to record a hadiya payment
 const recordHadiyaPaymentAPI = async (paymentData) => {
   try {
-    return await authFetch(`${import.meta.env.VITE_API_URL}/hadiya/record`, {
+    return await authFetch(`${import.meta.env.VITE_API_URL}/api/hadiya/record`, {
       method: 'POST',
       body: JSON.stringify(paymentData),
     });
