@@ -380,11 +380,7 @@ const SupervisorManagement = () => {
                     <input
                       type="text"
                       value={formData.name}
-                      onChange={e => {
-                        const value = e.target.value.replace(/[^a-zA-Z ]/g, '').slice(0, 20);
-                        setFormData(prev => ({ ...prev, name: value }));
-                      }}
-                      maxLength={20}
+                      onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                       required={!editingSupervisor}
                     />
@@ -394,21 +390,9 @@ const SupervisorManagement = () => {
                     <input
                       type="email"
                       value={formData.email}
-                      onChange={e => {
-                        let value = e.target.value.replace(/[^a-zA-Z0-9@._]/g, '').slice(0, 30);
-                        // Enforce domain part (after @) max 15 chars
-                        const atIdx = value.indexOf('@');
-                        if (atIdx !== -1) {
-                          const before = value.slice(0, atIdx + 1);
-                          let after = value.slice(atIdx + 1, atIdx + 16); // max 15 chars after @
-                          value = before + after;
-                        }
-                        setFormData(prev => ({ ...prev, email: value }));
-                      }}
-                      maxLength={30}
+                      onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                       required={!editingSupervisor}
-                      autoComplete="email"
                     />
                   </div>
                   <div>
@@ -416,11 +400,7 @@ const SupervisorManagement = () => {
                     <input
                       type="tel"
                       value={formData.phone}
-                      onChange={e => {
-                        const value = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
-                        setFormData(prev => ({ ...prev, phone: value }));
-                      }}
-                      maxLength={10}
+                      onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                       pattern="[0-9]{10}"
                       placeholder="Enter 10-digit phone number"
@@ -472,11 +452,7 @@ const SupervisorManagement = () => {
                       <input
                         type={showPassword ? "text" : "password"}
                         value={formData.password}
-                        onChange={e => {
-                          const value = e.target.value.slice(0, 15);
-                          setFormData(prev => ({ ...prev, password: value }));
-                        }}
-                        maxLength={15}
+                        onChange={handlePasswordChange}
                         className="mt-1 block w-full rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 pr-10 border-gray-300"
                         required={!editingSupervisor}
                         minLength={6}
@@ -498,11 +474,7 @@ const SupervisorManagement = () => {
                       <input
                         type={showConfirmPassword ? "text" : "password"}
                         value={formData.confirmPassword}
-                        onChange={e => {
-                          const value = e.target.value.slice(0, 15);
-                          setFormData(prev => ({ ...prev, confirmPassword: value }));
-                        }}
-                        maxLength={15}
+                        onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
                         className="mt-1 block w-full rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 pr-10 border-gray-300"
                         required={!editingSupervisor}
                         minLength={6}

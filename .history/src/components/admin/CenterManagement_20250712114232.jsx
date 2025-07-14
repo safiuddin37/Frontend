@@ -677,22 +677,20 @@ const CenterManagement = () => {
                       <div className="flex space-x-3" onClick={(e) => e.stopPropagation()}>
                         <button
                           onClick={(e) => {
-                            if (isInactive) return;
                             e.stopPropagation();
                             handleEdit(center);
                           }}
-                          className={`text-blue-600 transition-colors ${isInactive ? 'opacity-50 cursor-not-allowed' : 'hover:text-blue-800 cursor-pointer'}`}
+                          className="text-blue-600 hover:text-blue-800 transition-colors"
                           disabled={isInactive}
                         >
                           <FiEdit2 size={18} />
                         </button>
                         <button
                           onClick={(e) => {
-                            if (isInactive || isDeleting) return;
                             e.stopPropagation();
                             handleDelete(center);
                           }}
-                          className={`text-red-600 transition-colors ${isInactive || isDeleting ? 'opacity-50 cursor-not-allowed' : 'hover:text-red-800 cursor-pointer'}`}
+                          className="text-red-600 hover:text-red-800 transition-colors"
                           disabled={isInactive || isDeleting}
                         >
                           <FiTrash2 size={18} />

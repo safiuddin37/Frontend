@@ -357,7 +357,7 @@ console.log('[AddTutorForm] JWT token from localStorage:', token);
             name="name" 
             value={localForm.name || ''} 
             onChange={e => {
-              const value = e.target.value.replace(/[^a-zA-Z ]/g, '').slice(0, 25);
+              const value = e.target.value.replace(/[^a-zA-Z0-9 ]/g, '').slice(0, 25);
               setLocalForm(prev => ({ ...prev, name: value }));
             }} 
             maxLength={25} 
@@ -371,14 +371,7 @@ console.log('[AddTutorForm] JWT token from localStorage:', token);
             name="email" 
             value={localForm.email || ''} 
             onChange={e => {
-              let value = e.target.value.replace(/[^a-zA-Z0-9@._]/g, '').slice(0, 30);
-              // Enforce domain part (after @) max 15 chars
-              const atIdx = value.indexOf('@');
-              if (atIdx !== -1) {
-                const before = value.slice(0, atIdx + 1);
-                let after = value.slice(atIdx + 1, atIdx + 16); // max 15 chars after @
-                value = before + after;
-              }
+              const value = e.target.value.replace(/[^a-zA-Z0-9@._]/g, '').slice(0, 30);
               setLocalForm(prev => ({ ...prev, email: value }));
             }} 
             maxLength={30} 
@@ -412,14 +405,14 @@ console.log('[AddTutorForm] JWT token from localStorage:', token);
             name="password" 
             value={localForm.password || ''} 
             onChange={e => {
-              const value = e.target.value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 15);
+              const value = e.target.value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 10);
               setLocalForm(prev => ({ ...prev, password: value }));
             }} 
-            maxLength={15} 
+            maxLength={10} 
             type="text" 
             required 
             style={inputStyle} 
-            placeholder="Maximum 15 characters, no special characters" 
+            placeholder="Maximum 10 characters, no special characters" 
           />
           <div style={{ backgroundColor: '#e6f7ff', padding: '8px 12px', borderRadius: '6px', marginTop: '6px', borderLeft: '4px solid #1890ff' }}>
             <span style={{ fontWeight: 600, color: '#222' }}>Note:</span> Use <code style={{ backgroundColor: '#f0f0f0', padding: '2px 4px', borderRadius: '3px' }}>tutor123</code> as the default password for all tutors.

@@ -155,14 +155,7 @@ const AnnouncementManagement = () => {
               placeholderText="Start Date"
               className="border p-2 rounded w-full"
               minDate={new Date()}
-              dateFormat="dd/MM/yy"
-              renderCustomHeader={({ date }) => (
-                <div className="text-xs text-gray-500 px-2 py-1">{formatDate(date)}</div>
-              )}
             />
-            {form.startDate && (
-              <div className="text-xs text-gray-500 mt-1">Selected: {formatDate(form.startDate)}</div>
-            )}
           </div>
           <div className="w-full">
             <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
@@ -172,14 +165,7 @@ const AnnouncementManagement = () => {
               placeholderText="End Date"
               className="border p-2 rounded w-full"
               minDate={form.startDate || new Date()}
-              dateFormat="dd/MM/yy"
-              renderCustomHeader={({ date }) => (
-                <div className="text-xs text-gray-500 px-2 py-1">{formatDate(date)}</div>
-              )}
             />
-            {form.endDate && (
-              <div className="text-xs text-gray-500 mt-1">Selected: {formatDate(form.endDate)}</div>
-            )}
           </div>
         </div>
         <div>

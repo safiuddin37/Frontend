@@ -1,17 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiEdit2, FiTrash2, FiPlus, FiSearch, FiUser, FiMail, FiPhone, FiEye, FiEyeOff } from 'react-icons/fi';
 import useGet from '../../hooks/useGet';
 import { toast } from 'react-hot-toast';
 import Popover from '../common/Popover';
 
-const SupervisorManagement = () => {
-  console.log('SupervisorManagement component mounted');
-  console.log('Environment:', import.meta.env.MODE);
-  console.log('API URL:', import.meta.env.VITE_API_URL);
-  
-  const [selectedSupervisor, setSelectedSupervisor] = useState(null); 
-  const [editingSupervisor, setEditingSupervisor] = useState(null);
+const AdminManagement = () => {
+  const [editingAdmin, setEditingAdmin] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -20,60 +15,38 @@ const SupervisorManagement = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    phone: '',
-    assignedCenters: []
+    phone: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [showCenterDropdown, setShowCenterDropdown] = useState(false);
   
   // Popover states
   const [showErrorPopover, setShowErrorPopover] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [showDeleteConfirmPopover, setShowDeleteConfirmPopover] = useState(false);
-  const [supervisorToDelete, setSupervisorToDelete] = useState(null);
+  const [adminToDelete, setAdminToDelete] = useState(null);
   const [showFormPopover, setShowFormPopover] = useState(false);
   const [showSuccessPopover, setShowSuccessPopover] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
 
-  const { data: supervisors, loading, error: fetchError, refetch } = useGet(`/supervisor`);
-  const { data: centers } = useGet('/centers');
+  const { data: admins, loading, error: fetchError, refetch } = useGet('/admin');
 
-  // Add click outside handler
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      const dropdown = document.getElementById('center-dropdown');
-      const button = document.getElementById('center-dropdown-button');
-      if (dropdown && button && !dropdown.contains(event.target) && !button.contains(event.target)) {
-        setShowCenterDropdown(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  // Handle click on Add Supervisor button
+  // Handle click on Add Admin button
   const handleAddClick = () => {
-    setFormData({ name: '', email: '', phone: '', assignedCenters: []});
-    setEditingSupervisor(null);
+    setFormData({ name: '', email: '', password: '', confirmPassword: '', phone: '' });
+    setEditingAdmin(null);
     setShowFormPopover(true);
   };
   
-  const handleEditClick = (supervisor) => {
+  const handleEditClick = (admin) => {
     setFormData({
-      name: supervisor.name || '',
-      email: supervisor.email || '',
-      phone: supervisor.phone || '',
+      name: admin.name || '',
+      email: admin.email || '',
       password: '',
       confirmPassword: '',
-      assignedCenters: supervisor.assignedCenters?.map(center => 
-        typeof center === 'object' ? center._id : center
-      ) || []
+      phone: admin.phone || ''
     });
-    setEditingSupervisor(supervisor);
+    setEditingAdmin(admin);
     setShowFormPopover(true);
   };
 
@@ -81,63 +54,64 @@ const SupervisorManagement = () => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Add debug logging
-    console.log('API URL:', import.meta.env.VITE_API_URL);
-    console.log('Environment:', import.meta.env.MODE);
-    
     // Validate password length before submitting
-    if (!editingSupervisor && formData.password.length < 6) {
+    if (!editingAdmin && formData.password.length < 6) {
       setErrorMessage('Password must be at least 6 characters long');
       setShowErrorPopover(true);
       setIsLoading(false);
       return;
     }
 
+    // Only check password match if password is being changed
+    if (formData.password && formData.password !== formData.confirmPassword) {
+      setErrorMessage('Passwords do not match');
+      setShowErrorPopover(true);
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const url = editingSupervisor
-        ? `${import.meta.env.VITE_API_URL}/supervisor/${editingSupervisor._id}`
-        : `${import.meta.env.VITE_API_URL}/auth/supervisor/register`;
+      const url = editingAdmin
+        ? `${import.meta.env.VITE_API_URL}/admin/${editingAdmin._id}`
+        : `${import.meta.env.VITE_API_URL}/auth/admin/register`;
       
       // Prepare request body
       let requestBody = {};
       
-      if (editingSupervisor) {
-        // For editing, only send changed fields
-        if (formData.name !== editingSupervisor.name) {
-          requestBody.name = formData.name.trim();
+      if (editingAdmin) {
+        // For updates, only include fields that have changed
+        if (formData.name !== editingAdmin.name) {
+          requestBody.name = formData.name;
         }
-        if (formData.email !== editingSupervisor.email) {
-          requestBody.email = formData.email.trim();
+        if (formData.email !== editingAdmin.email) {
+          requestBody.email = formData.email;
         }
-        if (formData.phone !== editingSupervisor.phone) {
-          requestBody.phone = formData.phone.trim();
+        if (formData.phone !== editingAdmin.phone) {
+          requestBody.phone = formData.phone;
         }
         if (formData.password) {
           requestBody.password = formData.password;
         }
-        // Always send assignedCenters as it's an array that needs to be compared
-        requestBody.assignedCenters = formData.assignedCenters;
       } else {
-        // For new supervisor, include all required fields
+        // For new admin, include all required fields
         requestBody = {
           name: formData.name.trim(),
           email: formData.email.trim(),
           phone: formData.phone.trim(),
-          password: formData.password,
-          assignedCenters: formData.assignedCenters,
+          password: formData.password
         };
       }
 
       console.log('Sending request:', {
         url,
-        method: editingSupervisor ? 'PUT' : 'POST',
+        method: editingAdmin ? 'PUT' : 'POST',
         body: requestBody
       });
 
       const response = await fetch(
         url,
         {
-          method: editingSupervisor ? 'PUT' : 'POST',
+          method: editingAdmin ? 'PUT' : 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${JSON.parse(localStorage.getItem('userData')).token}`
@@ -160,24 +134,24 @@ const SupervisorManagement = () => {
           setErrorMessage(data.message);
           throw new Error(data.message);
         }
-        const errorMsg = 'Failed to save supervisor';
+        const errorMsg = 'Failed to save admin';
         setErrorMessage(errorMsg);
         throw new Error(errorMsg);
       }
 
       // Show success message via popover
-      setSuccessMessage(editingSupervisor ? 'Supervisor updated successfully' : 'Supervisor created successfully');
+      setSuccessMessage(editingAdmin ? 'Admin updated successfully' : 'Admin created successfully');
       setShowSuccessPopover(true);
       
       // Close the form popover
       setShowFormPopover(false);
       
       // These will happen after the success popover is closed
-      setEditingSupervisor(null);
-      setFormData({ name: '', email: '', password: '', confirmPassword: '', phone: '', assignedCenters: [] });
+      setEditingAdmin(null);
+      setFormData({ name: '', email: '', password: '', confirmPassword: '', phone: '' });
     } catch (err) {
       console.error('Error:', err);
-      const errorMsg = err.message || 'An error occurred while saving the supervisor';
+      const errorMsg = err.message || 'An error occurred while saving the admin';
       setErrorMessage(errorMsg);
       setShowErrorPopover(true);
     } finally {
@@ -192,19 +166,19 @@ const SupervisorManagement = () => {
   };
 
   // Show delete confirmation popover
-  const handleDeleteClick = (supervisor) => {
-    setSupervisorToDelete(supervisor);
+  const handleDeleteClick = (admin) => {
+    setAdminToDelete(admin);
     setShowDeleteConfirmPopover(true);
   };
 
   // Handle the actual delete operation
   const handleDelete = async () => {
-    if (!supervisorToDelete) return;
+    if (!adminToDelete) return;
     
     try {
       setIsLoading(true);
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/supervisor/${supervisorToDelete._id}`,
+        `https://mtc-backend-jn5y.onrender.com/api/admin/${adminToDelete._id}`,
         {
           method: 'DELETE',
           headers: {
@@ -214,16 +188,16 @@ const SupervisorManagement = () => {
       );
       const data = await response.json();
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to delete supervisor');
+        throw new Error(data.message || 'Failed to delete admin');
       }
       
       // Just use toast for success and close the confirmation popover
-      toast.success('Supervisor deleted successfully');
+      toast.success('Admin deleted successfully');
       setShowDeleteConfirmPopover(false);
-      setSupervisorToDelete(null);
+      setAdminToDelete(null);
       refetch();
     } catch (err) {
-      setErrorMessage(err.message || 'Failed to delete supervisor');
+      setErrorMessage(err.message || 'Failed to delete admin');
       setShowErrorPopover(true);
       setShowDeleteConfirmPopover(false); // Close delete popover if an error occurs
     } finally {
@@ -231,25 +205,14 @@ const SupervisorManagement = () => {
     }
   };
 
-  // Handle center selection
-  const handleCenterToggle = (centerId) => {
-    setFormData(prev => {
-      const currentCenters = prev.assignedCenters || [];
-      const newCenters = currentCenters.includes(centerId)
-        ? currentCenters.filter(id => id !== centerId)
-        : [...currentCenters, centerId];
-      return { ...prev, assignedCenters: newCenters };
-    });
-  };
-
-  const filteredSupervisors = supervisors?.filter(supervisor => 
-    supervisor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    supervisor.email.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredAdmins = admins?.filter(admin => 
+    admin.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    admin.email.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
 
   const itemsPerPage = 10;
-  const totalPages = Math.ceil(filteredSupervisors.length / itemsPerPage);
-  const paginatedSupervisors = filteredSupervisors.slice(
+  const totalPages = Math.ceil(filteredAdmins.length / itemsPerPage);
+  const paginatedAdmins = filteredAdmins.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -257,13 +220,13 @@ const SupervisorManagement = () => {
   return (
     <div className="p-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-        <h1 className="text-3xl font-bold text-primary-700">Supervisor Management</h1>
+        <h1 className="text-3xl font-bold text-primary-700">Admin Management</h1>
         <div className="flex gap-2">
           <button
             onClick={handleAddClick}
             className="flex items-center bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
           >
-            <FiPlus className="mr-2" /> Add New Supervisor
+            <FiPlus className="mr-2" /> Add New Admin
           </button>
         </div>
       </div>
@@ -272,7 +235,7 @@ const SupervisorManagement = () => {
           <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           <input
             type="text"
-            placeholder="Search supervisors by name or email..."
+            placeholder="Search admins by name or email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
@@ -283,7 +246,7 @@ const SupervisorManagement = () => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Supervisor Name</th>
+              <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Admin Name</th>
               <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Email</th>
               <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Contact</th>
               <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Actions</th>
@@ -293,44 +256,43 @@ const SupervisorManagement = () => {
             {loading ? (
               <tr><td colSpan={4} className="text-center py-8">Loading...</td></tr>
             ) : fetchError ? (
-              <tr><td colSpan={4} className="text-center text-red-500 py-8">Error loading supervisors: {fetchError}</td></tr>
-            ) : paginatedSupervisors.length === 0 ? (
-              <tr><td colSpan={4} className="text-center py-8 text-gray-500">No supervisors found.</td></tr>
-            ) : paginatedSupervisors.map((supervisor) => (
-              <tr key={supervisor._id} className="hover:bg-gray-50" >
-                 
+              <tr><td colSpan={4} className="text-center text-red-500 py-8">Error loading admins: {fetchError}</td></tr>
+            ) : paginatedAdmins.length === 0 ? (
+              <tr><td colSpan={4} className="text-center py-8 text-gray-500">No admins found.</td></tr>
+            ) : paginatedAdmins.map((admin) => (
+              <tr key={admin._id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white text-lg font-bold">
-                      {supervisor.name?.charAt(0)?.toUpperCase() || <FiUser />}
+                      {admin.name?.charAt(0)?.toUpperCase() || <FiUser />}
                     </div>
                     <div>
-                      <div className="text-sm font-semibold text-gray-900">{supervisor.name}</div>
+                      <div className="text-sm font-semibold text-gray-900">{admin.name}</div>
                     </div>
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center text-sm text-gray-700">
                     <FiMail className="mr-2 text-primary-600" />
-                    {supervisor.email}
+                    {admin.email}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center text-sm text-gray-700">
                     <FiPhone className="mr-2 text-primary-600" />
-                    {supervisor.phone || 'Not provided'}
+                    {admin.phone || 'Not provided'}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                   <button
-                    onClick={() => handleEditClick(supervisor)}
+                    onClick={() => handleEditClick(admin)}
                     className="text-blue-600 hover:text-blue-900"
                     title="Edit"
                   >
                     <FiEdit2 className="inline-block" />
                   </button>
                   <button
-                    onClick={() => handleDeleteClick(supervisor)}
+                    onClick={() => handleDeleteClick(admin)}
                     className="text-red-600 hover:text-red-900"
                     title="Delete"
                   >
@@ -363,14 +325,14 @@ const SupervisorManagement = () => {
           </button>
         </div>
       )}
-      {/* Supervisor Form Popover */}
+      {/* Admin Form Popover */}
       <Popover
         isOpen={showFormPopover}
         onClose={() => {
           setShowFormPopover(false);
-          setEditingSupervisor(null);
+          setEditingAdmin(null);
         }}
-        title={editingSupervisor ? 'Edit Supervisor' : 'Add New Supervisor'}
+        title={editingAdmin ? 'Edit Admin' : 'Add New Admin'}
         type="info"
         message={
           <form onSubmit={handleSubmit} className="mt-2 space-y-4">
@@ -386,7 +348,7 @@ const SupervisorManagement = () => {
                       }}
                       maxLength={20}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                      required={!editingSupervisor}
+                      required={!editingAdmin}
                     />
                   </div>
                   <div>
@@ -395,20 +357,12 @@ const SupervisorManagement = () => {
                       type="email"
                       value={formData.email}
                       onChange={e => {
-                        let value = e.target.value.replace(/[^a-zA-Z0-9@._]/g, '').slice(0, 30);
-                        // Enforce domain part (after @) max 15 chars
-                        const atIdx = value.indexOf('@');
-                        if (atIdx !== -1) {
-                          const before = value.slice(0, atIdx + 1);
-                          let after = value.slice(atIdx + 1, atIdx + 16); // max 15 chars after @
-                          value = before + after;
-                        }
+                        const value = e.target.value.replace(/[^a-zA-Z0-9@._]/g, '').slice(0, 25);
                         setFormData(prev => ({ ...prev, email: value }));
                       }}
-                      maxLength={30}
+                      maxLength={25}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                      required={!editingSupervisor}
-                      autoComplete="email"
+                      required={!editingAdmin}
                     />
                   </div>
                   <div>
@@ -424,49 +378,12 @@ const SupervisorManagement = () => {
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                       pattern="[0-9]{10}"
                       placeholder="Enter 10-digit phone number"
-                      required={!editingSupervisor}
+                      required={!editingAdmin}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Assigned Centers</label>
-                    <div className="relative">
-                      <button
-                        id="center-dropdown-button"
-                        type="button"
-                        onClick={() => setShowCenterDropdown(!showCenterDropdown)}
-                        className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        {formData.assignedCenters.length > 0
-                          ? `${formData.assignedCenters.length} centers selected`
-                          : 'Select centers'}
-                      </button>
-                      {showCenterDropdown && (
-                        <div
-                          id="center-dropdown"
-                          className="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md border border-gray-300 max-h-60 overflow-y-auto"
-                        >
-                          {centers?.map(center => (
-                            <div
-                              key={center._id}
-                              className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                              onClick={() => handleCenterToggle(center._id)}
-                            >
-                              <input
-                                type="checkbox"
-                                checked={formData.assignedCenters.includes(center._id)}
-                                onChange={() => {}}
-                                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                              />
-                              <span className="ml-2 text-sm text-gray-700">{center.name}</span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <div>
                     <label className="block text-sm font-medium text-gray-700">
-                      {editingSupervisor ? 'New Password (leave blank to keep current)' : 'Password'}
+                      {editingAdmin ? 'New Password (leave blank to keep current)' : 'Password'}
                     </label>
                     <div className="relative">
                       <input
@@ -478,7 +395,7 @@ const SupervisorManagement = () => {
                         }}
                         maxLength={15}
                         className="mt-1 block w-full rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 pr-10 border-gray-300"
-                        required={!editingSupervisor}
+                        required={!editingAdmin}
                         minLength={6}
                       />
                       <button 
@@ -492,7 +409,7 @@ const SupervisorManagement = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
-                      {editingSupervisor ? 'Confirm New Password' : 'Confirm Password'}
+                      {editingAdmin ? 'Confirm New Password' : 'Confirm Password'}
                     </label>
                     <div className="relative">
                       <input
@@ -504,7 +421,7 @@ const SupervisorManagement = () => {
                         }}
                         maxLength={15}
                         className="mt-1 block w-full rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 pr-10 border-gray-300"
-                        required={!editingSupervisor}
+                        required={!editingAdmin}
                         minLength={6}
                       />
                       <button 
@@ -522,7 +439,7 @@ const SupervisorManagement = () => {
                     type="button"
                     onClick={() => {
                       setShowFormPopover(false);
-                      setEditingSupervisor(null);
+                      setEditingAdmin(null);
                     }}
                     className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
                   >
@@ -533,7 +450,7 @@ const SupervisorManagement = () => {
                     disabled={isLoading}
                     className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
                   >
-                    {isLoading ? 'Saving...' : editingSupervisor ? 'Update' : 'Create'}
+                    {isLoading ? 'Saving...' : editingAdmin ? 'Update' : 'Create'}
                   </button>
                 </div>
               </form>
@@ -567,10 +484,10 @@ const SupervisorManagement = () => {
         isOpen={showDeleteConfirmPopover}
         onClose={() => {
           setShowDeleteConfirmPopover(false);
-          setSupervisorToDelete(null);
+          setAdminToDelete(null);
         }}
         title="Confirm Delete"
-        message={supervisorToDelete ? `Are you sure you want to delete supervisor ${supervisorToDelete.name}?` : 'Are you sure you want to delete this supervisor?'}
+        message={adminToDelete ? `Are you sure you want to delete admin ${adminToDelete.name}?` : 'Are you sure you want to delete this admin?'}
         type="confirm"
         onConfirm={handleDelete}
         confirmText="Delete"
@@ -580,4 +497,4 @@ const SupervisorManagement = () => {
   );
 };
 
-export default SupervisorManagement;
+export default AdminManagement; 

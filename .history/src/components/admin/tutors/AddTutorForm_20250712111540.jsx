@@ -371,14 +371,7 @@ console.log('[AddTutorForm] JWT token from localStorage:', token);
             name="email" 
             value={localForm.email || ''} 
             onChange={e => {
-              let value = e.target.value.replace(/[^a-zA-Z0-9@._]/g, '').slice(0, 30);
-              // Enforce domain part (after @) max 15 chars
-              const atIdx = value.indexOf('@');
-              if (atIdx !== -1) {
-                const before = value.slice(0, atIdx + 1);
-                let after = value.slice(atIdx + 1, atIdx + 16); // max 15 chars after @
-                value = before + after;
-              }
+              const value = e.target.value.replace(/[^a-zA-Z0-9@._]/g, '').slice(0, 30);
               setLocalForm(prev => ({ ...prev, email: value }));
             }} 
             maxLength={30} 
