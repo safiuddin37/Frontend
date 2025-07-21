@@ -696,7 +696,7 @@ const TutorStudents = () => {
       }
 
       // Make the DELETE request
-      const deleteUrl = `${import.meta.env.VITE_API_URL}/students/${studentId}`;
+      const deleteUrl = `https://mtc-backend-jn5y.onrender.com/api/students/${studentId}`;
 
       // Use fetch instead of axios for consistency
       const response = await fetch(deleteUrl, {
