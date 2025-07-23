@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { MapContainer, TileLayer, Marker, useMap, Circle } from 'react-leaflet'
 import { FiUsers, FiClock, FiCheck, FiX } from 'react-icons/fi'
@@ -32,16 +32,17 @@ const createCustomIcon = (color) => {
 const redIcon = createCustomIcon('red')
 const blueIcon = createCustomIcon('blue')
 
+// Fallback when the Geolocation API fails or is unavailable – uses an IP lookup service.
 const fetchLocationFallback = async () => {
   try {
-    const response = await axios.get(`https://api.opencagedata.com/geocode/v1/json?q=YOUR_QUERY&key=YOUR_API_KEY`);
-    const { results } = response.data;
-    if (results && results.length > 0) {
-      const { geometry } = results[0];
-      return { lat: geometry.lat, lng: geometry.lng };
+    // Simple IP-based lookup (≈ city-level). Free up to 30k calls / month.
+    const response = await axios.get('https://ipapi.co/json/');
+    const { latitude, longitude } = response.data;
+    if (latitude && longitude) {
+      return { lat: latitude, lng: longitude };
     }
   } catch (error) {
-    console.error('OpenCage API error:', error);
+    console.error('Fallback IP geolocation error:', error);
   }
   return null;
 };
@@ -97,7 +98,7 @@ const LocationMarker = ({ onLocationUpdate }) => {
       }
       setLocationError(message);
 
-      // Fallback to OpenCage API
+      // Fallback to IP location service
       fetchLocationFallback().then((fallbackPosition) => {
         if (fallbackPosition) {
           setPosition(fallbackPosition);
@@ -108,43 +109,31 @@ const LocationMarker = ({ onLocationUpdate }) => {
       });
     };
 
-    // Start watching position
+    // Start watching position once. We avoid restarting the watch constantly because
+    // that is battery-intensive and unreliable on some Android builds.
+    const geoOptions = { enableHighAccuracy: false, maximumAge: 5000, timeout: 20000 };
+
     watchIdRef.current = navigator.geolocation.watchPosition(
       pos => handleSuccess({
         latitude: pos.coords.latitude,
         longitude: pos.coords.longitude
       }),
       handleError,
-      { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
+      geoOptions
     );
 
-    // Poll every 5 seconds by clearing and restarting the watch
-    const interval = setInterval(() => {
-      if (watchIdRef.current !== null) {
-        navigator.geolocation.clearWatch(watchIdRef.current);
-      }
-      watchIdRef.current = navigator.geolocation.watchPosition(
-        pos => handleSuccess({
-          latitude: pos.coords.latitude,
-          longitude: pos.coords.longitude
-        }),
-        handleError,
-        { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
-      );
-    }, 5000);
-
+        // Clean-up on unmount
     return () => {
       if (watchIdRef.current !== null) {
         navigator.geolocation.clearWatch(watchIdRef.current);
       }
-      clearInterval(interval);
     };
   }, [map, onLocationUpdate]);
 
   return position === null ? null : <Marker position={position} icon={redIcon} />
 }
 
-import { useRef } from 'react';
+
 
 const TutorOverview = () => {
   const { alreadyMarked, loading: attendanceCheckLoading, error: attendanceCheckError } = useTodayAttendance();
