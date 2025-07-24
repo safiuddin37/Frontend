@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { MapContainer, TileLayer, Marker, useMap, Circle } from 'react-leaflet'
-import { FiUsers, FiClock, FiCheck, FiX } from 'react-icons/fi'
+import { FiUsers, FiClock, FiCheck, FiX, FiHelpCircle, FiSmartphone, FiMonitor } from 'react-icons/fi'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 import useGet from '../CustomHooks/useGet'
@@ -35,24 +35,49 @@ const blueIcon = createCustomIcon('blue')
 // Fallback when the Geolocation API fails or is unavailable – uses an IP lookup service.
 const fetchLocationFallback = async () => {
   try {
+    console.log('Attempting IP-based location fallback...');
     // Simple IP-based lookup (≈ city-level). Free up to 30k calls / month.
-    const response = await axios.get('https://ipapi.co/json/');
-    const { latitude, longitude } = response.data;
-    if (latitude && longitude) {
+    const response = await axios.get('https://ipapi.co/json/', { timeout: 10000 });
+    const { latitude, longitude, error } = response.data;
+    
+    if (error) {
+      console.error('IP geolocation service error:', error);
+      return null;
+    }
+    
+    if (latitude && longitude && typeof latitude === 'number' && typeof longitude === 'number') {
+      console.log('IP-based location obtained:', { lat: latitude, lng: longitude });
       return { lat: latitude, lng: longitude };
+    } else {
+      console.error('Invalid coordinates from IP service:', { latitude, longitude });
     }
   } catch (error) {
     console.error('Fallback IP geolocation error:', error);
+    
+    // Try alternative IP service as backup
+    try {
+      console.log('Trying alternative IP location service...');
+      const altResponse = await axios.get('https://api.ipify.org?format=json', { timeout: 5000 });
+      // This service only provides IP, we'd need another call for location
+      // For now, just log that we tried
+      console.log('Alternative service responded, but location lookup not implemented');
+    } catch (altError) {
+      console.error('Alternative IP service also failed:', altError);
+    }
   }
   return null;
 };
 
-const LocationMarker = ({ onLocationUpdate }) => {
+const LocationMarker = ({ onLocationUpdate, onLocationError }) => {
   const [position, setPosition] = useState(null)
   const map = useMap()
   const watchIdRef = useRef(null)
   const hasAnimatedRef = useRef(false)
   const [locationError, setLocationError] = useState(null)
+  const escalateTimerRef = useRef(null)
+  const hasInitialLocationRef = useRef(false)
+  const fallbackRequestedRef = useRef(false);
+  const lastErrorTimeRef = useRef(0);
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -67,63 +92,158 @@ const LocationMarker = ({ onLocationUpdate }) => {
       return;
     }
 
-    const handleSuccess = ({ latitude, longitude }) => {
+    const DESIRED_ACCURACY = 100; // meters - relaxed from 50 to get more readings
+    const handleSuccess = ({ latitude, longitude, accuracy }) => {
+      console.log('Location received:', { latitude, longitude, accuracy });
+      
       const latlng = { lat: latitude, lng: longitude };
+      
+      // Always accept the first location reading to get immediate positioning
+      if (!hasInitialLocationRef.current) {
+        setPosition(latlng);
+        onLocationUpdate(latlng);
+        hasInitialLocationRef.current = true;
+        
+        if (!hasAnimatedRef.current) {
+          map.flyTo(latlng, 17, { animate: true }); // Initial animation, zoom in to 17
+          hasAnimatedRef.current = true;
+        }
+        return;
+      }
+      
+      // For subsequent readings, apply accuracy filter
+      if (accuracy && accuracy > DESIRED_ACCURACY) {
+        console.log('Ignoring inaccurate reading:', accuracy);
+        return;
+      }
+      
       setPosition(latlng);
       onLocationUpdate(latlng);
-      if (!hasAnimatedRef.current) {
-        map.flyTo(latlng, 17, { animate: true }); // Initial animation, zoom in to 17
-        hasAnimatedRef.current = true;
-      } else {
-        map.setView(latlng, map.getZoom(), { animate: false }); // Always keep user centered, no animation
+      map.setView(latlng, map.getZoom(), { animate: false }); // Always keep user centered, no animation
+    };
+
+    const errorHandlerWrapper = (error) => {
+      const now = Date.now();
+      if (now - lastErrorTimeRef.current > 5000) { // Only handle errors every 5s
+        lastErrorTimeRef.current = now;
+        handleError(error);
       }
     };
 
     const handleError = (error) => {
       let message = '';
+      let shouldShowHelp = false;
+      
       switch (error.code) {
         case error.PERMISSION_DENIED:
-          message = 'User denied the request for Geolocation.';
+          message = 'Location access denied. Click "Get Help" to learn how to enable location permissions.';
+          shouldShowHelp = true;
           break;
         case error.POSITION_UNAVAILABLE:
-          message = 'Location information is unavailable.';
+          message = 'Location information is unavailable. Please check your GPS settings.';
+          shouldShowHelp = true;
           break;
         case error.TIMEOUT:
-          message = 'The request to get user location timed out.';
+          message = 'Location request timed out. Trying fallback method...';
           break;
         case error.UNKNOWN_ERROR:
         default:
           message = 'An unknown error occurred while retrieving location.';
+          shouldShowHelp = true;
           break;
       }
+      console.error('Geolocation error:', error);
       setLocationError(message);
+      
+      // Notify parent component about the error
+      if (onLocationError) {
+        onLocationError(message, shouldShowHelp);
+      }
 
-      // Fallback to IP location service
-      fetchLocationFallback().then((fallbackPosition) => {
-        if (fallbackPosition) {
-          setPosition(fallbackPosition);
-          onLocationUpdate(fallbackPosition);
-        } else {
-          setLocationError('Unable to determine location.');
-        }
-      });
+      // Clear any existing geolocation watchers or timers to prevent
+      // the error callback from firing repeatedly
+      if (watchIdRef.current !== null) {
+        navigator.geolocation.clearWatch(watchIdRef.current);
+        watchIdRef.current = null;
+      }
+      if (escalateTimerRef.current) {
+        clearTimeout(escalateTimerRef.current);
+        escalateTimerRef.current = null;
+      }
+
+      // For permission denied, don't try fallback as it won't be more accurate
+      if (error.code === error.PERMISSION_DENIED) {
+        return;
+      }
+
+      // Only try fallback if we haven't already requested it
+      if (!fallbackRequestedRef.current) {
+        fallbackRequestedRef.current = true;
+        
+        // Fallback to IP location service for other errors
+        fetchLocationFallback().then((fallbackPosition) => {
+          if (fallbackPosition) {
+            setPosition(fallbackPosition);
+            onLocationUpdate(fallbackPosition);
+            setLocationError(null); // Clear error if fallback works
+            console.log('Using IP-based location as fallback');
+          } else {
+            const finalMessage = 'Unable to determine location from any source. Please check your settings.';
+            setLocationError(finalMessage);
+            if (onLocationError) {
+              onLocationError(finalMessage, true);
+            }
+          }
+        });
+      }
     };
 
-    // Start watching position once. We avoid restarting the watch constantly because
-    // that is battery-intensive and unreliable on some Android builds.
-    const geoOptions = { enableHighAccuracy: false, maximumAge: 5000, timeout: 20000 };
+    // First, try to get current position immediately for faster initial load
+    navigator.geolocation.getCurrentPosition(
+      pos => handleSuccess({
+        latitude: pos.coords.latitude,
+        longitude: pos.coords.longitude,
+        accuracy: pos.coords.accuracy
+      }),
+      errorHandlerWrapper,
+      { enableHighAccuracy: false, maximumAge: 10000, timeout: 10000 }
+    );
+
+    // Start watching position for continuous updates
+    const geoOptions = { enableHighAccuracy: false, maximumAge: 5000, timeout: 15000 };
 
     watchIdRef.current = navigator.geolocation.watchPosition(
       pos => handleSuccess({
         latitude: pos.coords.latitude,
-        longitude: pos.coords.longitude
+        longitude: pos.coords.longitude,
+        accuracy: pos.coords.accuracy
       }),
-      handleError,
+      errorHandlerWrapper,
       geoOptions
     );
 
-        // Clean-up on unmount
+    // If we don't get a good fix within 15 seconds, escalate to high-accuracy GPS
+    escalateTimerRef.current = setTimeout(() => {
+      console.log('Escalating to high-accuracy GPS');
+      if (watchIdRef.current !== null) {
+        navigator.geolocation.clearWatch(watchIdRef.current);
+      }
+      watchIdRef.current = navigator.geolocation.watchPosition(
+        pos => handleSuccess({
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
+          accuracy: pos.coords.accuracy
+        }),
+        errorHandlerWrapper,
+        { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 }
+      );
+    }, 15000);
+
+    // Clean-up on unmount
     return () => {
+      if (escalateTimerRef.current) {
+        clearTimeout(escalateTimerRef.current);
+      }
       if (watchIdRef.current !== null) {
         navigator.geolocation.clearWatch(watchIdRef.current);
       }
@@ -132,6 +252,262 @@ const LocationMarker = ({ onLocationUpdate }) => {
 
   return position === null ? null : <Marker position={position} icon={redIcon} />
 }
+
+// Location Help Modal Component
+const LocationHelpModal = ({ isOpen, onClose, deviceInfo }) => {
+  if (!isOpen) return null;
+
+  const getInstructions = () => {
+    const { deviceType, browserName, isIOS, isAndroid, isChrome, isFirefox, isSafari } = deviceInfo;
+
+    const instructions = {
+      common: [
+        "Make sure you're connected to the internet",
+        "Ensure GPS/Location Services are enabled on your device",
+        "Allow location access when prompted by the browser"
+      ],
+      ios: {
+        safari: [
+          "1. Go to iPhone Settings → Privacy & Security → Location Services",
+          "2. Make sure Location Services is ON",
+          "3. Scroll down and tap 'Safari'",
+          "4. Select 'While Using App' or 'Ask Next Time'",
+          "5. Refresh this page and allow location access"
+        ],
+        chrome: [
+          "1. Go to iPhone Settings → Privacy & Security → Location Services",
+          "2. Make sure Location Services is ON",
+          "3. Open Chrome → Settings → Site Settings → Location",
+          "4. Make sure location access is allowed",
+          "5. Refresh this page and allow location access"
+        ]
+      },
+      android: {
+        chrome: [
+          "1. Go to Android Settings → Location → Turn ON",
+          "2. In Chrome, tap the lock icon next to the URL",
+          "3. Tap 'Permissions' → Location → Allow",
+          "4. Or go to Chrome Settings → Site Settings → Location → Allow",
+          "5. Refresh this page"
+        ],
+        firefox: [
+          "1. Go to Android Settings → Location → Turn ON",
+          "2. In Firefox, tap the shield icon → Permissions",
+          "3. Allow location access",
+          "4. Or go to Firefox Settings → Site Settings → Location",
+          "5. Refresh this page"
+        ]
+      },
+      desktop: {
+        chrome: [
+          "1. Click the location icon in the address bar",
+          "2. Select 'Always allow location access'",
+          "3. Or go to Chrome Settings → Privacy → Site Settings → Location",
+          "4. Make sure this site is allowed",
+          "5. Refresh this page"
+        ],
+        firefox: [
+          "1. Click the shield icon in the address bar",
+          "2. Turn off 'Enhanced Tracking Protection' for this site",
+          "3. Or go to Firefox Settings → Privacy → Permissions → Location",
+          "4. Allow location access for this site",
+          "5. Refresh this page"
+        ],
+        safari: [
+          "1. Go to Safari → Preferences → Websites → Location",
+          "2. Find this website and set to 'Allow'",
+          "3. Or click 'Allow' when prompted",
+          "4. Refresh this page"
+        ]
+      }
+    };
+
+    let specificInstructions = [];
+    
+    if (isIOS) {
+      specificInstructions = isSafari ? instructions.ios.safari : instructions.ios.chrome;
+    } else if (isAndroid) {
+      specificInstructions = isChrome ? instructions.android.chrome : instructions.android.firefox;
+    } else {
+      if (isChrome) specificInstructions = instructions.desktop.chrome;
+      else if (isFirefox) specificInstructions = instructions.desktop.firefox;
+      else if (isSafari) specificInstructions = instructions.desktop.safari;
+      else specificInstructions = instructions.desktop.chrome; // Default to Chrome instructions
+    }
+
+    return { common: instructions.common, specific: specificInstructions };
+  };
+
+  const instructions = getInstructions();
+
+  return (
+    <motion.div 
+      className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 px-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+    >
+      <motion.div 
+        className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        initial={{ scale: 0.9, y: 20 }}
+        animate={{ scale: 1, y: 0 }}
+        exit={{ scale: 0.9, y: 20 }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mr-4">
+                <FiHelpCircle className="text-blue-600 text-xl" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Location Access Help</h2>
+                <p className="text-gray-600">
+                  {deviceInfo.deviceType} • {deviceInfo.browserName}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <FiX className="text-xl text-gray-500" />
+            </button>
+          </div>
+        </div>
+
+        <div className="p-6">
+          {/* Problem Diagnosis */}
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              <div className="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center mr-3">
+                <FiX className="text-red-600 text-sm" />
+              </div>
+              What's the Problem?
+            </h3>
+            <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+              <p className="text-red-800 mb-2">
+                Your browser cannot access your device's location. This could be because:
+              </p>
+              <ul className="text-red-700 text-sm space-y-1 ml-4">
+                <li>• Location permissions are denied</li>
+                <li>• GPS/Location Services are turned off</li>
+                <li>• Browser settings are blocking location access</li>
+                <li>• You're using an insecure connection (HTTP instead of HTTPS)</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* General Steps */}
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                <span className="text-blue-600 text-sm font-bold">1</span>
+              </div>
+              General Steps (All Devices)
+            </h3>
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+              <ul className="text-blue-800 space-y-2">
+                {instructions.common.map((step, index) => (
+                  <li key={index} className="flex items-start">
+                    <div className="w-2 h-2 rounded-full bg-blue-400 mt-2 mr-3 flex-shrink-0"></div>
+                    {step}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Device-Specific Steps */}
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                <span className="text-green-600 text-sm font-bold">2</span>
+              </div>
+              Device-Specific Steps
+              <div className="ml-3 flex items-center">
+                {deviceInfo.isMobile ? (
+                  <FiSmartphone className="text-gray-500" />
+                ) : (
+                  <FiMonitor className="text-gray-500" />
+                )}
+                <span className="ml-1 text-sm text-gray-500">
+                  {deviceInfo.deviceType} • {deviceInfo.browserName}
+                </span>
+              </div>
+            </h3>
+            <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+              <ol className="text-green-800 space-y-3">
+                {instructions.specific.map((step, index) => (
+                  <li key={index} className="flex items-start">
+                    <div className="w-6 h-6 rounded-full bg-green-200 flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">
+                      <span className="text-green-700 text-xs font-bold">{index + 1}</span>
+                    </div>
+                    <span className="font-medium">{step}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </div>
+
+          {/* Troubleshooting Tips */}
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              <div className="w-6 h-6 rounded-full bg-yellow-100 flex items-center justify-center mr-3">
+                <span className="text-yellow-600 text-sm font-bold">!</span>
+              </div>
+              Still Not Working?
+            </h3>
+            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+              <ul className="text-yellow-800 space-y-2">
+                <li className="flex items-start">
+                  <div className="w-2 h-2 rounded-full bg-yellow-400 mt-2 mr-3 flex-shrink-0"></div>
+                  Try refreshing the page after changing settings
+                </li>
+                <li className="flex items-start">
+                  <div className="w-2 h-2 rounded-full bg-yellow-400 mt-2 mr-3 flex-shrink-0"></div>
+                  Clear your browser cache and cookies
+                </li>
+                <li className="flex items-start">
+                  <div className="w-2 h-2 rounded-full bg-yellow-400 mt-2 mr-3 flex-shrink-0"></div>
+                  Try using a different browser (Chrome recommended)
+                </li>
+                <li className="flex items-start">
+                  <div className="w-2 h-2 rounded-full bg-yellow-400 mt-2 mr-3 flex-shrink-0"></div>
+                  Make sure you're using HTTPS (secure connection)
+                </li>
+                <li className="flex items-start">
+                  <div className="w-2 h-2 rounded-full bg-yellow-400 mt-2 mr-3 flex-shrink-0"></div>
+                  Restart your browser completely
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button
+              onClick={() => {
+                onClose();
+                window.location.reload();
+              }}
+              className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium"
+            >
+              I've Fixed It - Refresh Page
+            </button>
+            <button
+              onClick={onClose}
+              className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors font-medium"
+            >
+              Close Help
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+};
 
 
 
@@ -147,6 +523,9 @@ const TutorOverview = () => {
   const [error, setError] = useState(null)
   const [locationError, setLocationError] = useState(null)
   const [distance, setDistance] = useState(null)
+  const [isLocationLoading, setIsLocationLoading] = useState(true)
+  const [showLocationHelp, setShowLocationHelp] = useState(false)
+  const locationMarkerRef = useRef(null)
 
   // Get tutor data from localStorage
   const tutorData = JSON.parse(localStorage.getItem('userData') || '{}')
@@ -180,16 +559,109 @@ const TutorOverview = () => {
     return () => clearInterval(timer)
   }, [])
 
-  const handleLocationUpdate = (location) => {
+  const handleLocationUpdate = useCallback((location) => {
+    // Validate location data
+    if (!location || typeof location.lat !== 'number' || typeof location.lng !== 'number') {
+      console.error('Invalid location data received:', location);
+      setLocationError('Invalid location data received');
+      setIsLocationLoading(false);
+      return;
+    }
+
+    // Check for valid coordinate ranges
+    if (location.lat < -90 || location.lat > 90 || location.lng < -180 || location.lng > 180) {
+      console.error('Location coordinates out of valid range:', location);
+      setLocationError('Location coordinates are invalid');
+      setIsLocationLoading(false);
+      return;
+    }
+
+    console.log('Valid location update received:', location);
     setLocationError(null);
-    setCurrentLocation(location)
+    setCurrentLocation(location);
+    setIsLocationLoading(false);
+    
     if (centerLocation) {
       // Calculate distance between current location and center location
-      const calculatedDistance = calculateDistance(location, centerLocation)
-      setDistance(calculatedDistance)
-      setLocationMatch(calculatedDistance <= 0.1) // Within 1300 meters (1.3 km)
+      const calculatedDistance = calculateDistance(location, centerLocation);
+      setDistance(calculatedDistance);
+      console.log('Distance to center:', calculatedDistance, 'km');
+      setLocationMatch(calculatedDistance <= 0.1); // Within 100 meters (0.1 km)
     }
-  }
+  }, [centerLocation]);
+
+  const handleLocationError = useCallback((errorMessage, shouldShowHelp) => {
+    setLocationError(errorMessage);
+    setIsLocationLoading(false);
+    
+    // Auto-show help for critical errors
+    if (shouldShowHelp && errorMessage.includes('denied')) {
+      // Auto-show help after a short delay for permission denied errors
+      setTimeout(() => {
+        setShowLocationHelp(true);
+      }, 2000);
+    }
+  }, []);
+
+  // Function to detect user's device and browser
+  const getDeviceInfo = () => {
+    const userAgent = navigator.userAgent;
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+    const isIOS = /iPad|iPhone|iPod/.test(userAgent);
+    const isAndroid = /Android/.test(userAgent);
+    const isChrome = /Chrome/.test(userAgent);
+    const isFirefox = /Firefox/.test(userAgent);
+    const isSafari = /Safari/.test(userAgent) && !isChrome;
+    const isEdge = /Edge/.test(userAgent);
+
+    return {
+      isMobile,
+      isIOS,
+      isAndroid,
+      isChrome,
+      isFirefox,
+      isSafari,
+      isEdge,
+      browserName: isChrome ? 'Chrome' : isFirefox ? 'Firefox' : isSafari ? 'Safari' : isEdge ? 'Edge' : 'Unknown',
+      deviceType: isIOS ? 'iOS' : isAndroid ? 'Android' : isMobile ? 'Mobile' : 'Desktop'
+    };
+  };
+
+  const handleRefreshLocation = useCallback(() => {
+    setIsLocationLoading(true);
+    setLocationError(null);
+    setCurrentLocation(null);
+    setLocationMatch(null);
+    setDistance(null);
+    
+    // Force a new location request
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const location = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          handleLocationUpdate(location);
+        },
+        (error) => {
+          console.error('Manual location refresh failed:', error);
+          setLocationError('Failed to refresh location. Please try again.');
+          setIsLocationLoading(false);
+        },
+        { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 }
+      );
+    } else {
+      fetchLocationFallback().then((fallbackPosition) => {
+        if (fallbackPosition) {
+          handleLocationUpdate(fallbackPosition);
+        } else {
+          setLocationError('Unable to determine location.');
+          setIsLocationLoading(false);
+        }
+      });
+    }
+  }, [handleLocationUpdate, centerLocation]);
 
   const calculateDistance = (loc1, loc2) => {
     // Haversine formula to calculate distance between two points
@@ -351,6 +823,15 @@ const TutorOverview = () => {
           </div>
         ) : (
           <>
+            {isLocationLoading && !currentLocation && (
+              <div className="mb-6 p-4 bg-blue-50/80 backdrop-blur-sm text-blue-700 rounded-xl border border-blue-100 flex items-center">
+                <svg className="animate-spin h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                </svg>
+                Getting your current location... Please ensure location permissions are enabled.
+              </div>
+            )}
             {error && (
               <div className="mb-6 p-4 bg-red-50/80 backdrop-blur-sm text-red-700 rounded-xl border border-red-100 flex items-center">
                 <FiX className="h-5 w-5 mr-3" />
@@ -358,9 +839,28 @@ const TutorOverview = () => {
               </div>
             )}
             {locationError && (
-              <div className="mb-6 p-4 bg-red-50/80 backdrop-blur-sm text-red-700 rounded-xl border border-red-100 flex items-center">
-                <FiX className="h-5 w-5 mr-3" />
-                {locationError}
+              <div className="mb-6 p-4 bg-red-50/80 backdrop-blur-sm text-red-700 rounded-xl border border-red-100">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center">
+                    <FiX className="h-5 w-5 mr-3" />
+                    {locationError}
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleRefreshLocation}
+                    className="px-3 py-1 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-sm font-medium"
+                  >
+                    Retry
+                  </button>
+                  <button
+                    onClick={() => setShowLocationHelp(true)}
+                    className="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium flex items-center"
+                  >
+                    <FiHelpCircle className="w-4 h-4 mr-1" />
+                    Get Help
+                  </button>
+                </div>
               </div>
             )}
             <div className="relative h-[300px] sm:h-[350px] md:h-[400px] rounded-2xl overflow-hidden mb-6 shadow-2xl border border-white/20 bg-white/5 backdrop-blur-sm transition-all duration-300 hover:shadow-accent-500/20">
@@ -375,7 +875,10 @@ const TutorOverview = () => {
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 />
-                <LocationMarker onLocationUpdate={handleLocationUpdate} />
+                <LocationMarker 
+                  onLocationUpdate={handleLocationUpdate} 
+                  onLocationError={handleLocationError}
+                />
                 <Marker 
                   position={[centerLocation.lat, centerLocation.lng]} 
                   icon={blueIcon}
@@ -390,25 +893,86 @@ const TutorOverview = () => {
 
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
               <div className="w-full sm:w-auto">
-                {locationMatch !== null && (
-                  <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-white/20 shadow-lg transition-all duration-300 hover:shadow-xl hover:shadow-primary-500/10">
+                {isLocationLoading ? (
+                  <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-white/20 shadow-lg transition-all duration-300">
                     <div className="flex items-center">
-                      <div className={`w-4 h-4 rounded-full mr-3 ${locationMatch ? 'bg-green-500' : 'bg-red-500'} shadow-lg`}></div>
-                      <p className={`text-base sm:text-lg font-medium ${locationMatch ? 'text-green-600' : 'text-red-600'}`}>
-                        {locationMatch 
-                          ? 'Location verified'
-                          : 'Location mismatch'}
+                      <svg className="animate-spin h-4 w-4 mr-3 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                      </svg>
+                      <p className="text-base sm:text-lg font-medium text-blue-600">
+                        Detecting location...
                       </p>
                     </div>
                   </div>
-                )}
+                ) : locationMatch !== null ? (
+                  <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-white/20 shadow-lg transition-all duration-300 hover:shadow-xl hover:shadow-primary-500/10">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className={`w-4 h-4 rounded-full mr-3 ${locationMatch ? 'bg-green-500' : 'bg-red-500'} shadow-lg`}></div>
+                        <div>
+                          <p className={`text-base sm:text-lg font-medium ${locationMatch ? 'text-green-600' : 'text-red-600'}`}>
+                            {locationMatch 
+                              ? 'Location verified'
+                              : 'Location mismatch'}
+                          </p>
+                          {distance !== null && (
+                            <p className="text-sm text-gray-500">
+                              Distance: {(distance * 1000).toFixed(0)}m from center
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <button
+                        onClick={handleRefreshLocation}
+                        disabled={isLocationLoading}
+                        className="ml-3 p-2 text-gray-500 hover:text-blue-600 transition-colors"
+                        title="Refresh location"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                ) : currentLocation === null && !locationError ? (
+                  <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-white/20 shadow-lg transition-all duration-300">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="w-4 h-4 rounded-full mr-3 bg-yellow-500 shadow-lg"></div>
+                        <p className="text-base sm:text-lg font-medium text-yellow-600">
+                          Waiting for location...
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={handleRefreshLocation}
+                          className="p-2 text-gray-500 hover:text-blue-600 transition-colors"
+                          title="Try to get location"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => setShowLocationHelp(true)}
+                          className="p-2 text-gray-500 hover:text-blue-600 transition-colors"
+                          title="Get help with location"
+                        >
+                          <FiHelpCircle className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
               </div>
               <div className="flex gap-4 w-full sm:w-auto justify-end">
                 <button
                   onClick={handleMarkAttendance}
-                  disabled={!locationMatch || attendanceMarked}
+                  disabled={!locationMatch || attendanceMarked || isLocationLoading}
                   className={`px-6 py-3 rounded-xl transition-all duration-300 flex items-center justify-center flex-1 sm:flex-none text-base font-medium shadow-lg ${
-                    locationMatch && !attendanceMarked
+                    locationMatch && !attendanceMarked && !isLocationLoading
                       ? 'bg-gradient-to-r from-green-600 to-emerald-500 text-white hover:shadow-xl hover:shadow-green-500/25 hover:-translate-y-0.5'
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
@@ -421,6 +985,13 @@ const TutorOverview = () => {
           </>
         )}
       </motion.div>
+
+      {/* Location Help Modal */}
+      <LocationHelpModal 
+        isOpen={showLocationHelp}
+        onClose={() => setShowLocationHelp(false)}
+        deviceInfo={getDeviceInfo()}
+      />
     </div>
   )
 }
