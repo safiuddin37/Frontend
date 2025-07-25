@@ -31,45 +31,54 @@ const createCustomIcon = (color) => {
 
 const redIcon = createCustomIcon('red')
 const blueIcon = createCustomIcon('blue')
+const orangeIcon = createCustomIcon('orange') // For IP-based locations
 
 // Fallback when the Geolocation API fails or is unavailable – uses an IP lookup service.
+// WARNING: IP-based location is only city-level accurate (can be kilometers off)
 const fetchLocationFallback = async () => {
+  console.warn('⚠️ Attempting IP-based location fallback - this will be much less accurate than GPS');
+  
   try {
-    console.log('Attempting IP-based location fallback...');
     // Simple IP-based lookup (≈ city-level). Free up to 30k calls / month.
-    const response = await axios.get('https://ipapi.co/json/', { timeout: 10000 });
-    const { latitude, longitude, error } = response.data;
+    const response = await axios.get('https://ipapi.co/json/', { timeout: 8000 });
+    const { latitude, longitude, error, city, region, country } = response.data;
     
     if (error) {
       console.error('IP geolocation service error:', error);
       return null;
     }
     
-    if (latitude && longitude && typeof latitude === 'number' && typeof longitude === 'number') {
-      console.log('IP-based location obtained:', { lat: latitude, lng: longitude });
-      return { lat: latitude, lng: longitude };
+    // Validate coordinates more strictly
+    if (latitude && longitude && 
+        typeof latitude === 'number' && typeof longitude === 'number' &&
+        latitude >= -90 && latitude <= 90 && 
+        longitude >= -180 && longitude <= 180) {
+      
+      console.warn(`📍 IP-based location: ${city}, ${region}, ${country}`);
+      console.warn(`⚠️ Coordinates: ${latitude}, ${longitude} - Accuracy: City-level (~1-10km radius)`);
+      
+      return { 
+        lat: latitude, 
+        lng: longitude,
+        isIPBased: true, // Flag to indicate this is not GPS
+        accuracy: 5000 // Assume 5km accuracy for IP-based location
+      };
     } else {
       console.error('Invalid coordinates from IP service:', { latitude, longitude });
     }
   } catch (error) {
-    console.error('Fallback IP geolocation error:', error);
+    console.error('Primary IP geolocation service failed:', error);
     
-    // Try alternative IP service as backup
-    try {
-      console.log('Trying alternative IP location service...');
-      const altResponse = await axios.get('https://api.ipify.org?format=json', { timeout: 5000 });
-      // This service only provides IP, we'd need another call for location
-      // For now, just log that we tried
-      console.log('Alternative service responded, but location lookup not implemented');
-    } catch (altError) {
-      console.error('Alternative IP service also failed:', altError);
-    }
+    // Don't try alternative services - they're usually less accurate
+    // and we want to encourage users to enable GPS instead
+    console.warn('Not attempting alternative IP services - please enable GPS for accurate location');
   }
   return null;
 };
 
 const LocationMarker = ({ onLocationUpdate, onLocationError }) => {
   const [position, setPosition] = useState(null)
+  const [isIPBased, setIsIPBased] = useState(false)
   const map = useMap()
   const watchIdRef = useRef(null)
   const hasAnimatedRef = useRef(false)
@@ -78,13 +87,18 @@ const LocationMarker = ({ onLocationUpdate, onLocationError }) => {
   const hasInitialLocationRef = useRef(false)
   const fallbackRequestedRef = useRef(false);
   const lastErrorTimeRef = useRef(0);
+  const lastValidPositionRef = useRef(null);
+  const accuracyHistoryRef = useRef([]);
 
   useEffect(() => {
     if (!navigator.geolocation) {
+      // Only use IP fallback as last resort, and warn user about accuracy
       fetchLocationFallback().then((fallbackPosition) => {
         if (fallbackPosition) {
           setPosition(fallbackPosition);
+          setIsIPBased(true);
           onLocationUpdate(fallbackPosition);
+          console.warn('Using IP-based location - accuracy may be several kilometers off');
         } else {
           setLocationError('Unable to determine location.');
         }
@@ -92,17 +106,54 @@ const LocationMarker = ({ onLocationUpdate, onLocationError }) => {
       return;
     }
 
-    const DESIRED_ACCURACY = 100; // meters - relaxed from 50 to get more readings
+    const DESIRED_ACCURACY = 200; // meters - relaxed for better compatibility
+    const MAX_DISTANCE_JUMP = 2000; // meters - relaxed to allow valid location changes
+    const MIN_ACCURACY_FOR_INITIAL = 1000; // meters - much more relaxed for initial reading
+    
+    // Calculate distance between two coordinates in meters
+    const calculateDistance = (lat1, lng1, lat2, lng2) => {
+      const R = 6371e3; // Earth's radius in meters
+      const φ1 = lat1 * Math.PI/180;
+      const φ2 = lat2 * Math.PI/180;
+      const Δφ = (lat2-lat1) * Math.PI/180;
+      const Δλ = (lng2-lng1) * Math.PI/180;
+
+      const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                Math.cos(φ1) * Math.cos(φ2) *
+                Math.sin(Δλ/2) * Math.sin(Δλ/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+      return R * c;
+    };
+
     const handleSuccess = ({ latitude, longitude, accuracy }) => {
       console.log('Location received:', { latitude, longitude, accuracy });
       
       const latlng = { lat: latitude, lng: longitude };
       
-      // Always accept the first location reading to get immediate positioning
+      // Validate coordinates
+      if (!latitude || !longitude || 
+          latitude < -90 || latitude > 90 || 
+          longitude < -180 || longitude > 180) {
+        console.warn('Invalid coordinates received:', { latitude, longitude });
+        return;
+      }
+
+      // For the first location reading, accept it to get immediate positioning
       if (!hasInitialLocationRef.current) {
+        console.log('First location reading accepted:', { latitude, longitude, accuracy });
+        
         setPosition(latlng);
+        setIsIPBased(false); // This is GPS-based location
         onLocationUpdate(latlng);
         hasInitialLocationRef.current = true;
+        lastValidPositionRef.current = latlng;
+        
+        // Track accuracy history
+        accuracyHistoryRef.current.push(accuracy || 999);
+        if (accuracyHistoryRef.current.length > 5) {
+          accuracyHistoryRef.current.shift();
+        }
         
         if (!hasAnimatedRef.current) {
           map.flyTo(latlng, 17, { animate: true }); // Initial animation, zoom in to 17
@@ -111,14 +162,37 @@ const LocationMarker = ({ onLocationUpdate, onLocationError }) => {
         return;
       }
       
-      // For subsequent readings, apply accuracy filter
+      // For subsequent readings, apply basic filters only
       if (accuracy && accuracy > DESIRED_ACCURACY) {
-        console.log('Ignoring inaccurate reading:', accuracy);
+        console.log('Ignoring very inaccurate reading:', accuracy);
         return;
+      }
+
+      // Check for unrealistic distance jumps (possible GPS glitch)
+      if (lastValidPositionRef.current) {
+        const distance = calculateDistance(
+          lastValidPositionRef.current.lat, 
+          lastValidPositionRef.current.lng,
+          latitude, 
+          longitude
+        );
+        
+        if (distance > MAX_DISTANCE_JUMP) {
+          console.warn(`Ignoring location jump of ${Math.round(distance)}m - likely GPS error`);
+          return;
+        }
+      }
+
+      // Track accuracy history (simplified)
+      accuracyHistoryRef.current.push(accuracy || 999);
+      if (accuracyHistoryRef.current.length > 3) {
+        accuracyHistoryRef.current.shift();
       }
       
       setPosition(latlng);
+      setIsIPBased(false); // This is GPS-based location
       onLocationUpdate(latlng);
+      lastValidPositionRef.current = latlng;
       map.setView(latlng, map.getZoom(), { animate: false }); // Always keep user centered, no animation
     };
 
@@ -176,17 +250,23 @@ const LocationMarker = ({ onLocationUpdate, onLocationError }) => {
         return;
       }
 
-      // Only try fallback if we haven't already requested it
-      if (!fallbackRequestedRef.current) {
+      // Try IP fallback for timeout and position unavailable errors
+      if ((error.code === error.TIMEOUT || error.code === error.POSITION_UNAVAILABLE) && !fallbackRequestedRef.current) {
         fallbackRequestedRef.current = true;
+        console.warn('GPS failed - attempting IP fallback (less accurate)');
         
-        // Fallback to IP location service for other errors
         fetchLocationFallback().then((fallbackPosition) => {
           if (fallbackPosition) {
             setPosition(fallbackPosition);
+            setIsIPBased(true);
             onLocationUpdate(fallbackPosition);
-            setLocationError(null); // Clear error if fallback works
-            console.log('Using IP-based location as fallback');
+            setLocationError('Using approximate location - GPS unavailable');
+            console.warn('Using IP-based location as fallback - accuracy may be several kilometers off');
+            
+            // Clear the error after successful fallback
+            if (onLocationError) {
+              onLocationError(null, false);
+            }
           } else {
             const finalMessage = 'Unable to determine location from any source. Please check your settings.';
             setLocationError(finalMessage);
@@ -198,7 +278,14 @@ const LocationMarker = ({ onLocationUpdate, onLocationError }) => {
       }
     };
 
-    // First, try to get current position immediately for faster initial load
+    // Start with standard GPS options for better compatibility
+    const standardOptions = { 
+      enableHighAccuracy: false, 
+      maximumAge: 60000, // Accept locations up to 1 minute old
+      timeout: 10000 
+    };
+
+    // First, try to get current position with standard accuracy
     navigator.geolocation.getCurrentPosition(
       pos => handleSuccess({
         latitude: pos.coords.latitude,
@@ -206,12 +293,10 @@ const LocationMarker = ({ onLocationUpdate, onLocationError }) => {
         accuracy: pos.coords.accuracy
       }),
       errorHandlerWrapper,
-      { enableHighAccuracy: false, maximumAge: 10000, timeout: 10000 }
+      standardOptions
     );
 
     // Start watching position for continuous updates
-    const geoOptions = { enableHighAccuracy: false, maximumAge: 5000, timeout: 15000 };
-
     watchIdRef.current = navigator.geolocation.watchPosition(
       pos => handleSuccess({
         latitude: pos.coords.latitude,
@@ -219,25 +304,27 @@ const LocationMarker = ({ onLocationUpdate, onLocationError }) => {
         accuracy: pos.coords.accuracy
       }),
       errorHandlerWrapper,
-      geoOptions
+      standardOptions
     );
 
-    // If we don't get a good fix within 15 seconds, escalate to high-accuracy GPS
+    // Try high accuracy after getting initial location
     escalateTimerRef.current = setTimeout(() => {
-      console.log('Escalating to high-accuracy GPS');
-      if (watchIdRef.current !== null) {
-        navigator.geolocation.clearWatch(watchIdRef.current);
+      if (hasInitialLocationRef.current) {
+        console.log('Upgrading to high-accuracy GPS for better precision');
+        if (watchIdRef.current !== null) {
+          navigator.geolocation.clearWatch(watchIdRef.current);
+        }
+        watchIdRef.current = navigator.geolocation.watchPosition(
+          pos => handleSuccess({
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude,
+            accuracy: pos.coords.accuracy
+          }),
+          errorHandlerWrapper,
+          { enableHighAccuracy: true, maximumAge: 30000, timeout: 15000 }
+        );
       }
-      watchIdRef.current = navigator.geolocation.watchPosition(
-        pos => handleSuccess({
-          latitude: pos.coords.latitude,
-          longitude: pos.coords.longitude,
-          accuracy: pos.coords.accuracy
-        }),
-        errorHandlerWrapper,
-        { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 }
-      );
-    }, 15000);
+    }, 5000);
 
     // Clean-up on unmount
     return () => {
@@ -250,7 +337,13 @@ const LocationMarker = ({ onLocationUpdate, onLocationError }) => {
     };
   }, [map, onLocationUpdate]);
 
-  return position === null ? null : <Marker position={position} icon={redIcon} />
+  return position === null ? null : (
+    <Marker 
+      position={position} 
+      icon={isIPBased ? orangeIcon : redIcon}
+      title={isIPBased ? "Approximate location (IP-based)" : "GPS location"}
+    />
+  )
 }
 
 // Location Help Modal Component
