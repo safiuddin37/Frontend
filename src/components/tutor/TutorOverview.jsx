@@ -836,7 +836,7 @@ const TutorOverview = () => {
               </svg>
             ) : centerStudents}
           </div>
-          <div className="text-sm font-medium tracking-wide opacity-90">Center Students all</div>
+          <div className="text-sm font-medium tracking-wide opacity-90">Center Students</div>
         </div>
 
         {/* Time Card */}
