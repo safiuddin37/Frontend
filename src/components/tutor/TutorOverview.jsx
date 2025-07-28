@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { MapContainer, TileLayer, Marker, useMap, Circle } from 'react-leaflet'
-import { FiUsers, FiClock, FiCheck, FiX, FiHelpCircle, FiSmartphone, FiMonitor } from 'react-icons/fi'
+import { FiUsers, FiClock, FiCheck, FiX, FiHelpCircle } from 'react-icons/fi'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 import useGet from '../CustomHooks/useGet'
@@ -133,91 +133,10 @@ const LocationMarker = ({ onLocationUpdate, onLocationError }) => {
 }
 
 // Location Help Modal Component
-const LocationHelpModal = ({ isOpen, onClose, deviceInfo }) => {
+const LocationHelpModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
-  const getInstructions = () => {
-    const { deviceType, browserName, isIOS, isAndroid, isChrome, isFirefox, isSafari } = deviceInfo;
 
-    const instructions = {
-      common: [
-        "Make sure you're connected to the internet",
-        "Ensure GPS/Location Services are enabled on your device",
-        "Allow location access when prompted by the browser"
-      ],
-      ios: {
-        safari: [
-          "1. Go to iPhone Settings → Privacy & Security → Location Services",
-          "2. Make sure Location Services is ON",
-          "3. Scroll down and tap 'Safari'",
-          "4. Select 'While Using App' or 'Ask Next Time'",
-          "5. Refresh this page and allow location access"
-        ],
-        chrome: [
-          "1. Go to iPhone Settings → Privacy & Security → Location Services",
-          "2. Make sure Location Services is ON",
-          "3. Open Chrome → Settings → Site Settings → Location",
-          "4. Make sure location access is allowed",
-          "5. Refresh this page and allow location access"
-        ]
-      },
-      android: {
-        chrome: [
-          "1. Go to Android Settings → Location → Turn ON",
-          "2. In Chrome, tap the lock icon next to the URL",
-          "3. Tap 'Permissions' → Location → Allow",
-          "4. Or go to Chrome Settings → Site Settings → Location → Allow",
-          "5. Refresh this page"
-        ],
-        firefox: [
-          "1. Go to Android Settings → Location → Turn ON",
-          "2. In Firefox, tap the shield icon → Permissions",
-          "3. Allow location access",
-          "4. Or go to Firefox Settings → Site Settings → Location",
-          "5. Refresh this page"
-        ]
-      },
-      desktop: {
-        chrome: [
-          "1. Click the location icon in the address bar",
-          "2. Select 'Always allow location access'",
-          "3. Or go to Chrome Settings → Privacy → Site Settings → Location",
-          "4. Make sure this site is allowed",
-          "5. Refresh this page"
-        ],
-        firefox: [
-          "1. Click the shield icon in the address bar",
-          "2. Turn off 'Enhanced Tracking Protection' for this site",
-          "3. Or go to Firefox Settings → Privacy → Permissions → Location",
-          "4. Allow location access for this site",
-          "5. Refresh this page"
-        ],
-        safari: [
-          "1. Go to Safari → Preferences → Websites → Location",
-          "2. Find this website and set to 'Allow'",
-          "3. Or click 'Allow' when prompted",
-          "4. Refresh this page"
-        ]
-      }
-    };
-
-    let specificInstructions = [];
-    
-    if (isIOS) {
-      specificInstructions = isSafari ? instructions.ios.safari : instructions.ios.chrome;
-    } else if (isAndroid) {
-      specificInstructions = isChrome ? instructions.android.chrome : instructions.android.firefox;
-    } else {
-      if (isChrome) specificInstructions = instructions.desktop.chrome;
-      else if (isFirefox) specificInstructions = instructions.desktop.firefox;
-      else if (isSafari) specificInstructions = instructions.desktop.safari;
-      else specificInstructions = instructions.desktop.chrome; // Default to Chrome instructions
-    }
-
-    return { common: instructions.common, specific: specificInstructions };
-  };
-
-  const instructions = getInstructions();
 
   return (
     <motion.div 
@@ -242,9 +161,7 @@ const LocationHelpModal = ({ isOpen, onClose, deviceInfo }) => {
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">Location Access Help</h2>
-                <p className="text-gray-600">
-                  {deviceInfo.deviceType} • {deviceInfo.browserName}
-                </p>
+                <p className="text-gray-600">Enable GPS location access</p>
               </div>
             </div>
             <button
@@ -267,7 +184,7 @@ const LocationHelpModal = ({ isOpen, onClose, deviceInfo }) => {
             </h3>
             <div className="bg-red-50 border border-red-200 rounded-xl p-4">
               <p className="text-red-800 mb-2">
-                Your browser cannot access your device's location. This could be because:
+                Your browser cannot access your location. This could be because:
               </p>
               <ul className="text-red-700 text-sm space-y-1 ml-4">
                 <li>• Location permissions are denied</li>
@@ -284,51 +201,35 @@ const LocationHelpModal = ({ isOpen, onClose, deviceInfo }) => {
               <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center mr-3">
                 <span className="text-blue-600 text-sm font-bold">1</span>
               </div>
-              General Steps (All Devices)
+              How to Enable Location Access
             </h3>
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
               <ul className="text-blue-800 space-y-2">
-                {instructions.common.map((step, index) => (
-                  <li key={index} className="flex items-start">
-                    <div className="w-2 h-2 rounded-full bg-blue-400 mt-2 mr-3 flex-shrink-0"></div>
-                    {step}
-                  </li>
-                ))}
+                <li className="flex items-start">
+                  <div className="w-2 h-2 rounded-full bg-blue-400 mt-2 mr-3 flex-shrink-0"></div>
+                  Make sure you're connected to the internet
+                </li>
+                <li className="flex items-start">
+                  <div className="w-2 h-2 rounded-full bg-blue-400 mt-2 mr-3 flex-shrink-0"></div>
+                  Enable GPS/Location Services on your device
+                </li>
+                <li className="flex items-start">
+                  <div className="w-2 h-2 rounded-full bg-blue-400 mt-2 mr-3 flex-shrink-0"></div>
+                  Allow location access when prompted by the browser
+                </li>
+                <li className="flex items-start">
+                  <div className="w-2 h-2 rounded-full bg-blue-400 mt-2 mr-3 flex-shrink-0"></div>
+                  Click the location icon in your browser's address bar and select "Allow"
+                </li>
+                <li className="flex items-start">
+                  <div className="w-2 h-2 rounded-full bg-blue-400 mt-2 mr-3 flex-shrink-0"></div>
+                  Refresh the page after changing location settings
+                </li>
               </ul>
             </div>
           </div>
 
-          {/* Device-Specific Steps */}
-          <div className="mb-8">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-              <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center mr-3">
-                <span className="text-green-600 text-sm font-bold">2</span>
-              </div>
-              Device-Specific Steps
-              <div className="ml-3 flex items-center">
-                {deviceInfo.isMobile ? (
-                  <FiSmartphone className="text-gray-500" />
-                ) : (
-                  <FiMonitor className="text-gray-500" />
-                )}
-                <span className="ml-1 text-sm text-gray-500">
-                  {deviceInfo.deviceType} • {deviceInfo.browserName}
-                </span>
-              </div>
-            </h3>
-            <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-              <ol className="text-green-800 space-y-3">
-                {instructions.specific.map((step, index) => (
-                  <li key={index} className="flex items-start">
-                    <div className="w-6 h-6 rounded-full bg-green-200 flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">
-                      <span className="text-green-700 text-xs font-bold">{index + 1}</span>
-                    </div>
-                    <span className="font-medium">{step}</span>
-                  </li>
-                ))}
-              </ol>
-            </div>
-          </div>
+
 
           {/* Troubleshooting Tips */}
           <div className="mb-6">
@@ -482,29 +383,7 @@ const TutorOverview = () => {
     }
   }, []);
 
-  // Function to detect user's device and browser
-  const getDeviceInfo = () => {
-    const userAgent = navigator.userAgent;
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
-    const isIOS = /iPad|iPhone|iPod/.test(userAgent);
-    const isAndroid = /Android/.test(userAgent);
-    const isChrome = /Chrome/.test(userAgent);
-    const isFirefox = /Firefox/.test(userAgent);
-    const isSafari = /Safari/.test(userAgent) && !isChrome;
-    const isEdge = /Edge/.test(userAgent);
 
-    return {
-      isMobile,
-      isIOS,
-      isAndroid,
-      isChrome,
-      isFirefox,
-      isSafari,
-      isEdge,
-      browserName: isChrome ? 'Chrome' : isFirefox ? 'Firefox' : isSafari ? 'Safari' : isEdge ? 'Edge' : 'Unknown',
-      deviceType: isIOS ? 'iOS' : isAndroid ? 'Android' : isMobile ? 'Mobile' : 'Desktop'
-    };
-  };
 
   const handleRefreshLocation = useCallback(() => {
     setIsLocationLoading(true);
@@ -866,10 +745,9 @@ const TutorOverview = () => {
       </motion.div>
 
       {/* Location Help Modal */}
-      <LocationHelpModal 
+      <LocationHelpModal
         isOpen={showLocationHelp}
         onClose={() => setShowLocationHelp(false)}
-        deviceInfo={getDeviceInfo()}
       />
     </div>
   )
