@@ -697,28 +697,28 @@ const TutorOverview = () => {
   }, []);
 
   // Function to detect user's device and browser
-  const getDeviceInfo = () => {
-    const userAgent = navigator.userAgent;
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
-    const isIOS = /iPad|iPhone|iPod/.test(userAgent);
-    const isAndroid = /Android/.test(userAgent);
-    const isChrome = /Chrome/.test(userAgent);
-    const isFirefox = /Firefox/.test(userAgent);
-    const isSafari = /Safari/.test(userAgent) && !isChrome;
-    const isEdge = /Edge/.test(userAgent);
+  // const getDeviceInfo = () => {
+  //   const userAgent = navigator.userAgent;
+  //   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+  //   const isIOS = /iPad|iPhone|iPod/.test(userAgent);
+  //   const isAndroid = /Android/.test(userAgent);
+  //   const isChrome = /Chrome/.test(userAgent);
+  //   const isFirefox = /Firefox/.test(userAgent);
+  //   const isSafari = /Safari/.test(userAgent) && !isChrome;
+  //   const isEdge = /Edge/.test(userAgent);
 
-    return {
-      isMobile,
-      isIOS,
-      isAndroid,
-      isChrome,
-      isFirefox,
-      isSafari,
-      isEdge,
-      browserName: isChrome ? 'Chrome' : isFirefox ? 'Firefox' : isSafari ? 'Safari' : isEdge ? 'Edge' : 'Unknown',
-      deviceType: isIOS ? 'iOS' : isAndroid ? 'Android' : isMobile ? 'Mobile' : 'Desktop'
-    };
-  };
+  //   return {
+  //     isMobile,
+  //     isIOS,
+  //     isAndroid,
+  //     isChrome,
+  //     isFirefox,
+  //     isSafari,
+  //     isEdge,
+  //     browserName: isChrome ? 'Chrome' : isFirefox ? 'Firefox' : isSafari ? 'Safari' : isEdge ? 'Edge' : 'Unknown',
+  //     deviceType: isIOS ? 'iOS' : isAndroid ? 'Android' : isMobile ? 'Mobile' : 'Desktop'
+  //   };
+  // };
 
   const handleRefreshLocation = useCallback(() => {
     setIsLocationLoading(true);
