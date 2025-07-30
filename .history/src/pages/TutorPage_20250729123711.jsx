@@ -301,8 +301,8 @@ const TutorPage = () => {
               )}
             </motion.button>
           </form>
-          <div className="mt-4 text-center text-sm text-blue-600">
-              <Link to="/tutor/forgot-password" style={{ textDecoration: 'underline', cursor: 'pointer' }}>forgot password?</Link>
+          <div className="mt-4 text-center text-sm text-underlineblue-600">
+              <a href="">forgot password?</a>
               </div>
           <div className="mt-4 text-center">
             <p className="text-sm text-gray-600 mb-2">Or continue as</p>

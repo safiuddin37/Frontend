@@ -71,7 +71,6 @@ function App() {
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/tutor" element={<TutorPage />} />
           <Route path="/tutor/forgot-password" element={<TutorForgotPassword />} />
-          <Route path="/tutor/password-reset/:token" element={<TutorPasswordReset />} />
           <Route path="/supervisor" element={<SupervisorPage />} />
           <Route path="/guest-login" element={<GuestLoginPage />} />
           <Route path="/guest-dashboard" element={<GuestDashboard />} />
