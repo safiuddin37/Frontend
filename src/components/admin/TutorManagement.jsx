@@ -73,12 +73,12 @@ const TutorManagement = () => {
         }
       });
       
-      console.log('Sending JSON data to API:', jsonData);
+      console.log('Submitting tutor payload:', JSON.stringify(jsonData, null, 2));  // Log the payload
       
       // Password validation
       if ('password' in formData && !isValidPassword(formData.password)) {
         setErrorMessage(
-          'Password must be at least 8 characters, contain no spaces, and not include quotes (\" or \\\').'
+          'Password must be at least 8 characters, contain no spaces, and not include quotes (" or \').'
         );
         setShowErrorPopover(true);
         setIsSubmitting(false);
@@ -96,8 +96,9 @@ const TutorManagement = () => {
         // With axios, successful responses come to this point
         setIsSubmitting(false);
         // Don't immediately reset - let the form show its success message first
+        return response; // Ensure promise resolves
       } catch (apiError) {
-        // Detailed error handling for API errors
+        console.error('Full error response:', apiError.response?.data);  // Detailed backend error
         console.error('API Error:', apiError);
         
         // Get detailed error message from the response if available
@@ -125,6 +126,7 @@ const TutorManagement = () => {
         throw apiError; // Re-throw to be caught by outer catch
       }
     } catch (err) {
+      console.error('Full error response:', err.response?.data);  // Detailed backend error
       console.error('Add Tutor Error:', err);
       if (!showErrorPopover) { // Only set if not already set by inner catch
         // Specific handling for 500 errors
@@ -252,7 +254,7 @@ const TutorManagement = () => {
         }
       });
       
-      console.log('Sending JSON data to API for update:', jsonData);
+      console.log('Submitting tutor payload:', JSON.stringify(jsonData, null, 2));  // Log the payload
       
       // Password validation
       if ('password' in updatedData && updatedData.password && !isValidPassword(updatedData.password)) {
@@ -286,6 +288,7 @@ const TutorManagement = () => {
       // Trigger refresh of tutor list for when we return to it
       setRefreshTrigger(prev => prev + 1);
     } catch (err) {
+      console.error('Full error response:', err.response?.data);  // Detailed backend error
       setErrorMessage(err.message || 'Failed to update tutor');
       setShowErrorPopover(true);
     } finally {
