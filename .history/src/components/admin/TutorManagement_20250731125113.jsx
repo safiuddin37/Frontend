@@ -400,7 +400,8 @@ const TutorManagement = () => {
             background: 'white', 
             borderRadius: '12px', 
             padding: '24px',
-            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.05)'
+            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.05)',
+            marginBottom: '32px'
           }}>
             <TutorList 
               onEdit={handleEdit} 
@@ -479,7 +480,7 @@ const TutorManagement = () => {
               </svg>
               Back
             </button>
-            <h2 style={{ margin: 0, fontSize: '24px', fontWeight: '600' }}>Edit Tutor: {selectedTutor?.name}</h2>
+            {/* <h2 style={{ margin: 0, fontSize: '24px', fontWeight: '600' }}>Edit Tutor: {selectedTutor?.name}</h2> */}
           </div>
           <UpdateTutorForm 
             onSubmit={handleUpdateTutor} 

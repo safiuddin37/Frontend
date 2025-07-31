@@ -5,12 +5,10 @@ import UpdateTutorForm from './tutors/UpdateTutorForm';
 import TutorProfile from './tutors/TutorProfile';
 import TutorList from './tutors/TutorList';
 import Popover from '../common/Popover';
-import useGet from '../CustomHooks/useGet';
 
 const TutorManagement = () => {
   const [mode, setMode] = useState('list'); // 'list' | 'add' | 'update' | 'profile'
   const [selectedTutor, setSelectedTutor] = useState(null);
-  const { response: tutors } = useGet('/tutors');
 
   // State for form data, errors, etc.
   const [formData, setFormData] = useState({});
@@ -337,37 +335,15 @@ const TutorManagement = () => {
           <div style={{ 
             background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)', 
             borderRadius: '10px', 
-            padding: '20px', 
+            padding: '24px', 
             marginBottom: '24px',
             color: 'white',
             boxShadow: '0 10px 25px rgba(59, 130, 246, 0.15)'
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ flex: '1' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <div>
                 <h1 style={{ fontSize: '24px', fontWeight: '700', margin: '0 0 6px 0' }}>Tutor Management</h1>
                 <p style={{ fontSize: '14px', margin: '0', opacity: '0.9' }}>Manage all tutors, their profiles, and assignments</p>
-              </div>
-              <div style={{ 
-                display: 'flex', 
-                gap: '24px', 
-                alignItems: 'center', 
-                background: 'rgba(255, 255, 255, 0.1)',
-                padding: '12px 24px',
-                borderRadius: '8px',
-                margin: '0 24px'
-              }}>
-                <div style={{ textAlign: 'center', paddingRight: '24px', borderRight: '1px solid rgba(255, 255, 255, 0.2)' }}>
-                  <h3 style={{ fontSize: '20px', fontWeight: '700', margin: '0' }}>{tutorStats.total}</h3>
-                  <p style={{ fontSize: '12px', margin: '4px 0 0 0' }}>Total</p>
-                </div>
-                <div style={{ textAlign: 'center', paddingRight: '24px', borderRight: '1px solid rgba(255, 255, 255, 0.2)' }}>
-                  <h3 style={{ fontSize: '20px', fontWeight: '700', margin: '0', color: '#4ade80' }}>{tutorStats.active}</h3>
-                  <p style={{ fontSize: '12px', margin: '4px 0 0 0' }}>Active</p>
-                </div>
-                <div style={{ textAlign: 'center' }}>
-                  <h3 style={{ fontSize: '20px', fontWeight: '700', margin: '0', color: '#f87171' }}>{tutorStats.inactive}</h3>
-                  <p style={{ fontSize: '12px', margin: '4px 0 0 0' }}>Inactive</p>
-                </div>
               </div>
               <button
                 style={{ 
@@ -382,8 +358,7 @@ const TutorManagement = () => {
                   boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
-                  whiteSpace: 'nowrap'
+                  gap: '6px'
                 }}
                 onClick={handleAdd}
               >
@@ -394,13 +369,35 @@ const TutorManagement = () => {
                 Add Tutor
               </button>
             </div>
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(3, 1fr)', 
+              gap: '16px',
+              background: 'rgba(255, 255, 255, 0.1)',
+              padding: '16px',
+              borderRadius: '8px'
+            }}>
+              <div style={{ textAlign: 'center' }}>
+                <p style={{ fontSize: '12px', opacity: '0.9', margin: '0 0 4px 0' }}>Total Tutors</p>
+                <h3 style={{ fontSize: '24px', fontWeight: '700', margin: '0' }}>{tutorStats.total}</h3>
+              </div>
+              <div style={{ textAlign: 'center', borderLeft: '1px solid rgba(255, 255, 255, 0.2)', borderRight: '1px solid rgba(255, 255, 255, 0.2)' }}>
+                <p style={{ fontSize: '12px', opacity: '0.9', margin: '0 0 4px 0' }}>Active Tutors</p>
+                <h3 style={{ fontSize: '24px', fontWeight: '700', margin: '0', color: '#4ade80' }}>{tutorStats.active}</h3>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <p style={{ fontSize: '12px', opacity: '0.9', margin: '0 0 4px 0' }}>Inactive Tutors</p>
+                <h3 style={{ fontSize: '24px', fontWeight: '700', margin: '0', color: '#f87171' }}>{tutorStats.inactive}</h3>
+              </div>
+            </div>
           </div>
           
           <div style={{ 
             background: 'white', 
             borderRadius: '12px', 
             padding: '24px',
-            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.05)'
+            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.05)',
+            marginBottom: '32px'
           }}>
             <TutorList 
               onEdit={handleEdit} 

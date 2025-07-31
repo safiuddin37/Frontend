@@ -9,7 +9,7 @@ const TutorList = ({ onEdit, onDelete, onProfile }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('active'); // Set 'active' as default
+  const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'active', 'inactive'
   const [filteredTutors, setFilteredTutors] = useState([]);
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -88,9 +88,7 @@ const TutorList = ({ onEdit, onDelete, onProfile }) => {
 
       const data = await response.json();
       setTutors(data);
-      // Filter active tutors initially
-      const activeTutors = data.filter(tutor => tutor.status === 'active');
-      setFilteredTutors(activeTutors);
+      setFilteredTutors(data); // Initialize filtered tutors with all tutors
     } catch (err) {
       setError(err.message || 'Failed to fetch tutors');
     } finally {
@@ -201,6 +199,7 @@ const TutorList = ({ onEdit, onDelete, onProfile }) => {
   return (
     <div>
       {/* Stats Cards */}
+      
       {/* Search and Filters */}
       <div style={{ marginBottom: '24px' }}>
         <div style={{ display: 'flex', gap: '16px', marginBottom: '20px' }}>

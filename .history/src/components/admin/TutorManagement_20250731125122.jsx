@@ -400,7 +400,8 @@ const TutorManagement = () => {
             background: 'white', 
             borderRadius: '12px', 
             padding: '24px',
-            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.05)'
+            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.05)',
+            marginBottom: '32px'
           }}>
             <TutorList 
               onEdit={handleEdit} 

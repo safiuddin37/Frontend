@@ -4,6 +4,7 @@ import useGet from '../CustomHooks/useGet'
 import { useState, useMemo, useEffect } from 'react'
 import { format } from 'date-fns'
 import { toast } from 'react-hot-toast'
+import { useNavigate } from 'react-router-dom'
 
 // Reusable Popover component for feedback
 const Popover = ({ isOpen, onClose, title, message, type = 'success' }) => {
@@ -32,7 +33,8 @@ const Popover = ({ isOpen, onClose, title, message, type = 'success' }) => {
   );
 };
 
-const Overview = ({ onTabChange }) => {
+const Overview = () => {
+  const navigate = useNavigate();
   // State for clearing activity
   // const [clearingActivity, setClearingActivity] = useState(false);
   const [showPopover, setShowPopover] = useState(false);
@@ -220,21 +222,21 @@ const Overview = ({ onTabChange }) => {
         {[
           {
             label: 'Active Tutors',
-            value: tutorsLoading ? '...' : activeTutors?.length || 0,
+            value: activeTutors.length,
             icon: FiUsers,
-            tab: 'tutors'
+            onClick: () => navigate('/', { state: { activeTab: 'tutors' } })
           },
           {
             label: 'Total Centers',
-            value: centersLoading ? '...' : activeCenters?.length || 0,
+            value: activeCenters.length,
             icon: FiMapPin,
-            tab: 'centers'
+            onClick: () => navigate('/', { state: { activeTab: 'centers' } })
           },
           {
-            label: 'Attendance',
-            value: attendancePercentage,
+            label: 'Today\'s Attendance',
+            value: localAttendance?.length || 0,
             icon: FiClock,
-            tab: 'reports'
+            onClick: () => navigate('/', { state: { activeTab: 'reports' } })
           }
         ].map((stat, index) => (
           <motion.div
@@ -242,7 +244,7 @@ const Overview = ({ onTabChange }) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            onClick={() => onTabChange(stat.tab)}
+            onClick={stat.onClick}
             className="bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
           >
             <div className="flex items-center justify-between">

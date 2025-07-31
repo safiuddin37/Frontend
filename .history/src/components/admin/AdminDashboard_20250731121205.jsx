@@ -12,6 +12,7 @@ import HadiyaManagement from './HadiyaManagement';
 import AdminGuestPage from '../../pages/AdminGuestPage';
 import AnnouncementManagement from './AnnouncementManagement';
 import { FiMenu, FiX } from 'react-icons/fi'; // Icons for mobile menu toggle
+import { NavigateProvider } from '../../context/NavigateContext';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -59,7 +60,7 @@ const AdminDashboard = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'overview':
-        return <Overview onTabChange={setActiveTab} />;
+        return <Overview />;
       case 'tutors':
         return <TutorManagement />;
       case 'centers':

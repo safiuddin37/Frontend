@@ -88,9 +88,7 @@ const TutorList = ({ onEdit, onDelete, onProfile }) => {
 
       const data = await response.json();
       setTutors(data);
-      // Filter active tutors initially
-      const activeTutors = data.filter(tutor => tutor.status === 'active');
-      setFilteredTutors(activeTutors);
+      setFilteredTutors(data); // Initialize filtered tutors with all tutors
     } catch (err) {
       setError(err.message || 'Failed to fetch tutors');
     } finally {

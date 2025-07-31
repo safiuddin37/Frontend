@@ -59,7 +59,7 @@ const AdminDashboard = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'overview':
-        return <Overview onTabChange={setActiveTab} />;
+        return <Overview />;
       case 'tutors':
         return <TutorManagement />;
       case 'centers':
