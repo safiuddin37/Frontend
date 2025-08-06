@@ -584,12 +584,11 @@ const AdminManagement = () => {
         
         {/* Activity Stats */}
         {activityStats && (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              <div className="bg-white p-4 rounded-xl shadow">
-                <h3 className="text-sm font-semibold text-gray-600 mb-2 flex items-center">
-                  <FiActivity className="mr-2" />
-                  Total Actions
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div className="bg-white p-4 rounded-xl shadow">
+              <h3 className="text-sm font-semibold text-gray-600 mb-2 flex items-center">
+                <FiActivity className="mr-2" />
+                Total Actions
               </h3>
               <div className="text-2xl font-bold text-primary-600">
                 {(() => {
@@ -612,7 +611,7 @@ const AdminManagement = () => {
                 {(() => {
                   if (!activityStats.adminStats) return 'N/A';
                   const mostActiveAdmin = Object.entries(activityStats.adminStats)
-                    .sort((a, b) => (b[1].count || 0) - (a[1].count || 0))[0];
+                    .sort((a, b) => b[1].count - a[1].count)[0];
                   return mostActiveAdmin ? mostActiveAdmin[0] : 'N/A';
                 })()}
               </div>
@@ -620,10 +619,9 @@ const AdminManagement = () => {
                 {(() => {
                   if (!activityStats.adminStats) return '0 actions';
                   const mostActiveAdmin = Object.entries(activityStats.adminStats)
-                    .sort((a, b) => (b[1].count || 0) - (a[1].count || 0))[0];
+                    .sort((a, b) => b[1].count - a[1].count)[0];
                   return `${mostActiveAdmin ? mostActiveAdmin[1].count : 0} actions`;
                 })()}
-              </div>
             </div>
 
             <div className="bg-white p-4 rounded-xl shadow">
@@ -635,7 +633,7 @@ const AdminManagement = () => {
                 {(() => {
                   if (!activityStats.dailyStats) return 'N/A';
                   const mostActiveDay = Object.entries(activityStats.dailyStats)
-                    .sort((a, b) => (b[1].count || 0) - (a[1].count || 0))[0];
+                    .sort((a, b) => b[1].count - a[1].count)[0];
                   return mostActiveDay ? mostActiveDay[0] : 'N/A';
                 })()}
               </div>
@@ -643,10 +641,9 @@ const AdminManagement = () => {
                 {(() => {
                   if (!activityStats.dailyStats) return '0 actions';
                   const mostActiveDay = Object.entries(activityStats.dailyStats)
-                    .sort((a, b) => (b[1].count || 0) - (a[1].count || 0))[0];
+                    .sort((a, b) => b[1].count - a[1].count)[0];
                   return `${mostActiveDay ? mostActiveDay[1].count : 0} actions`;
                 })()}
-              </div>
             </div>
 
             <div className="bg-white p-4 rounded-xl shadow">
@@ -662,6 +659,7 @@ const AdminManagement = () => {
               </div>
             </div>
           </div>
+        )}
 
         {/* Activity List */}
         <div className="bg-white rounded-xl shadow overflow-hidden">
@@ -774,11 +772,9 @@ const AdminManagement = () => {
             </div>
           )}
         </div>
-        </>
-        )}
       </div>
     </div>
   );
 };
 
-export default AdminManagement;
+export default AdminManagement; 

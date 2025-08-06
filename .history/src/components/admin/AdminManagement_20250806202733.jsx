@@ -774,11 +774,9 @@ const AdminManagement = () => {
             </div>
           )}
         </div>
-        </>
-        )}
       </div>
     </div>
   );
 };
 
-export default AdminManagement;
+export default AdminManagement; 

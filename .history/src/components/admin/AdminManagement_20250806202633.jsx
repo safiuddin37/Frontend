@@ -584,12 +584,11 @@ const AdminManagement = () => {
         
         {/* Activity Stats */}
         {activityStats && (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              <div className="bg-white p-4 rounded-xl shadow">
-                <h3 className="text-sm font-semibold text-gray-600 mb-2 flex items-center">
-                  <FiActivity className="mr-2" />
-                  Total Actions
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div className="bg-white p-4 rounded-xl shadow">
+              <h3 className="text-sm font-semibold text-gray-600 mb-2 flex items-center">
+                <FiActivity className="mr-2" />
+                Total Actions
               </h3>
               <div className="text-2xl font-bold text-primary-600">
                 {(() => {
@@ -662,6 +661,7 @@ const AdminManagement = () => {
               </div>
             </div>
           </div>
+        )}
 
         {/* Activity List */}
         <div className="bg-white rounded-xl shadow overflow-hidden">
@@ -774,11 +774,9 @@ const AdminManagement = () => {
             </div>
           )}
         </div>
-        </>
-        )}
       </div>
     </div>
   );
 };
 
-export default AdminManagement;
+export default AdminManagement; 
