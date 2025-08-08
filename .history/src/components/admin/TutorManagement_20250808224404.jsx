@@ -11,7 +11,6 @@ const TutorManagement = () => {
   const [mode, setMode] = useState('list'); // 'list' | 'add' | 'update' | 'profile'
   const [selectedTutor, setSelectedTutor] = useState(null);
   const { response: tutors } = useGet('/tutors');
-  const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'active' | 'inactive'
 
   // State for form data, errors, etc.
   const [formData, setFormData] = useState({});
@@ -28,11 +27,6 @@ const TutorManagement = () => {
   const handleAdd = () => {
     setFormData({});
     setMode('add');
-  };
-
-  // Handle filter clicks
-  const handleFilterClick = (filter) => {
-    setStatusFilter(filter);
   };
 
   // Password validation helper
@@ -362,90 +356,17 @@ const TutorManagement = () => {
                 borderRadius: '8px',
                 margin: '0 24px'
               }}>
-                <div 
-                  style={{ 
-                    textAlign: 'center', 
-                    paddingRight: '24px', 
-                    borderRight: '1px solid rgba(255, 255, 255, 0.2)',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    opacity: statusFilter === 'all' ? 1 : 0.7,
-                    position: 'relative'
-                  }}
-                  onClick={() => handleFilterClick('all')}
-                  onMouseEnter={(e) => e.target.style.opacity = '1'}
-                  onMouseLeave={(e) => e.target.style.opacity = statusFilter === 'all' ? 1 : 0.7}
-                >
+                <div style={{ textAlign: 'center', paddingRight: '24px', borderRight: '1px solid rgba(255, 255, 255, 0.2)' }}>
                   <h3 style={{ fontSize: '20px', fontWeight: '700', margin: '0' }}>{tutorStats.total}</h3>
-                  <p style={{ fontSize: '12px', margin: '4px 0 0 0' }}>Total Tutors</p>
-                  {statusFilter === 'all' && (
-                    <div style={{
-                      position: 'absolute',
-                      bottom: '-2px',
-                      left: '50%',
-                      transform: 'translateX(-50%)',
-                      width: '20px',
-                      height: '3px',
-                      backgroundColor: 'white',
-                      borderRadius: '2px'
-                    }}></div>
-                  )}
+                  <p style={{ fontSize: '12px', margin: '4px 0 0 0' }}>Total</p>
                 </div>
-                <div 
-                  style={{ 
-                    textAlign: 'center', 
-                    paddingRight: '24px', 
-                    borderRight: '1px solid rgba(255, 255, 255, 0.2)',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    opacity: statusFilter === 'active' ? 1 : 0.7,
-                    position: 'relative'
-                  }}
-                  onClick={() => handleFilterClick('active')}
-                  onMouseEnter={(e) => e.target.style.opacity = '1'}
-                  onMouseLeave={(e) => e.target.style.opacity = statusFilter === 'active' ? 1 : 0.7}
-                >
+                <div style={{ textAlign: 'center', paddingRight: '24px', borderRight: '1px solid rgba(255, 255, 255, 0.2)' }}>
                   <h3 style={{ fontSize: '20px', fontWeight: '700', margin: '0', color: '#4ade80' }}>{tutorStats.active}</h3>
-                  <p style={{ fontSize: '12px', margin: '4px 0 0 0' }}>Active Tutors</p>
-                  {statusFilter === 'active' && (
-                    <div style={{
-                      position: 'absolute',
-                      bottom: '-2px',
-                      left: '50%',
-                      transform: 'translateX(-50%)',
-                      width: '20px',
-                      height: '3px',
-                      backgroundColor: '#4ade80',
-                      borderRadius: '2px'
-                    }}></div>
-                  )}
+                  <p style={{ fontSize: '12px', margin: '4px 0 0 0' }}>Active</p>
                 </div>
-                <div 
-                  style={{ 
-                    textAlign: 'center',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    opacity: statusFilter === 'inactive' ? 1 : 0.7,
-                    position: 'relative'
-                  }}
-                  onClick={() => handleFilterClick('inactive')}
-                  onMouseEnter={(e) => e.target.style.opacity = '1'}
-                  onMouseLeave={(e) => e.target.style.opacity = statusFilter === 'inactive' ? 1 : 0.7}
-                >
+                <div style={{ textAlign: 'center' }}>
                   <h3 style={{ fontSize: '20px', fontWeight: '700', margin: '0', color: '#f87171' }}>{tutorStats.inactive}</h3>
-                  <p style={{ fontSize: '12px', margin: '4px 0 0 0' }}>Inactive Tutors</p>
-                  {statusFilter === 'inactive' && (
-                    <div style={{
-                      position: 'absolute',
-                      bottom: '-2px',
-                      left: '50%',
-                      transform: 'translateX(-50%)',
-                      width: '20px',
-                      height: '3px',
-                      backgroundColor: '#f87171',
-                      borderRadius: '2px'
-                    }}></div>
-                  )}
+                  <p style={{ fontSize: '12px', margin: '4px 0 0 0' }}>Inactive</p>
                 </div>
               </div>
               <button
@@ -485,7 +406,6 @@ const TutorManagement = () => {
               onEdit={handleEdit} 
               onDelete={handleDeleteTutor} 
               onProfile={handleProfile} 
-              statusFilter={statusFilter}
               key={refreshTrigger} // Force re-render on refresh
             />
           </div>

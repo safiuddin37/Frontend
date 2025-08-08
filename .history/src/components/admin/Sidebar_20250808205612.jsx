@@ -50,6 +50,7 @@ const Sidebar = ({ activeTab, onTabChange, className }) => {
     { id: 'announcements', label: 'Announcements', icon: FiFileText },
     { id: 'centers', label: 'Centers', icon: FiMapPin },
     { id: 'reports', label: 'Reports', icon: FiFileText },
+    { id: 'activity-logs', label: 'Activity Logs', icon: FiActivity },
     { id: 'students', label: 'Students', icon: FiUser },
     { id: 'admins', label: 'Admins', icon: FiUserPlus },
     { id: 'supervisors', label: 'Supervisors', icon: FiUserCheck }
