@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FiDownload, FiCalendar, FiFilter, FiSearch, FiX } from 'react-icons/fi';
+import { FiDownload, FiCalendar, FiFilter } from 'react-icons/fi';
 import useGet from '../CustomHooks/useGet';
 import { toast } from 'react-hot-toast';
 import { format } from 'date-fns';
@@ -31,107 +31,11 @@ const ReportManagement = () => {
   const [selectedCenter, setSelectedCenter] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [tutorQuery, setTutorQuery] = useState('');
-  const [centerQuery, setCenterQuery] = useState('');
-  const [isMapOpen, setIsMapOpen] = useState(false);
-  const [mapTutor, setMapTutor] = useState(null);
-  const [mapPoints, setMapPoints] = useState([]);
-  const mapContainerRef = useRef(null);
-  const mapInstanceRef = useRef(null);
-  const leafletRef = useRef(null);
 
   const { response: centers } = useGet('/centers');
   const { response: attendanceReport, loading, error: reportError } = useGet(
     `/attendance/report?month=${selectedMonth}&year=${selectedYear}${selectedCenter ? `&centerId=${selectedCenter}` : ''}`
   );
-
-  const filteredReports = useMemo(() => {
-    if (!attendanceReport) return [];
-    const t = tutorQuery.trim().toLowerCase();
-    const c = centerQuery.trim().toLowerCase();
-    return attendanceReport.filter((r) => {
-      const tutorMatch = !t || r.tutor.name.toLowerCase().includes(t);
-      const centerMatch = !c || (r.center?.name || '').toLowerCase().includes(c);
-      return tutorMatch && centerMatch;
-    });
-  }, [attendanceReport, tutorQuery, centerQuery]);
-
-  const openMapForTutor = async (report) => {
-    try {
-      setIsMapOpen(true);
-      setMapTutor(report.tutor);
-      setMapPoints([]);
-      const token = localStorage.getItem('token');
-      const url = `${import.meta.env.VITE_API_URL}/attendance/tutor-coordinates?month=${selectedMonth}&year=${selectedYear}&tutorId=${report.tutor._id}`;
-      const res = await fetch(url, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error('Failed to load coordinates');
-      const data = await res.json();
-      const points = (data?.[0]?.points) || [];
-      setMapPoints(points);
-    } catch (e) {
-      toast.error(e.message || 'Failed to open map');
-    }
-  };
-
-  useEffect(() => {
-    if (!isMapOpen) return;
-    let isCancelled = false;
-    (async () => {
-      try {
-        if (!leafletRef.current) {
-          const L = await import('leaflet');
-          // Leaflet CSS (vite can handle CSS import dynamically)
-          await import('leaflet/dist/leaflet.css');
-          leafletRef.current = L;
-        }
-        if (isCancelled) return;
-        const L = leafletRef.current;
-
-        // Initialize map once
-        if (mapInstanceRef.current) {
-          mapInstanceRef.current.remove();
-          mapInstanceRef.current = null;
-        }
-
-        const defaultCenter = mapPoints.length ? [mapPoints[0].lat, mapPoints[0].lng] : [20.5937, 78.9629]; // India center fallback
-        const map = L.map(mapContainerRef.current).setView(defaultCenter, mapPoints.length ? 13 : 5);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          maxZoom: 19,
-          attribution: '&copy; OpenStreetMap contributors',
-        }).addTo(map);
-
-        const markers = [];
-        mapPoints.forEach((p) => {
-          const marker = L.circleMarker([p.lat, p.lng], {
-            radius: 6,
-            color: '#2563eb',
-            fillColor: '#3b82f6',
-            fillOpacity: 0.7,
-          }).addTo(map);
-          marker.bindPopup(`${p.date} ${p.time}`);
-          markers.push(marker);
-        });
-
-        if (markers.length) {
-          const group = L.featureGroup(markers);
-          map.fitBounds(group.getBounds().pad(0.2));
-        }
-
-        mapInstanceRef.current = map;
-      } catch (e) {
-        console.error(e);
-      }
-    })();
-    return () => {
-      isCancelled = true;
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
-        mapInstanceRef.current = null;
-      }
-    };
-  }, [isMapOpen, mapPoints]);
 
   const handleDownload = async () => {
     try {
@@ -410,21 +314,7 @@ const ReportManagement = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div className="relative">
-            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              value={tutorQuery}
-              onChange={(e) => setTutorQuery(e.target.value)}
-              placeholder="Search tutors by name..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          
-        </div>
-
-        {filteredReports && filteredReports.length > 0 ? (
+        {attendanceReport && attendanceReport.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -444,7 +334,7 @@ const ReportManagement = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredReports.map((report) => {
+                {attendanceReport.map((report) => {
                   // Calculate days in the selected month
                   const date = new Date(selectedYear, selectedMonth - 1, 1);
                   const lastDay = new Date(selectedYear, selectedMonth, 0).getDate();
@@ -471,7 +361,7 @@ const ReportManagement = () => {
                   const absentPercentage = (absentDays / workdaysToConsider) * 100;
 
                   return (
-                    <tr key={report.tutor._id} className="hover:bg-gray-50 cursor-pointer" onClick={() => openMapForTutor(report)}>
+                    <tr key={report.tutor._id} className="hover:bg-gray-50">
                       <td className="px-4 py-3 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
                           {report.tutor.name}
@@ -515,42 +405,6 @@ const ReportManagement = () => {
           </div>
         )}
       </div>
-
-      {isMapOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white rounded-xl shadow-xl w-11/12 md:w-3/4 lg:w-2/3 max-h-[85vh] flex flex-col">
-            <div className="flex items-center justify-between px-5 py-3 border-b">
-              <div>
-                <h2 className="text-lg font-semibold">Attendance Map</h2>
-                <p className="text-sm text-gray-500">{mapTutor?.name} • {format(new Date(selectedYear, selectedMonth - 1, 1), 'MMMM yyyy')}</p>
-              </div>
-              <button onClick={() => setIsMapOpen(false)} className="p-2 rounded hover:bg-gray-100">
-                <FiX />
-              </button>
-            </div>
-            <div className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="md:col-span-2">
-                <div ref={mapContainerRef} className="w-full h-[55vh] rounded-lg overflow-hidden border" />
-              </div>
-              <div className="space-y-2 overflow-y-auto max-h-[55vh]">
-                <h3 className="font-medium">Marked locations ({mapPoints.length})</h3>
-                <div className="text-xs text-gray-500">Only present days within selected month are shown.</div>
-                <ul className="divide-y">
-                  {mapPoints.map((p, idx) => (
-                    <li key={idx} className="py-2 text-sm">
-                      <div className="font-medium">{p.date} {p.time}</div>
-                      <div className="text-gray-600">Lat: {p.lat.toFixed(6)}, Lng: {p.lng.toFixed(6)}</div>
-                    </li>
-                  ))}
-                  {!mapPoints.length && (
-                    <li className="py-6 text-sm text-gray-500">No coordinates for this month.</li>
-                  )}
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
